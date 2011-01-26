@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChunkEngine", "ChunkEngine\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlockEditor", "BlockEditor\BlockEditor.csproj", "{CCEE44DE-E7D5-43D1-ACA4-53108FE27321}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorldGenerator", "WorldGenerator\WorldGenerator.csproj", "{B7A2BF36-45FB-4A25-853A-3ED09B59086E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{CCEE44DE-E7D5-43D1-ACA4-53108FE27321}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCEE44DE-E7D5-43D1-ACA4-53108FE27321}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCEE44DE-E7D5-43D1-ACA4-53108FE27321}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7A2BF36-45FB-4A25-853A-3ED09B59086E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7A2BF36-45FB-4A25-853A-3ED09B59086E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7A2BF36-45FB-4A25-853A-3ED09B59086E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7A2BF36-45FB-4A25-853A-3ED09B59086E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

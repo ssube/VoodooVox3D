@@ -8,8 +8,13 @@ namespace BoxEngine
     {   
         public class Chunk
         {
-            private List<List<List<Block>>> mBlocks;
+            private Block[,] mBlocks;
 
+			public Chunk(WorldGenerator.Generator gen)
+			{
+				int[,] grid = gen.CreateGrid(4, 4);
+
+			}
         }
     }
 }

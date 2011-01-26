@@ -41,6 +41,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ChunkEngine\ChunkEngine.csproj">
+      <Project>{0E592831-3E0D-4385-BFD6-733F1FDB7FA2}</Project>
+      <Name>ChunkEngine</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RenderEngine\RenderEngine.csproj">
       <Project>{688770DB-4CB6-49D3-9A61-A0345BBA3040}</Project>
       <Name>RenderEngine</Name>
