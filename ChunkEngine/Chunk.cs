@@ -17,7 +17,7 @@ namespace BoxEngine
 				int max = dict.GetTemplateCount();
 				List<int> keys = dict.GetTemplateKeys();
 
-				int[,] grid = gen.CreateGrid(4, 4);
+				int[,] grid = gen.CreateGrid(0, 0, 4, 4);
 
 				for (int px = 0; px < 4; ++px)
 				{

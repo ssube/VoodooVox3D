@@ -8,22 +8,24 @@ namespace BoxEngine
 	{
 		public class Generator
 		{
-			private BasicNoiseGenerator mInternal;
+			private int mSeed;
 
 			public Generator()
 			{
-				mInternal = new BasicNoiseGenerator(System.DateTime.Now.Millisecond, 255);
+				mSeed = System.DateTime.Now.Millisecond;
 			}
 
-			public int[,] CreateGrid(int x, int y)
+			public int[,] CreateGrid(int offsetx, int offsety, int sizex, int sizey)
 			{
-				int[,] values = new int[x,y];
+				Random rng = new Random(offsetx * offsety);
 
-				for (int px = 0; px < x; ++px)
+				int[,] values = new int[sizex, sizey];
+
+				for (int px = 0; px < sizex; ++px)
 				{
-					for (int py = 0; py < y; ++py)
+					for (int py = 0; py < sizey; ++py)
 					{
-						values[px, py] = mInternal.GetPoint(x, y);
+						values[px, py] = rng.Next();
 					}
 				}
 

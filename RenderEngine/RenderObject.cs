@@ -37,10 +37,11 @@ namespace BoxEngine
             public RenderObject(Device device)
             {
                 mDevice = device;
+				mPosition = Matrix.Identity;
 
                 var elems = new[]
                 {
-                    new VertexElement(0,  0, DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.PositionTransformed, 0),
+                    new VertexElement(0,  0, DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Position, 0),
                     new VertexElement(0, 16, DeclarationType.Color,  DeclarationMethod.Default, DeclarationUsage.Color, 0),
                     VertexElement.VertexDeclarationEnd
                 };
@@ -89,6 +90,8 @@ namespace BoxEngine
 
 			public void DrawGeometry()
 			{
+				mDevice.SetRenderState(RenderState.CullMode, Cull.None);
+
                 Result hr = mDevice.BeginScene();
 
                 if (hr.IsSuccess)

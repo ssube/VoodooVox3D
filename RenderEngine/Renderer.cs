@@ -17,6 +17,9 @@ namespace BoxEngine
 
             private Direct3D mObject;
             private Device mDevice;
+			private InputManager mInput;
+
+			private Matrix mProj;
 
             private List<RenderObject> mObjects;
 			private Camera mCamera;
@@ -25,7 +28,7 @@ namespace BoxEngine
             {
                 mObjects = new List<RenderObject>();
 
-				mCamera = new Camera(new Vector3(-50.0f, 10.0f, 15.0f));
+				mCamera = new Camera(new Vector3(-3.0f, 1.0f, 1.5f));
 
                 mForm = new RenderForm("BoxGame Render Engine");
                 mForm.Height = height;
@@ -56,6 +59,12 @@ namespace BoxEngine
                     mForm.Handle, CreateFlags.HardwareVertexProcessing, pp);
 
                 mForm.Show();
+
+				float aspect = width / (float)height;
+				mProj = Matrix.PerspectiveFovLH((float)Math.PI / 4, aspect, 1.0f, 1000.0f);
+				mDevice.SetTransform(TransformState.Projection, mProj);
+
+				mInput = new InputManager(mForm.Handle, mCamera);
             }
 
             public RenderObject CreateObject()
@@ -91,6 +100,8 @@ namespace BoxEngine
                     Console.WriteLine("FPS: {0}", (double)frames / seconds);
                     lastTicks = nowTicks + 10000000;
                     frames = 0;
+
+					//mCamera.Translate(Vector3.UnitY / 5);
                 }
 
                 mDevice.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Orange, 1.0f, 0);

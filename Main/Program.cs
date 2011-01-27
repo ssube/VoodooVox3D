@@ -22,9 +22,12 @@ namespace Main
 
             Vertex[] verts = new Vertex[]
             {
-                new Vertex(320.0f, 080.0f, 0.5f, 1.0f, Color.Green),
-                new Vertex(520.0f, 400.0f, 0.5f, 1.0f, Color.Blue ),
-                new Vertex(120.0f, 400.0f, 0.5f, 1.0f, Color.Red  )
+                new Vertex(0.0f, 0.0f, 1.0f, 1.0f, Color.Green ),
+                new Vertex(1.0f, 0.0f, 1.0f, 1.0f, Color.Blue  ),
+                new Vertex(1.0f, 1.0f, 1.0f, 1.0f, Color.Red   ),
+				new Vertex(0.0f, 1.0f, 1.0f, 1.0f, Color.Purple),
+				new Vertex(0.0f, 1.0f, 0.0f, 1.0f, Color.Peru  ),
+				new Vertex(0.0f, 0.0f, 0.0f, 1.0f, Color.Gold  )
             };
 
             RenderObject tri = mRenderer.CreateObject();
