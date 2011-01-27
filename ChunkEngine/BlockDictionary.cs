@@ -95,6 +95,11 @@ namespace BoxEngine
                 return mTemplates.Count;
             }
 
+			public List<int> GetTemplateKeys()
+			{
+				return new List<int>(mTemplates.Keys);
+			}
+
             public BlockTemplate GetTemplate(int n)
             {
                 return mTemplates[n];

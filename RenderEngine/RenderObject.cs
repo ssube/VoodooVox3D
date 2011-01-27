@@ -25,6 +25,7 @@ namespace BoxEngine
         public class RenderObject
         {
             private VertexBuffer mVB;
+			private Effect mShader;
             private Material mMaterial;
             private Matrix mPosition;
             private Device mDevice;
@@ -76,6 +77,18 @@ namespace BoxEngine
 
             public void Render()
             {
+				if (mMaterial != null)
+				{
+					mDevice.Material = mMaterial;
+				}
+				
+				mDevice.SetTransform(TransformState.World, mPosition);
+
+				DrawGeometry();
+			}
+
+			public void DrawGeometry()
+			{
                 Result hr = mDevice.BeginScene();
 
                 if (hr.IsSuccess)

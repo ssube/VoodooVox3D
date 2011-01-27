@@ -6,7 +6,7 @@ namespace BoxEngine
 {
 	namespace WorldGenerator
 	{
-		private class BasicNoiseGenerator
+		class BasicNoiseGenerator
 		{
 			int mPrimarySeed;
 			int mMax;

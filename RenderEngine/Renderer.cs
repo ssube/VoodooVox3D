@@ -14,13 +14,18 @@ namespace BoxEngine
         public class Renderer
         {
             private RenderForm mForm;
+
             private Direct3D mObject;
             private Device mDevice;
+
             private List<RenderObject> mObjects;
+			private Camera mCamera;
 
             public Renderer(int width, int height)
             {
                 mObjects = new List<RenderObject>();
+
+				mCamera = new Camera(new Vector3(-50.0f, 10.0f, 15.0f));
 
                 mForm = new RenderForm("BoxGame Render Engine");
                 mForm.Height = height;
@@ -64,18 +69,24 @@ namespace BoxEngine
 
             public void StartLoop()
             {
+				matrix = Matrix.Identity;
+
                 MessagePump.Run(mForm, RenderFrame);
             }
 
             long lastTicks;
+			long nowTicks;
             long frames;
+			Matrix matrix;
 
             public void RenderFrame()
             {
                 ++frames;
-                if (DateTime.Now.Ticks > lastTicks)
+
+				nowTicks = DateTime.Now.Ticks;
+
+                if (nowTicks > lastTicks)
                 {
-                    long nowTicks = DateTime.Now.Ticks;
                     double seconds = (double)(nowTicks - lastTicks) / 10000000.0;
                     Console.WriteLine("FPS: {0}", (double)frames / seconds);
                     lastTicks = nowTicks + 10000000;
@@ -83,6 +94,8 @@ namespace BoxEngine
                 }
 
                 mDevice.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Orange, 1.0f, 0);
+
+				mDevice.SetTransform(TransformState.View, mCamera.ViewMatrix);
 
                 foreach (RenderObject obj in mObjects)
                 {

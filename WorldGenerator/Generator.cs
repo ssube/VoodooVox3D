@@ -9,12 +9,10 @@ namespace BoxEngine
 		public class Generator
 		{
 			private BasicNoiseGenerator mInternal;
-			private int mMax;
 
-			public Generator(int max)
+			public Generator()
 			{
-				mMax = max;
-				mInternal = new BasicNoiseGenerator(System.DateTime.Now.Millisecond, max);
+				mInternal = new BasicNoiseGenerator(System.DateTime.Now.Millisecond, 255);
 			}
 
 			public int[,] CreateGrid(int x, int y)
