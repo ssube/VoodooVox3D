@@ -60,7 +60,7 @@ namespace BoxEngine
                 mVertCount = data.Length;
                 mVBSize = mVertCount * mVertSize;
 
-                mVB = new VertexBuffer(mDevice, mVBSize, Usage.WriteOnly, VertexFormat.None, Pool.Default);
+                mVB = new VertexBuffer(mDevice, mVBSize, Usage.WriteOnly, VertexFormat.Position|VertexFormat.Diffuse, Pool.Default);
 
                 DataStream verts = mVB.Lock(0, mVBSize, LockFlags.Discard);
 
@@ -91,6 +91,7 @@ namespace BoxEngine
 			public void DrawGeometry()
 			{
 				mDevice.SetRenderState(RenderState.CullMode, Cull.None);
+				mDevice.SetRenderState(RenderState.ColorVertex, true);
 
                 Result hr = mDevice.BeginScene();
 

@@ -40,7 +40,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
-    <Compile Include="Input.cs" />
     <Compile Include="RenderObject.cs" />
     <Compile Include="Renderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

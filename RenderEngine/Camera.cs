@@ -11,61 +11,47 @@ namespace BoxEngine
 {
 	namespace RenderEngine
 	{
+		public class MathHelper
+		{
+			public static float ToRadian(float input)
+			{
+				return (input / 360.0f) * (2.0f * (float)Math.PI);
+			}
+		}
+
 		public class Camera
 		{
-			/*Matrix mViewMatrix;
+			private Vector3 mPosition;
+			private float mYaw, mPitch;
 
-			public Matrix ViewMatrix
-			{
-				get
-				{
-					return mViewMatrix;
-				}
-				set
-				{
-					mViewMatrix = value;
-				}
-			}*/
-
-			Vector3 mPosition;
-			Vector3 mUp, mRight, mForward;
-
-			float yaw, pitch, row;
-
-			public Camera(Vector3 position)
+			public Camera(Vector3 position, float yaw, float pitch)
 			{
 				mPosition = position;
-				mUp = Vector3.UnitY;
-				mRight = Vector3.UnitX;
-				mForward = Vector3.UnitZ;
+				mYaw = yaw;
+				mPitch = pitch;
 			}
 
 			public void Translate(Vector3 translation)
 			{
-				//mPosition += Vector3.Multiply(translation, new Vector3((float)Math.Sin(yaw), 1.0f, (float)Math.Cos(yaw)));
+				Matrix rotationMatrix = Matrix.RotationYawPitchRoll(MathHelper.ToRadian(mYaw), MathHelper.ToRadian(mPitch), MathHelper.ToRadian(0.0f));
+
+				mPosition += Vector3.TransformCoordinate(translation, rotationMatrix);
 			}
 
-			public void Translate(float x, float y, float z)
+			public void Rotate(float yaw, float pitch)
 			{
-				Matrix translationMatrix = Matrix.Translation(x, y, z);
-				mViewMatrix += translationMatrix;
+				mYaw = ( mYaw + yaw ) % 360;
+				mPitch = (mPitch + pitch) % 360;
 			}
 
-			public void Rotate(Quaternion rotation)
+			public Matrix GetViewMatrix()
 			{
-				Matrix rotationMatrix = Matrix.RotationQuaternion(rotation);
-				mViewMatrix += rotationMatrix;
-			}
+				Matrix rotationMatrix = Matrix.RotationYawPitchRoll(MathHelper.ToRadian(mYaw), MathHelper.ToRadian(mPitch), MathHelper.ToRadian(0.0f));
 
-			public void Rotate(float x, float y, float z, float w)
-			{
-				Rotate(new Quaternion(x, y, z, w));
-			}
+				Vector3 forward = Vector3.TransformCoordinate(Vector3.UnitZ, rotationMatrix);
+				Vector3 target = mPosition + forward;
 
-			public void Rotate(Vector3 axis, float amount)
-			{
-				Matrix rotationMatrix = Matrix.RotationAxis(axis, amount);
-				mViewMatrix += rotationMatrix;
+				return Matrix.LookAtLH(mPosition, target, Vector3.UnitY);
 			}
 		}
 	}
