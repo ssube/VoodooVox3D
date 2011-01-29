@@ -41,7 +41,7 @@ namespace BoxEngine
 			public void Rotate(float yaw, float pitch)
 			{
 				mYaw = ( mYaw + yaw ) % 360;
-				mPitch = (mPitch + pitch) % 360;
+				mPitch = Math.Max(Math.Min(mPitch + pitch, 45.0f), -45.0f);
 			}
 
 			public Matrix GetViewMatrix()

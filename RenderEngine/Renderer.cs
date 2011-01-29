@@ -64,8 +64,10 @@ namespace BoxEngine
 
                 mForm.Show();
 
+				mForm.MouseClick += new MouseEventHandler(mForm_MouseClick);
+
 				float aspect = width / (float)height;
-				mProj = Matrix.PerspectiveFovLH((float)Math.PI / 4, aspect, 1.0f, 1000.0f);
+				mProj = Matrix.PerspectiveFovLH(MathHelper.ToRadian(70.0f), aspect, 1.0f, 1000.0f);
 				mDevice.SetTransform(TransformState.Projection, mProj);
 
 				mTimer = new Timer();
@@ -77,13 +79,18 @@ namespace BoxEngine
 				SlimDX.DirectInput.CooperativeLevel coop = SlimDX.DirectInput.CooperativeLevel.Foreground | SlimDX.DirectInput.CooperativeLevel.Nonexclusive;
 
 				mMouse = new SlimDX.DirectInput.Mouse(mInput);
-				mMouse.SetCooperativeLevel(mForm.Handle, coop);
+				mMouse.SetCooperativeLevel(mForm.Handle, SlimDX.DirectInput.CooperativeLevel.Exclusive | SlimDX.DirectInput.CooperativeLevel.Foreground);
 
 				mKeyboard = new SlimDX.DirectInput.Keyboard(mInput);
 				mKeyboard.SetCooperativeLevel(mForm.Handle, coop);
 
 				mTimer.Start();
             }
+
+			void mForm_MouseClick(object sender, MouseEventArgs e)
+			{
+				if (!running) running = true;
+			}
 
 			~Renderer()
 			{
@@ -105,7 +112,6 @@ namespace BoxEngine
 
             public void StartLoop()
             {
-				matrix = Matrix.Identity;
 
                 MessagePump.Run(mForm, RenderFrame);
             }
@@ -113,23 +119,26 @@ namespace BoxEngine
             long lastTicks;
 			long nowTicks;
             long frames;
-			Matrix matrix;
+
+			bool running = true;
 
             public void RenderFrame()
             {
+				if (!running) return;
+
                 ++frames;
 
 				nowTicks = DateTime.Now.Ticks;
 
                 if (nowTicks > lastTicks)
                 {
-                    double seconds = (double)(nowTicks - lastTicks) / 10000000.0;
+                    double seconds = (double)(nowTicks - lastTicks) / 10000000.0f;
                     Console.WriteLine("FPS: {0}", (double)frames / seconds);
                     lastTicks = nowTicks + 10000000;
                     frames = 0;
                 }
 
-                mDevice.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Orange, 1.0f, 0);
+                mDevice.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
 
 				mDevice.SetTransform(TransformState.View, mCamera.GetViewMatrix());
 
@@ -149,49 +158,89 @@ namespace BoxEngine
 
 			void ProcessMouseInput()
 			{
+				if (!running) return;
+
 				if (mMouse.Acquire().IsFailure) return;
 				if (mMouse.Poll().IsFailure) return;
 
 				SlimDX.DirectInput.MouseState state = mMouse.GetCurrentState();
 				if (Result.Last.IsFailure) return;
 
+				if (!running && state.IsPressed(0))
+				{
+					//mMouse.SetCooperativeLevel(mForm.Handle, SlimDX.DirectInput.CooperativeLevel.Exclusive);
+					mMouse.Acquire();
+					running = true;
+				}
+
 				mCamera.Rotate(state.X / 10.0f, state.Y / 10.0f);
 			}
+
+			float jumpTimer;
+			SlimDX.DirectInput.KeyboardState curState, lastState;
 
 			void ProcessKeyboardInput()
 			{
 				if (mKeyboard.Acquire().IsFailure) return;
 				if (mKeyboard.Poll().IsFailure) return;
 
-				SlimDX.DirectInput.KeyboardState state = mKeyboard.GetCurrentState();
+				curState = mKeyboard.GetCurrentState();
 				if (Result.Last.IsFailure) return;
 
-				if (state.IsPressed(SlimDX.DirectInput.Key.Escape))
+				if (WasPressed(SlimDX.DirectInput.Key.Escape))
 				{
-					mForm.Close();
+					if (running)
+					{
+						mMouse.Unacquire();
+						//mMouse.SetCooperativeLevel(mForm.Handle, SlimDX.DirectInput.CooperativeLevel.Nonexclusive);
+						running = false;
+					}
+					else
+					{
+						mForm.Close();
+					}
 				}
 
 				Vector3 translation = Vector3.Zero;
-				if (state.IsPressed(SlimDX.DirectInput.Key.W))
+				if (curState.IsPressed(SlimDX.DirectInput.Key.W))
 				{
 					translation.Z += 1.0f;
 				}
-				if (state.IsPressed(SlimDX.DirectInput.Key.S))
+				if (curState.IsPressed(SlimDX.DirectInput.Key.S))
 				{
 					translation.Z -= 1.0f;
 				}
-				if (state.IsPressed(SlimDX.DirectInput.Key.A))
+				if (curState.IsPressed(SlimDX.DirectInput.Key.A))
 				{
 					translation.X -= 1.0f;
 				}
-				if (state.IsPressed(SlimDX.DirectInput.Key.D))
+				if (curState.IsPressed(SlimDX.DirectInput.Key.D))
 				{
 					translation.X += 1.0f;
 				}
+				if (WasPressed(SlimDX.DirectInput.Key.Space))
+				{
+					jumpTimer += 1000.0f / 50.0f;
+					if (jumpTimer < 0.3f)
+					{
+						translation.Y += 1.0f;
+					}
+				}
+				else
+				{
+					jumpTimer = 0.0f;
+					//translation.Y -= 0.1f;
+				}
 
 				// Handle gravity here
-
 				mCamera.Translate(translation);
+
+				lastState = curState;
+			}
+
+			private bool WasPressed(SlimDX.DirectInput.Key key)
+			{
+				return (curState.IsPressed(key) && !lastState.IsPressed(key));
 			}
         }
     }

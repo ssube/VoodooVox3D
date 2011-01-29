@@ -92,12 +92,15 @@ namespace BoxEngine
 			{
 				mDevice.SetRenderState(RenderState.CullMode, Cull.None);
 				mDevice.SetRenderState(RenderState.ColorVertex, true);
+				mDevice.SetRenderState(RenderState.Lighting, false);
 
                 Result hr = mDevice.BeginScene();
 
                 if (hr.IsSuccess)
                 {
                     mDevice.VertexDeclaration = mVertDecl;
+					//mDevice.VertexFormat = VertexFormat.Diffuse | VertexFormat.Position;
+
                     hr = mDevice.SetStreamSource(0, mVB, 0, mVertSize);
 
                     if (hr.IsSuccess)
