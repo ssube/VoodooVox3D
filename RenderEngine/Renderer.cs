@@ -28,11 +28,13 @@ namespace BoxEngine
 			private SlimDX.DirectInput.Keyboard mKeyboard;
 			Timer mTimer;
 
+			private SlimDX.DirectInput.CooperativeLevel mCoopFocus, mCoopUnfocus;
+
             public Renderer(int width, int height)
             {
                 mObjects = new List<RenderObject>();
 
-				mCamera = new Camera(new Vector3(-3.0f, 1.0f, 1.5f), 0.0f, 0.0f);
+				mCamera = new Camera(new Vector3(0.0f, 0.0f, -6.0f), 0.0f, 0.0f);
 
                 mForm = new RenderForm("BoxGame Render Engine");
                 mForm.Height = height;
@@ -63,11 +65,12 @@ namespace BoxEngine
                     mForm.Handle, CreateFlags.HardwareVertexProcessing, pp);
 
                 mForm.Show();
+				mForm.Focus();
 
 				mForm.MouseClick += new MouseEventHandler(mForm_MouseClick);
 
 				float aspect = width / (float)height;
-				mProj = Matrix.PerspectiveFovLH(MathHelper.ToRadian(70.0f), aspect, 1.0f, 1000.0f);
+				mProj = Matrix.PerspectiveFovLH(MathHelper.ToRadian(90.0f), aspect, 1.0f, 1000.0f);
 				mDevice.SetTransform(TransformState.Projection, mProj);
 
 				mTimer = new Timer();
@@ -76,13 +79,14 @@ namespace BoxEngine
 
 				mInput = new SlimDX.DirectInput.DirectInput();
 
-				SlimDX.DirectInput.CooperativeLevel coop = SlimDX.DirectInput.CooperativeLevel.Foreground | SlimDX.DirectInput.CooperativeLevel.Nonexclusive;
+				mCoopUnfocus = SlimDX.DirectInput.CooperativeLevel.Foreground | SlimDX.DirectInput.CooperativeLevel.Nonexclusive;
+				mCoopFocus = SlimDX.DirectInput.CooperativeLevel.Foreground | SlimDX.DirectInput.CooperativeLevel.Exclusive;
 
 				mMouse = new SlimDX.DirectInput.Mouse(mInput);
-				mMouse.SetCooperativeLevel(mForm.Handle, SlimDX.DirectInput.CooperativeLevel.Exclusive | SlimDX.DirectInput.CooperativeLevel.Foreground);
+				mMouse.SetCooperativeLevel(mForm.Handle, mCoopFocus);
 
 				mKeyboard = new SlimDX.DirectInput.Keyboard(mInput);
-				mKeyboard.SetCooperativeLevel(mForm.Handle, coop);
+				mKeyboard.SetCooperativeLevel(mForm.Handle, mCoopFocus);
 
 				mTimer.Start();
             }
@@ -168,8 +172,8 @@ namespace BoxEngine
 
 				if (!running && state.IsPressed(0))
 				{
-					//mMouse.SetCooperativeLevel(mForm.Handle, SlimDX.DirectInput.CooperativeLevel.Exclusive);
 					mMouse.Acquire();
+					mKeyboard.Acquire();
 					running = true;
 				}
 
@@ -181,6 +185,8 @@ namespace BoxEngine
 
 			void ProcessKeyboardInput()
 			{
+				if (!running) return;
+
 				if (mKeyboard.Acquire().IsFailure) return;
 				if (mKeyboard.Poll().IsFailure) return;
 
@@ -192,7 +198,7 @@ namespace BoxEngine
 					if (running)
 					{
 						mMouse.Unacquire();
-						//mMouse.SetCooperativeLevel(mForm.Handle, SlimDX.DirectInput.CooperativeLevel.Nonexclusive);
+						mKeyboard.Unacquire();
 						running = false;
 					}
 					else

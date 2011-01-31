@@ -10,18 +10,33 @@ namespace BoxEngine
         [Serializable]
         public class BlockTemplate
         {
-			private Dictionary<String, object> mAttributes;
+			protected Dictionary<String, object> mAttributes;
 
 			public BlockTemplate()
 			{
 				mAttributes = new Dictionary<string, object>();
 			}
 
-			public object GetAttribute(String key)
+			public BlockTemplate(BlockTemplate template)
+			{
+				mAttributes = template.mAttributes;
+			}
+
+			public T GetAttribute<T>(String key)
 			{
 				object value = null;
 				mAttributes.TryGetValue(key, out value);
-				return value;
+				try
+				{
+					T real = (T)value;
+					return real;
+				}
+				catch (System.Exception ex)
+				{
+					Console.WriteLine("Unable to cast block attribute {0} from {1} to {2}, error:\n\t{3}", key, typeof(T).Name, value.GetType().Name, ex.Message);
+					object error = null;					
+					return (T)error;
+				}
 			}
 
 			public void SetAttribute(String key, object value)
@@ -41,14 +56,11 @@ namespace BoxEngine
 		}
 
         [Serializable]
-        public class Block
+        public class Block : BlockTemplate
         {
-            private BlockTemplate mTemplate;
-
-            public Block(BlockTemplate template) 
-            {
-                mTemplate = template;
-            }
+			public Block(BlockTemplate template) : base(template)
+			{
+			}
         }
     }
 }

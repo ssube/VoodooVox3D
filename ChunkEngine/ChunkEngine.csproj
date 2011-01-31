@@ -34,6 +34,7 @@
     <Reference Include="SlimDX, Version=2.0.10.43, Culture=neutral, PublicKeyToken=b1b0c32fd1ffe4f9, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -43,9 +44,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WorldGenerator\WorldGenerator.csproj">
-      <Project>{B7A2BF36-45FB-4A25-853A-3ED09B59086E}</Project>
+    <ProjectReference Include="..\NativeWorldLibrary\NativeWorldLibrary.vcproj">
+      <Project>{49C7E291-39B2-4343-BD80-7A49B7EC04F0}</Project>
       <Name>WorldGenerator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RenderEngine\RenderEngine.csproj">
+      <Project>{688770DB-4CB6-49D3-9A61-A0345BBA3040}</Project>
+      <Name>RenderEngine</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

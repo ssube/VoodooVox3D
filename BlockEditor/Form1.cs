@@ -136,23 +136,55 @@ namespace BlockEditor
 						switch (attrType)
 						{
 							case 's':
-								attrValue = Convert.ToString(cell.Value);
+								try
+								{
+									attrValue = Convert.ToString(cell.Value);
+								}
+								catch (Exception ex)
+								{
+									MessageBox.Show(String.Format("Error converting cell {0}:{1} to string.", cell.RowIndex, cell.ColumnIndex));
+									attrValue = String.Empty;
+								}
 								break;
 							case 'i':
-								attrValue = Convert.ToInt32(cell.Value);
+								try
+								{
+									attrValue = Convert.ToInt32(cell.Value);
+								}
+								catch (Exception ex)
+								{
+									MessageBox.Show(String.Format("Error converting cell {0}:{1} to int.", cell.RowIndex, cell.ColumnIndex));
+									attrValue = 0;
+								}
 								break;
 							case 'f':
-								attrValue = Convert.ToSingle(cell.Value);
+								try
+								{
+									attrValue = Convert.ToSingle(cell.Value);
+								}
+								catch (Exception ex)
+								{
+									MessageBox.Show(String.Format("Error converting cell {0}:{1} to float.", cell.RowIndex, cell.ColumnIndex));
+									attrValue = 0.0f;
+								}
 								break;
 							case 'b':
-								attrValue = Convert.ToBoolean(cell.Value);
+								try
+								{
+									attrValue = Convert.ToBoolean(cell.Value);
+								}
+								catch (Exception ex)
+								{
+									MessageBox.Show(String.Format("Error converting cell {0}:{1} to boolean.", cell.RowIndex, cell.ColumnIndex));
+									attrValue = false;
+								}
 								break;
 						}
 
 						t.SetAttribute(name, attrValue);
 					}
 
-					mDictionary.SetTemplate((int)t.GetAttribute("iID"), t);
+					mDictionary.SetTemplate(t.GetAttribute<int>("iID"), t);
 				}
 			}
 		}
@@ -162,7 +194,7 @@ namespace BlockEditor
 			blockDetails.Columns.Add("iID", "iID");
 			blockDetails.Columns.Add("sName", "sName");
 
-			blockDetails.Columns.Add("iTexture", "iTexture");
+			blockDetails.Columns.Add("fTexture", "fTexture");
 			blockDetails.Columns.Add("bOcclude", "bOcclude");
 
 			blockDetails.Columns.Add("iValue", "iValue");

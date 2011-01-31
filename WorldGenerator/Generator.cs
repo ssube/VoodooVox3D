@@ -8,24 +8,27 @@ namespace BoxEngine
 	{
 		public class Generator
 		{
-			private int mSeed;
+			private WorldGenerator.NativeGenerator mNative;
 
 			public Generator()
 			{
-				mSeed = System.DateTime.Now.Millisecond;
+				mNative = new WorldGenerator.NativeGenerator();
+				mNative.AddID(0);
+				mNative.AddID(1);
+				mNative.AddID(2);
 			}
 
 			public int[,] CreateGrid(int offsetx, int offsety, int sizex, int sizey)
 			{
-				Random rng = new Random(offsetx * offsety);
-
 				int[,] values = new int[sizex, sizey];
 
 				for (int px = 0; px < sizex; ++px)
 				{
 					for (int py = 0; py < sizey; ++py)
 					{
-						values[px, py] = rng.Next();
+						int fullx = offsetx + px;
+
+						values[px, py] = mNative.GetPoint(offsetx + px, offsety + py, 0.0f);
 					}
 				}
 
