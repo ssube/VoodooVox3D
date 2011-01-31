@@ -11,7 +11,7 @@ namespace BoxEngine
 	{
 		public class Chunk
 		{
-			//private WorldGenerator.Generator mGen;
+			private WorldGenerator.Generator mGen;
 			private Block[, ,] mBlocks;
 
 			// System memory geometry shadow buffer
@@ -20,10 +20,10 @@ namespace BoxEngine
 			public Chunk(BlockDictionary dict)
 			{
 				mVerts = new List<Vertex>();
-				//mGen = new BoxEngine.WorldGenerator.Generator();
+				mGen = new BoxEngine.WorldGenerator.Generator(13);
 				mBlocks = new Block[4, 4, 4];
 
-				Random rnd = new Random();
+				//Random rnd = new Random();
 
 				int max = dict.GetTemplateCount();
 				List<int> keys = dict.GetTemplateKeys();
@@ -35,7 +35,8 @@ namespace BoxEngine
 						for (int pz = 0; pz < 4; ++pz)
 						{
 							//double rawvalue = mGen.GetPoint((float)px, (float)py, 10.0f);
-							int id = rnd.Next() % max;
+							float raw = mGen.GetPoint(px * 4.0f, py * 4.0f, pz * 4.0f); //rnd.Next() % max;
+							int id = (int)( raw * max );
 
 							BlockTemplate pt = dict.GetTemplate(keys[id]);
 

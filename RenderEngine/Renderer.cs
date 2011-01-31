@@ -241,6 +241,8 @@ namespace BoxEngine
 				// Handle gravity here
 				mCamera.Translate(translation);
 
+				//mCamera.Position = mWorld.ProcessCollision(mCamera.Position);
+
 				lastState = curState;
 			}
 

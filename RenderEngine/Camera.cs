@@ -24,6 +24,14 @@ namespace BoxEngine
 			private Vector3 mPosition;
 			private float mYaw, mPitch;
 
+			public Vector3 Position
+			{
+				get
+				{
+					return mPosition;
+				}
+			}
+
 			public Camera(Vector3 position, float yaw, float pitch)
 			{
 				mPosition = position;
