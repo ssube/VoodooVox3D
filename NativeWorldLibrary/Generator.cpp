@@ -1,77 +1,67 @@
-using namespace System;
-using namespace System::Collections::Generic;
 
-//#include <noise/noise.h>
-//#include <noise/module/perlin.h>
+#include "Generator.hpp"
 
-//#pragma comment(lib, "libnoise.lib")
+#define NOISESIZE 16
+#define INDEX(x, y, z) ((x*NOISESIZE*NOISESIZE)+(y*NOISESIZE)+z)
 
-namespace BoxEngine
+Generator::Generator(int seed)
 {
-	namespace WorldGenerator
+	mValues = new int[NOISESIZE * NOISESIZE * NOISESIZE];
+
+	// Fill the noise bin
+	srand(seed);
+	
+	for ( int x = 0; x < 16; ++x )
 	{
-		public ref class Generator
+		for ( int y = 0; y < 16; ++y )
 		{
-		public:
-			Generator(int seed)
+			for ( int z = 0; z < 16; ++z )
 			{
-				mValues = gcnew cli::array<int, 3>(16, 16, 16);
-
-				// Fill the noise bin
-				Random ^ rnd = gcnew System::Random(seed);
-
-				for ( int x = 0; x < 16; ++x )
-				{
-					for ( int y = 0; y < 16; ++y )
-					{
-						for ( int z = 0; z < 16; ++z )
-						{
-							mValues[x, y, z] = rnd->Next();
-						}
-					}
-				}
+				mValues[INDEX(x, y, z)] = abs(rand()) % 0xFFFF;
 			}
-
-			~Generator()
-			{
-			}
-
-			float GetPoint(float x, float y, float z)
-			{
-				int cellx = (int)Math::Floor(x); int nextx = cellx + 1;
-				int celly = (int)Math::Floor(y); int nexty = celly + 1;
-				int cellz = (int)Math::Floor(z); int nextz = cellz + 1;
-
-				cellx = cellx % 16; nextx = nextx % 16;
-				celly = celly % 16; nexty = nexty % 16;
-				cellz = cellz % 16; nextz = nextz % 16;
-
-				float offx = x - cellx;
-				float offy = y - celly;
-				float offz = z - cellz;
-
-				float tx = Interp(ToFloat(mValues[cellx, celly, cellz]), ToFloat(mValues[cellx+1, celly, cellz]), offx);
-				float ty = Interp(ToFloat(mValues[cellx, celly, cellz]), ToFloat(mValues[cellx, celly+1, cellz]), offy);
-				float tz = Interp(ToFloat(mValues[cellx, celly, cellz]), ToFloat(mValues[cellx, celly, cellz+1]), offz);
-
-				return ( tx + ty + tz ) / 3.0f;
-			}
-
-			private:
-				//noise::module::Perlin * mPerlin;
-				cli::array<int, 3> ^ mValues;
-
-				float Interp(float a, float b, float x)
-				{
-					float ft = x * Math::PI;
-					float f = ( 1 - Math::Cos(ft)) * 0.5;
-					return ( a * ( 1-f) ) + ( b * f );
-				}
-
-				float ToFloat(int i)
-				{
-					return ( (float)i / (float)0x7FFFFFFF );
-				}
-		};
+		}
 	}
+}
+
+Generator::~Generator()
+{
+	delete[] mValues;
+}
+
+float Generator::GetPoint(float x, float y, float z)
+{
+	int cellx = floor(x); int nextx = cellx + 1;
+	int celly = floor(y); int nexty = celly + 1;
+	int cellz = floor(z); int nextz = cellz + 1;
+
+	cellx = cellx % NOISESIZE; nextx = nextx % NOISESIZE;
+	celly = celly % NOISESIZE; nexty = nexty % NOISESIZE;
+	cellz = cellz % NOISESIZE; nextz = nextz % NOISESIZE;
+
+	float offx = x - cellx;
+	float offy = y - celly;
+	float offz = z - cellz;
+
+	size_t offset0 = INDEX(x, y, z);
+	size_t offsetX = offset0 + ( NOISESIZE * NOISESIZE );
+	size_t offsetY = offset0 + NOISESIZE;
+	size_t offsetZ = offset0 + 1;
+
+	float tx = Interp(ToFloat(mValues[offset0]), ToFloat(mValues[offsetX]), offx);
+	float ty = Interp(ToFloat(mValues[offset0]), ToFloat(mValues[offsetY]), offy);
+	float tz = Interp(ToFloat(mValues[offset0]), ToFloat(mValues[offsetZ]), offz);
+
+	return ( tx + ty + tz ) / 3.0f;
+}
+
+float Generator::Interp(float a, float b, float x)
+{
+	float ft = x * 3.14159f;
+	float f = ( 1 - cos(ft) ) * 0.5;
+	return ( a * ( 1 - f ) ) + ( b * f );
+}
+
+float Generator::ToFloat(int i)
+{
+	return ( (float)i / (float)0xFFFF );
 }

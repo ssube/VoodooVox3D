@@ -43,12 +43,6 @@
     <Compile Include="Chunk.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\NativeWorldLibrary\NativeWorldLibrary.vcproj">
-      <Project>{49C7E291-39B2-4343-BD80-7A49B7EC04F0}</Project>
-      <Name>WorldGenerator</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -6,9 +6,11 @@
 LPDIRECT3D9 dxObj;
 LPDIRECT3DDEVICE9 dxDevice;
 RenderObject * obj = NULL, * obj2 = NULL;
+bool render = true;
 
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void Render();
+void Cleanup();
 
 INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in_opt LPSTR lpCmdLine, __in int nShowCmd )
 {
@@ -78,6 +80,13 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+
+		if ( render )
+		{
+			Render();
+		} else {
+			Sleep(10);
+		}
 	}
 
 	return 0;
@@ -85,14 +94,27 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if ( render && 
+		( msg == WM_SIZE && wParam == SIZE_MINIMIZED ) ||
+		( msg == WM_ENTERSIZEMOVE ) || ( msg == WM_ENTERMENULOOP ) )
+	{
+		render = false;
+	} else if ( !render &&
+		( msg == WM_SETCURSOR && wParam != SIZE_MINIMIZED ) ||
+		( msg == WM_EXITSIZEMOVE ) || ( msg == WM_EXITMENULOOP ) ||
+		( msg == WM_ACTIVATEAPP && wParam == TRUE ) )
+	{
+		render = true;
+	}
+
 	switch ( msg )
 	{
 	case WM_DESTROY:
+		Cleanup();
 		PostQuitMessage(0);
 		return 0;
 	case WM_PAINT:
-		Render();
-		ValidateRect(hWnd, NULL);
+		//ValidateRect(hWnd, NULL);
 		return 0;
 	}
 
