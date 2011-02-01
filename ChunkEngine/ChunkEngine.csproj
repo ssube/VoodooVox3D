@@ -48,10 +48,6 @@
       <Project>{49C7E291-39B2-4343-BD80-7A49B7EC04F0}</Project>
       <Name>WorldGenerator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RenderEngine\RenderEngine.csproj">
-      <Project>{688770DB-4CB6-49D3-9A61-A0345BBA3040}</Project>
-      <Name>RenderEngine</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
