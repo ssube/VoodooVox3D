@@ -3,6 +3,8 @@
 #include "VertexHeader.hpp"
 #include "RenderObject.hpp"
 
+#include "BlockDictionary.hpp"
+
 LPDIRECT3D9 dxObj;
 LPDIRECT3DDEVICE9 dxDevice;
 RenderObject * obj = NULL, * obj2 = NULL;
