@@ -16,6 +16,7 @@ Camera * mCamera;
 InputManager * mInput;
 DWORD mLastTicks, mTicks;
 float mFrameTime;
+D3DMATRIX mProj;
 
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void Render();
@@ -57,10 +58,10 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 
 	D3DVERTEXELEMENT9 vertElems[] = 
 	{
-		{0,  0, D3DDECLTYPE_FLOAT4,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-		{0, 16, D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
-		{0, 28, D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
-		{0, 40, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,    0},
+		{0,  0, D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		{0, 12, D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
+		{0, 24, D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+		{0, 36, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,    0},
 		D3DDECL_END()
 	};
 
@@ -68,9 +69,9 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 
 	Vertex vertices[] =
 	{
-		{ 1500.0f,   50.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffff0000, },
-		{ 2500.0f, 2500.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff00ff00, },
-		{   50.0f, 2500.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff0000ff, },
+		{ 150.0f,  50.0f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffff0000, },
+		{ 250.0f, 250.0f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff00ff00, },
+		{  50.0f, 200.0f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff0000ff, },
 	};
 
 	obj = new RenderObject(dxDevice, VertexDecl);
@@ -87,6 +88,9 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 
 	mCamera = new Camera();
 	mInput = new InputManager(hWnd);
+
+	D3DXMatrixPerspectiveFovLH((D3DXMATRIX*)&mProj, D3DXToRadian(90.0f), 640.0f/480.0f, 1.0f, 1000.0f);
+	dxDevice->SetTransform(D3DTS_PROJECTION, &mProj);
 
 	// ----------
 	ShowWindow(hWnd, nShowCmd);
@@ -171,8 +175,6 @@ void Render()
 
 	dxDevice->Present(NULL, NULL, NULL, NULL);
 }
-
-long lastticks;
 
 void Input()
 {
