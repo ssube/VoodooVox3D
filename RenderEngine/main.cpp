@@ -2,6 +2,8 @@
 #include "Includes.hpp"
 #include "VertexHeader.hpp"
 #include "RenderObject.hpp"
+#include "Camera.hpp"
+#include "InputManager.hpp"
 
 #include "BlockDictionary.hpp"
 #include "Chunk.hpp"
@@ -10,9 +12,14 @@ LPDIRECT3D9 dxObj;
 LPDIRECT3DDEVICE9 dxDevice;
 RenderObject * obj = NULL, * obj2 = NULL;
 bool render = true;
+Camera * mCamera;
+InputManager * mInput;
+DWORD mLastTicks, mTicks;
+float mFrameTime;
 
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void Render();
+void Input();
 void Cleanup();
 
 INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in_opt LPSTR lpCmdLine, __in int nShowCmd )
@@ -61,17 +68,13 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 
 	Vertex vertices[] =
 	{
-		{ 150.0f,  50.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffff0000, },
-		{ 250.0f, 250.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff00ff00, },
-		{  50.0f, 250.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff0000ff, },
+		{ 1500.0f,   50.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffff0000, },
+		{ 2500.0f, 2500.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff00ff00, },
+		{   50.0f, 2500.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff0000ff, },
 	};
 
 	obj = new RenderObject(dxDevice, VertexDecl);
 	obj->SetGeometry(3, vertices);
-
-	vertices[0].x =  50.0f; vertices[0].y = 150.0f; vertices[0].z = 0.6f;
-	vertices[1].x =  50.0f; vertices[1].y =  50.0f; vertices[0].z = 0.3f;
-	vertices[2].x = 250.0f; vertices[2].y =  50.0f; vertices[2].z = 0.5f;
 
 	// Block/chunk stuff
 	BlockDictionary * dict = BlockDictionary::FromFile("blocks.dict");
@@ -81,6 +84,9 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 
 	obj2 = new RenderObject(dxDevice, VertexDecl);
 	obj2->SetGeometry(chunkVertCount, chunkVerts);
+
+	mCamera = new Camera();
+	mInput = new InputManager(hWnd);
 
 	// ----------
 	ShowWindow(hWnd, nShowCmd);
@@ -92,8 +98,14 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 
+		mLastTicks = mTicks;
+		mTicks = GetTickCount();
+		DWORD diff = (mTicks>mLastTicks) ? mTicks - mLastTicks : mTicks;
+		mFrameTime = (float)(diff) / 1000.0f;
+
 		if ( render )
 		{
+			Input();
 			Render();
 		} else {
 			Sleep(10);
@@ -110,12 +122,14 @@ LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		( msg == WM_ENTERSIZEMOVE ) || ( msg == WM_ENTERMENULOOP ) )
 	{
 		render = false;
+		mInput->Drop();
 	} else if ( !render &&
-		( msg == WM_SETCURSOR && wParam != SIZE_MINIMIZED ) ||
+		( msg == WM_SIZE && wParam != SIZE_MINIMIZED ) ||
 		( msg == WM_EXITSIZEMOVE ) || ( msg == WM_EXITMENULOOP ) ||
 		( msg == WM_ACTIVATEAPP && wParam == TRUE ) )
 	{
 		render = true;
+		mInput->Grab();
 	}
 
 	switch ( msg )
@@ -145,6 +159,8 @@ void Render()
 	present();
 	*/
 
+	dxDevice->SetTransform(D3DTS_VIEW, mCamera->GetViewMatrix());
+
 	dxDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(32, 32, 96), 1.0f, 0);	
 
 	dxDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
@@ -154,6 +170,42 @@ void Render()
 	obj2->Render();
 
 	dxDevice->Present(NULL, NULL, NULL, NULL);
+}
+
+long lastticks;
+
+void Input()
+{
+	mInput->Poll();
+
+	if ( mInput->KeyDown(DIK_ESCAPE) )
+	{
+		mInput->Drop();
+		render = false;
+		return;
+	}
+
+	D3DXVECTOR3 translate(0, 0, 0);
+
+	if ( mInput->KeyDown(DIK_W) )
+	{
+		translate.z += 2.0f * mFrameTime;
+	}
+	if ( mInput->KeyDown(DIK_S) )
+	{
+		translate.z -= 2.0f * mFrameTime;
+	}
+	if ( mInput->KeyDown(DIK_A) )
+	{
+		translate.x -= 2.0f * mFrameTime;
+	}
+	if ( mInput->KeyDown(DIK_D) )
+	{
+		translate.x += 2.0f * mFrameTime;
+	}
+
+	mCamera->Translate(translate);
+	mCamera->Rotate(mInput->MouseX(), mInput->MouseY());
 }
 
 VOID Cleanup()

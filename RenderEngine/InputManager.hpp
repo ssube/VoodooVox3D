@@ -6,13 +6,24 @@
 class InputManager
 {
 public:
-	InputManager(void);
+	InputManager(HWND hWnd);
 	~InputManager(void);
 
 	void Grab();
 	void Drop();
 
+	void Poll();
+
+	bool KeyDown(DWORD key);
+	bool KeyPress(DWORD key);
+
+	LONG MouseX();
+	LONG MouseY();
+
 private:
 	LPDIRECTINPUT mDInput;
-	LPDIRECTINPUTDEVICEW mKeyboard, mMouse;
+	LPDIRECTINPUTDEVICE mKeyboard, mMouse;
+
+	DIMOUSESTATE mLastMouseState, mMouseState;
+	char mLastKeyboardState[256], mKeyboardState[256];
 };
