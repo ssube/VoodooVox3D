@@ -38,7 +38,7 @@ void RenderObject::Render()
 	}
 }
 
-void RenderObject::SetGeometry(int vertCount, Vertex *verts)
+void RenderObject::SetGeometry(size_t vertCount, Vertex * verts)
 {
 	mVertCount = vertCount;
 

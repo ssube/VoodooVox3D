@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\NativeWorldLibrary&quot;;&quot;$(SolutionDir)\RenderEngine&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;CHUNKENGINE_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -114,6 +115,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\NativeWorldLibrary&quot;;&quot;$(SolutionDir)\RenderEngine&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;CHUNKENGINE_EXPORTS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -171,11 +173,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Block.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\BlockDictionary.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\BlockTemplate.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Chunk.cpp"
 				>
 			</File>
 		</Filter>
@@ -185,11 +195,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\Block.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\BlockDictionary.hpp"
 				>
 			</File>
 			<File
 				RelativePath=".\BlockTemplate.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Chunk.hpp"
 				>
 			</File>
 			<File

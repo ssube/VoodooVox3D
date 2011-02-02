@@ -1,5 +1,5 @@
 
-#include "Generator.hpp"
+#include "WorldGenerator.hpp"
 
 #define NOISESIZE 16
 #define INDEX(x, y, z) ((x*NOISESIZE*NOISESIZE)+(y*NOISESIZE)+z)

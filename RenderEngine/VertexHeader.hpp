@@ -5,7 +5,9 @@
 
 struct Vertex
 {
-	FLOAT x, y, z, rhw;
+	FLOAT x, y, z, w;
+	FLOAT nx, ny, nz;
+	FLOAT tu, tv, tw;
 	DWORD color;
 };
 

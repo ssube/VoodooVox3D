@@ -4,6 +4,7 @@
 #include "RenderObject.hpp"
 
 #include "BlockDictionary.hpp"
+#include "Chunk.hpp"
 
 LPDIRECT3D9 dxObj;
 LPDIRECT3DDEVICE9 dxDevice;
@@ -49,8 +50,10 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 
 	D3DVERTEXELEMENT9 vertElems[] = 
 	{
-		{0,  0, D3DDECLTYPE_FLOAT4,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITIONT, 0},
-		{0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,     0},
+		{0,  0, D3DDECLTYPE_FLOAT4,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		{0, 16, D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
+		{0, 28, D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+		{0, 40, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,    0},
 		D3DDECL_END()
 	};
 
@@ -58,9 +61,9 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 
 	Vertex vertices[] =
 	{
-		{ 150.0f,  50.0f, 0.5f, 1.0f, 0xffff0000, },
-		{ 250.0f, 250.0f, 0.5f, 1.0f, 0xff00ff00, },
-		{  50.0f, 250.0f, 0.5f, 1.0f, 0xff0000ff, },
+		{ 150.0f,  50.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffff0000, },
+		{ 250.0f, 250.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff00ff00, },
+		{  50.0f, 250.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff0000ff, },
 	};
 
 	obj = new RenderObject(dxDevice, VertexDecl);
@@ -70,8 +73,14 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 	vertices[1].x =  50.0f; vertices[1].y =  50.0f; vertices[0].z = 0.3f;
 	vertices[2].x = 250.0f; vertices[2].y =  50.0f; vertices[2].z = 0.5f;
 
+	// Block/chunk stuff
+	BlockDictionary * dict = BlockDictionary::FromFile("blocks.dict");
+	Chunk * nChunk = new Chunk(dict);
+	Vertex * chunkVerts = nChunk->GetGeometry();
+	size_t chunkVertCount = nChunk->GetGeometryCount(); 
+
 	obj2 = new RenderObject(dxDevice, VertexDecl);
-	obj2->SetGeometry(3, vertices);
+	obj2->SetGeometry(chunkVertCount, chunkVerts);
 
 	// ----------
 	ShowWindow(hWnd, nShowCmd);

@@ -11,10 +11,10 @@ public:
 
 	void Render();
 
-	void SetGeometry(int vertCount, Vertex * verts);
+	void SetGeometry(size_t vertCount, Vertex * verts);
 
 private:
-	int mVertCount;
+	size_t mVertCount;
 
 	LPDIRECT3DDEVICE9 mDevice;
 	LPDIRECT3DVERTEXBUFFER9 mVertBuffer;

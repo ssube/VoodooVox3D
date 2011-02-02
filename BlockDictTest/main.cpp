@@ -9,19 +9,22 @@ int main(int argc, char * argv[])
 
 	printf("\tAdding attributes (i, f, b)\n");
 	dict->AddAttribute("iID");
-	dict->AddAttribute("fTest");
-	dict->AddAttribute("bStuff");
+	dict->AddAttribute("bOcclude");
+	dict->AddAttribute("fTexture");
+	dict->AddAttribute("sName");
 
 	printf("\tCreating template\n");
 	BlockTemplate * temp1 = new BlockTemplate();
 	temp1->AddAttribute("iID", 1);
-	temp1->AddAttribute("fTest", 1.0f);
-	temp1->AddAttribute("bStuff", false);
+	temp1->AddAttribute("bOcclude", false);
+	temp1->AddAttribute("fTexture", 1.0f);
+	temp1->AddAttribute("sName", "Noodles");
 
 	BlockTemplate * temp2 = new BlockTemplate();
 	temp2->AddAttribute("iID", 13);
-	temp2->AddAttribute("fTest", 99.0f);
-	temp2->AddAttribute("bStuff", true);
+	temp2->AddAttribute("bOcclude", true);
+	temp2->AddAttribute("fTexture", 99.0f);
+	temp2->AddAttribute("sName", "Stone");
 
 	printf("\tAdding templates\n");
 	dict->AddTemplate(temp1);
@@ -36,4 +39,6 @@ int main(int argc, char * argv[])
 	BlockDictionary * dict2 = BlockDictionary::Deserialize(dictBuffer);
 
 	printf("Test complete.\n");
+
+	dict2->ToFile("blocks.dict");
 }
