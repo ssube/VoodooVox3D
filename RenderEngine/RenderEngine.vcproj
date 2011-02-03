@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="RenderEngine"
+	Name="BoxGame"
 	ProjectGUID="{8124F62C-98DA-4E21-8B94-A0E521D51E88}"
 	RootNamespace="RenderEngine"
 	Keyword="Win32Proj"
@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9d.lib d3dx9.lib dinput8.lib dxguid.lib ChunkEngine.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dxguid.lib ChunkEngine.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(TargetDir)&quot;"
 				GenerateDebugInformation="true"
@@ -204,7 +204,23 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\ChunkEngine\Block.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\ChunkEngine\BlockDictionary.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\ChunkEngine\BlockTemplate.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Camera.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\ChunkEngine\Chunk.cpp"
 				>
 			</File>
 			<File
@@ -227,6 +243,10 @@
 				RelativePath=".\VertexHeader.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\NativeWorldLibrary\WorldGenerator.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -234,7 +254,23 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\ChunkEngine\Block.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\ChunkEngine\BlockDictionary.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\ChunkEngine\BlockTemplate.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Camera.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\ChunkEngine\Chunk.hpp"
 				>
 			</File>
 			<File
@@ -251,6 +287,10 @@
 			</File>
 			<File
 				RelativePath=".\VertexHeader.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NativeWorldLibrary\WorldGenerator.hpp"
 				>
 			</File>
 		</Filter>

@@ -1,22 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WorldGenerator", "NativeWorldLibrary\NativeWorldLibrary.vcproj", "{49C7E291-39B2-4343-BD80-7A49B7EC04F0}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderEngine", "RenderEngine\RenderEngine.vcproj", "{8124F62C-98DA-4E21-8B94-A0E521D51E88}"
-	ProjectSection(ProjectDependencies) = postProject
-		{1E780E46-2B6D-4FAB-A50F-583A04C8FDE3} = {1E780E46-2B6D-4FAB-A50F-583A04C8FDE3}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChunkEngine", "ChunkEngine\ChunkEngine.vcproj", "{1E780E46-2B6D-4FAB-A50F-583A04C8FDE3}"
-	ProjectSection(ProjectDependencies) = postProject
-		{49C7E291-39B2-4343-BD80-7A49B7EC04F0} = {49C7E291-39B2-4343-BD80-7A49B7EC04F0}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoxGame", "RenderEngine\RenderEngine.vcproj", "{8124F62C-98DA-4E21-8B94-A0E521D51E88}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlockDictTest", "BlockDictTest\BlockDictTest.vcproj", "{7ACD5E41-5EC7-4ACC-B89A-65426765FD21}"
-	ProjectSection(ProjectDependencies) = postProject
-		{1E780E46-2B6D-4FAB-A50F-583A04C8FDE3} = {1E780E46-2B6D-4FAB-A50F-583A04C8FDE3}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,16 +15,6 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{49C7E291-39B2-4343-BD80-7A49B7EC04F0}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{49C7E291-39B2-4343-BD80-7A49B7EC04F0}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{49C7E291-39B2-4343-BD80-7A49B7EC04F0}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{49C7E291-39B2-4343-BD80-7A49B7EC04F0}.Debug|Win32.ActiveCfg = Debug|Win32
-		{49C7E291-39B2-4343-BD80-7A49B7EC04F0}.Debug|Win32.Build.0 = Debug|Win32
-		{49C7E291-39B2-4343-BD80-7A49B7EC04F0}.Release|Any CPU.ActiveCfg = Release|Win32
-		{49C7E291-39B2-4343-BD80-7A49B7EC04F0}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{49C7E291-39B2-4343-BD80-7A49B7EC04F0}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{49C7E291-39B2-4343-BD80-7A49B7EC04F0}.Release|Win32.ActiveCfg = Release|Win32
-		{49C7E291-39B2-4343-BD80-7A49B7EC04F0}.Release|Win32.Build.0 = Release|Win32
 		{8124F62C-98DA-4E21-8B94-A0E521D51E88}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{8124F62C-98DA-4E21-8B94-A0E521D51E88}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{8124F62C-98DA-4E21-8B94-A0E521D51E88}.Debug|Mixed Platforms.Build.0 = Debug|Win32
@@ -48,16 +25,6 @@ Global
 		{8124F62C-98DA-4E21-8B94-A0E521D51E88}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{8124F62C-98DA-4E21-8B94-A0E521D51E88}.Release|Win32.ActiveCfg = Release|Win32
 		{8124F62C-98DA-4E21-8B94-A0E521D51E88}.Release|Win32.Build.0 = Release|Win32
-		{1E780E46-2B6D-4FAB-A50F-583A04C8FDE3}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{1E780E46-2B6D-4FAB-A50F-583A04C8FDE3}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{1E780E46-2B6D-4FAB-A50F-583A04C8FDE3}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{1E780E46-2B6D-4FAB-A50F-583A04C8FDE3}.Debug|Win32.ActiveCfg = Debug|Win32
-		{1E780E46-2B6D-4FAB-A50F-583A04C8FDE3}.Debug|Win32.Build.0 = Debug|Win32
-		{1E780E46-2B6D-4FAB-A50F-583A04C8FDE3}.Release|Any CPU.ActiveCfg = Release|Win32
-		{1E780E46-2B6D-4FAB-A50F-583A04C8FDE3}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{1E780E46-2B6D-4FAB-A50F-583A04C8FDE3}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{1E780E46-2B6D-4FAB-A50F-583A04C8FDE3}.Release|Win32.ActiveCfg = Release|Win32
-		{1E780E46-2B6D-4FAB-A50F-583A04C8FDE3}.Release|Win32.Build.0 = Release|Win32
 		{7ACD5E41-5EC7-4ACC-B89A-65426765FD21}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{7ACD5E41-5EC7-4ACC-B89A-65426765FD21}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{7ACD5E41-5EC7-4ACC-B89A-65426765FD21}.Debug|Mixed Platforms.Build.0 = Debug|Win32
