@@ -16,7 +16,11 @@ Camera * mCamera;
 InputManager * mInput;
 DWORD mLastTicks, mTicks;
 float mFrameTime;
-D3DMATRIX mProj;
+D3DXMATRIX mProj;
+ID3DXFont * font;
+RECT rect;
+char msg[64];
+LPDIRECT3DVOLUMETEXTURE9 dxTexture;
 
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void Render();
@@ -48,6 +52,9 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 	pp.BackBufferWidth = 640;
 	pp.BackBufferHeight = 480;
 	pp.BackBufferFormat = D3DFMT_X8R8G8B8;
+	pp.AutoDepthStencilFormat = D3DFMT_D24S8;
+	pp.EnableAutoDepthStencil = TRUE;
+	pp.hDeviceWindow = hWnd;
 
 	HRESULT hrDev = dxObj->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING, &pp, &dxDevice);
 	if ( FAILED(hrDev) )
@@ -67,33 +74,45 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 
 	dxDevice->CreateVertexDeclaration(vertElems, &VertexDecl);
 
+	/*
 	Vertex vertices[] =
 	{
-		{ 150.0f,  50.0f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffff0000, },
-		{ 250.0f, 250.0f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff00ff00, },
-		{  50.0f, 200.0f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff0000ff, },
+		{ 150.0f,  50.0f, 1.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xffff0000, },
+		{ 250.0f, 250.0f, 1.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff00ff00, },
+		{  50.0f, 200.0f, 1.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0xff0000ff, },
 	};
 
 	obj = new RenderObject(dxDevice, VertexDecl);
 	obj->SetGeometry(3, vertices);
+	*/
 
 	// Block/chunk stuff
 	BlockDictionary * dict = BlockDictionary::FromFile("blocks.dict");
-	Chunk * nChunk = new Chunk(dict);
-	Vertex * chunkVerts = nChunk->GetGeometry();
-	size_t chunkVertCount = nChunk->GetGeometryCount(); 
+	Chunk * mChunk = new Chunk(dict);
+	mChunk->GenerateGeometry();
 
 	obj2 = new RenderObject(dxDevice, VertexDecl);
-	obj2->SetGeometry(chunkVertCount, chunkVerts);
+	obj2->SetGeometry(mChunk->GetGeometryCount(), mChunk->GetGeometry());
 
 	mCamera = new Camera();
 	mInput = new InputManager(hWnd);
+	mInput->Grab();
 
-	D3DXMatrixPerspectiveFovLH((D3DXMATRIX*)&mProj, D3DXToRadian(90.0f), 640.0f/480.0f, 1.0f, 1000.0f);
+	D3DXMatrixPerspectiveFovLH(&mProj, D3DXToRadian(90.0f), 640.0f/480.0f, 1.0f, 1000.0f);
 	dxDevice->SetTransform(D3DTS_PROJECTION, &mProj);
+
+	D3DXCreateFontA(dxDevice, 12, 8, 1, 0, FALSE, NULL, NULL, NULL, NULL, "Arial", &font);
+	LONG left = 5;//rand() % 200;
+	LONG top = 5;//rand() % 150;
+	rect.left = left; rect.right = left + 250;
+	rect.top = top; rect.bottom = top + 150;
+
+	HRESULT hrTex = D3DXCreateVolumeTextureFromFile(dxDevice, L"texture.dds", &dxTexture);
 
 	// ----------
 	ShowWindow(hWnd, nShowCmd);
+	//ShowWindow(hWnd, SW_SHOWNORMAL)
+	BringWindowToTop(hWnd);
 	UpdateWindow(hWnd);
 
 	MSG msg;
@@ -112,7 +131,14 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 			Input();
 			Render();
 		} else {
-			Sleep(10);
+			mInput->Poll();
+			if ( mInput->MouseDown(0) )
+			{
+				render = true;
+				mInput->Grab();
+			} else {
+				Sleep(25);
+			}
 		}
 	}
 
@@ -126,14 +152,21 @@ LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		( msg == WM_ENTERSIZEMOVE ) || ( msg == WM_ENTERMENULOOP ) )
 	{
 		render = false;
-		mInput->Drop();
+		if ( mInput )
+		{
+			mInput->Drop();
+		}
 	} else if ( !render &&
 		( msg == WM_SIZE && wParam != SIZE_MINIMIZED ) ||
 		( msg == WM_EXITSIZEMOVE ) || ( msg == WM_EXITMENULOOP ) ||
-		( msg == WM_ACTIVATEAPP && wParam == TRUE ) )
+		( msg == WM_ACTIVATEAPP && wParam == TRUE ) ||
+		( msg == WM_SHOWWINDOW && wParam == TRUE ) )
 	{
 		render = true;
-		mInput->Grab();
+		if ( mInput )
+		{
+			mInput->Grab();
+		}
 	}
 
 	switch ( msg )
@@ -152,26 +185,25 @@ LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void Render()
 {
-	/*
-	clear();
-
-	foreach ( object in world )
-	{
-		render(object);
-	}
-
-	present();
-	*/
-
 	dxDevice->SetTransform(D3DTS_VIEW, mCamera->GetViewMatrix());
 
-	dxDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(32, 32, 96), 1.0f, 0);	
+	dxDevice->Clear(0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, D3DCOLOR_XRGB(32, 32, 96), 1.0f, 0);	
 
 	dxDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	dxDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+	dxDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+	dxDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
 
-	obj->Render();
+	dxDevice->SetTexture(0, dxTexture);
+
+	//obj->Render();
 	obj2->Render();
+
+	sprintf(msg, "FPS: %2.4f", 1.0f / mFrameTime);
+
+	dxDevice->BeginScene();
+	font->DrawTextA(NULL, msg, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xFF, 0xFF, 0xFF, 0xFF));
+	dxDevice->EndScene();
 
 	dxDevice->Present(NULL, NULL, NULL, NULL);
 }
@@ -187,27 +219,29 @@ void Input()
 		return;
 	}
 
+	float defaultSpeed = 20.0f; // two meters
+
 	D3DXVECTOR3 translate(0, 0, 0);
 
 	if ( mInput->KeyDown(DIK_W) )
 	{
-		translate.z += 2.0f * mFrameTime;
+		translate.z += defaultSpeed * mFrameTime;
 	}
 	if ( mInput->KeyDown(DIK_S) )
 	{
-		translate.z -= 2.0f * mFrameTime;
+		translate.z -= defaultSpeed * mFrameTime;
 	}
 	if ( mInput->KeyDown(DIK_A) )
 	{
-		translate.x -= 2.0f * mFrameTime;
+		translate.x -= defaultSpeed * mFrameTime;
 	}
 	if ( mInput->KeyDown(DIK_D) )
 	{
-		translate.x += 2.0f * mFrameTime;
+		translate.x += defaultSpeed * mFrameTime;
 	}
 
 	mCamera->Translate(translate);
-	mCamera->Rotate(mInput->MouseX(), mInput->MouseY());
+	mCamera->Rotate(mInput->MouseX() / 10.0f, mInput->MouseY() / 10.0f);
 }
 
 VOID Cleanup()

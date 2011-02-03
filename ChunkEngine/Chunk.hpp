@@ -18,19 +18,20 @@ public:
 
 	Vertex * GetGeometry();
 	size_t GetGeometryCount();
+	void GenerateGeometry();
 
 private:
-	static const size_t ChunkWidth = 4;
-	static const size_t ChunkHeight = 4; // 16;
+	static const size_t ChunkSize = 8;
 
 	Generator * mGen;
-	Block * mBlocks[ChunkWidth][ChunkWidth][ChunkHeight];
+	Block * mBlocks[ChunkSize][ChunkSize][ChunkSize];
 
 	bool mDirty;
 
-	vector<Vertex> mGeometry;
+	vector<Vertex> mGeometryVector;
+	Vertex * mGeometry;
+	size_t mGeometryCount;
 
-	void GenerateGeometry();
 	void ProcessPoint(int x, int y, int z);
 	void AddVertex(float x, float y, float z, float nx, float ny, float nz, float tu, float tv, float tw, unsigned long color);
 };

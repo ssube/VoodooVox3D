@@ -42,10 +42,10 @@ float Generator::GetPoint(float x, float y, float z)
 	float offy = y - celly;
 	float offz = z - cellz;
 
-	size_t offset0 = INDEX(x, y, z);
-	size_t offsetX = offset0 + ( NOISESIZE * NOISESIZE );
-	size_t offsetY = offset0 + NOISESIZE;
-	size_t offsetZ = offset0 + 1;
+	size_t offset0 = INDEX(cellx, celly, cellz);
+	size_t offsetX = INDEX(nextx, celly, cellz);
+	size_t offsetY = INDEX(cellx, nexty, cellz);
+	size_t offsetZ = INDEX(cellx, celly, nextz);
 
 	float tx = Interp(ToFloat(mValues[offset0]), ToFloat(mValues[offsetX]), offx);
 	float ty = Interp(ToFloat(mValues[offset0]), ToFloat(mValues[offsetY]), offy);

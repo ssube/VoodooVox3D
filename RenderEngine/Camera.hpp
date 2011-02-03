@@ -11,12 +11,12 @@ public:
 	void Translate(D3DXVECTOR3 translate);
 	void Rotate(float yaw, float pitch);
 
-	D3DMATRIX * GetViewMatrix();
+	D3DXMATRIX * GetViewMatrix();
 
 private:
 	D3DXVECTOR3 mPos, mForward, mUp;
 	float mYaw, mPitch;
 
 	bool mDirty;
-	D3DMATRIX mViewMat;
+	D3DXMATRIX mViewMat;
 };

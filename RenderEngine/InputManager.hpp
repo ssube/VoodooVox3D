@@ -17,10 +17,13 @@ public:
 	bool KeyDown(DWORD key);
 	bool KeyPress(DWORD key);
 
+	bool MouseDown(DWORD button);
+
 	LONG MouseX();
 	LONG MouseY();
 
 private:
+	HWND mHwnd;
 	LPDIRECTINPUT mDInput;
 	LPDIRECTINPUTDEVICE mKeyboard, mMouse;
 

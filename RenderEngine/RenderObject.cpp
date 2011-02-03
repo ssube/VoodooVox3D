@@ -7,6 +7,7 @@ RenderObject::RenderObject(LPDIRECT3DDEVICE9 device, LPDIRECT3DVERTEXDECLARATION
 {
 	mDevice->AddRef();
 	mVertDecl->AddRef();
+	D3DXMatrixIdentity(&mTransform);
 }
 
 RenderObject::~RenderObject(void)
@@ -27,12 +28,14 @@ RenderObject::~RenderObject(void)
 
 void RenderObject::Render()
 {
+	mDevice->SetTransform(D3DTS_WORLD, &mTransform);
+
 	if ( SUCCEEDED(mDevice->BeginScene()) )
 	{
 		mDevice->SetStreamSource(0, mVertBuffer, 0, sizeof(Vertex));
 		mDevice->SetVertexDeclaration(mVertDecl);
 
-		mDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, mVertCount);
+		mDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, mVertCount / 3);
 
 		mDevice->EndScene();
 	}
