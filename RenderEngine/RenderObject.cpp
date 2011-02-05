@@ -7,11 +7,14 @@ RenderObject::RenderObject(LPDIRECT3DDEVICE9 device, LPDIRECT3DVERTEXDECLARATION
 {
 	mDevice->AddRef();
 	mVertDecl->AddRef();
+
 	D3DXMatrixIdentity(&mTransform);
 }
 
 RenderObject::~RenderObject(void)
 {
+	//mEngine->DestroyRenderObject(this);
+
 	if ( mVertBuffer )
 	{
 		mVertBuffer->Release();

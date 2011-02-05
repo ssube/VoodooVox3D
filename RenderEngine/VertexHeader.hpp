@@ -18,5 +18,3 @@ struct Vertex
 		: x(x), y(y), z(z), nx(nx), ny(ny), nz(nz), tu(tu), tv(tv), tw(tw), color(color)
 	{ };
 };
-
-extern LPDIRECT3DVERTEXDECLARATION9 VertexDecl;

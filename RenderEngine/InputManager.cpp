@@ -109,7 +109,7 @@ void InputManager::Poll()
 
 bool InputManager::KeyDown(DWORD key)
 {
-	return mKeyboardState[key] & 0x80;
+	return ( mKeyboardState[key] & 0x80 ) == 0x80;
 }
 
 bool InputManager::KeyPress(DWORD key)
@@ -119,7 +119,7 @@ bool InputManager::KeyPress(DWORD key)
 
 bool InputManager::MouseDown(DWORD button)
 {
-	return mMouseState.rgbButtons[button];
+	return ( mMouseState.rgbButtons[button] > 0 );
 }
 
 LONG InputManager::MouseX()

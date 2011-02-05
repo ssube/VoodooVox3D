@@ -204,15 +204,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\ChunkEngine\Block.cpp"
+				RelativePath=".\Block.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\ChunkEngine\BlockDictionary.cpp"
+				RelativePath=".\BlockDictionary.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\ChunkEngine\BlockTemplate.cpp"
+				RelativePath=".\BlockTemplate.cpp"
 				>
 			</File>
 			<File
@@ -220,7 +220,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\ChunkEngine\Chunk.cpp"
+				RelativePath=".\Chunk.cpp"
 				>
 			</File>
 			<File
@@ -236,6 +236,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RenderEngine.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\RenderObject.cpp"
 				>
 			</File>
@@ -244,7 +248,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\NativeWorldLibrary\WorldGenerator.cpp"
+				RelativePath=".\World.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WorldGenerator.cpp"
 				>
 			</File>
 		</Filter>
@@ -254,15 +262,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\ChunkEngine\Block.hpp"
+				RelativePath=".\Block.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\ChunkEngine\BlockDictionary.hpp"
+				RelativePath=".\BlockDictionary.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\ChunkEngine\BlockTemplate.hpp"
+				RelativePath=".\BlockTemplate.hpp"
 				>
 			</File>
 			<File
@@ -270,7 +278,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\ChunkEngine\Chunk.hpp"
+				RelativePath=".\Chunk.hpp"
 				>
 			</File>
 			<File
@@ -282,6 +290,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RenderEngine.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\RenderObject.hpp"
 				>
 			</File>
@@ -290,7 +302,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\NativeWorldLibrary\WorldGenerator.hpp"
+				RelativePath=".\World.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WorldGenerator.hpp"
 				>
 			</File>
 		</Filter>
