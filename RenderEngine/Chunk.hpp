@@ -21,7 +21,7 @@ public:
 	void GenerateGeometry();
 
 private:
-	static const size_t ChunkSize = 8;
+	static const size_t ChunkSize = 16;
 
 	Generator * mGen;
 	Block * mBlocks[ChunkSize][ChunkSize][ChunkSize];

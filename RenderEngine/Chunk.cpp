@@ -84,6 +84,9 @@ void Chunk::ProcessPoint(int x, int y, int z)
 	bool drawThis;
 	block->GetAttribute(attrRender, &drawThis);
 
+	unsigned char vshade = 0xff - ( rand() % 128 );
+	DWORD vcolor = 0xff000000 | ( vshade << 16 ) | ( vshade << 8 ) | vshade;
+
 	if ( !drawThis )
 	{
 		return;
@@ -169,77 +172,77 @@ void Chunk::ProcessPoint(int x, int y, int z)
 	if (!b[0][1][1])
 	{
 		// On the -X, facing -X, with b[1][1][]'s texture
-		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz - offset, -1, 0, 0, 0, 0, texture, 0xff0000ff));
-		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz + offset, -1, 0, 0, 0, 1, texture, 0xffff8800));
-		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz + offset, -1, 0, 0, 1, 1, texture, 0xff0000ff));
+		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz - offset, -1, 0, 0, 0, 0, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz + offset, -1, 0, 0, 0, 1, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz + offset, -1, 0, 0, 1, 1, texture, vcolor));
 
-		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz + offset, -1, 0, 0, 1, 1, texture, 0xff0000ff));
-		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz - offset, -1, 0, 0, 1, 0, texture, 0xffff0000));
-		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz - offset, -1, 0, 0, 0, 0, texture, 0xff0000ff));
+		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz + offset, -1, 0, 0, 1, 1, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz - offset, -1, 0, 0, 1, 0, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz - offset, -1, 0, 0, 0, 0, texture, vcolor));
 	}
 
 	// Test the right:
 	if (!b[2][1][1])
 	{
 		// On the +X, facing -X
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, +1, 0, 0, 1, 1, texture, 0xffff8800));
-		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz + offset, +1, 0, 0, 0, 1, texture, 0xff00ff00));
-		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz - offset, +1, 0, 0, 0, 0, texture, 0xffff8800));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, +1, 0, 0, 1, 1, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz + offset, +1, 0, 0, 0, 1, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz - offset, +1, 0, 0, 0, 0, texture, vcolor));
 
-		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz - offset, +1, 0, 0, 0, 0, texture, 0xffff8800));
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz - offset, +1, 0, 0, 1, 0, texture, 0xff00ff00));
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, +1, 0, 0, 1, 1, texture, 0xffff8800));
+		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz - offset, +1, 0, 0, 0, 0, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz - offset, +1, 0, 0, 1, 0, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, +1, 0, 0, 1, 1, texture, vcolor));
 	}
 
 	// Test the bottom:
 	if (!b[1][0][1])
 	{
 		// On the -Y, facing -Y
-		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz - offset, 0, -1, 0, 1, 0, texture, 0xffff8800));
-		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz + offset, 0, -1, 0, 1, 1, texture, 0xff00ff00));
-		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz + offset, 0, -1, 0, 0, 1, texture, 0xffff8800));
+		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz - offset, 0, -1, 0, 1, 0, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz + offset, 0, -1, 0, 1, 1, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz + offset, 0, -1, 0, 0, 1, texture, vcolor));
 
-		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz + offset, 0, -1, 0, 0, 1, texture, 0xffff8800));
-		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz - offset, 0, -1, 0, 0, 0, texture, 0xff0000ff));
-		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz - offset, 0, -1, 0, 1, 0, texture, 0xffff8800));
+		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz + offset, 0, -1, 0, 0, 1, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz - offset, 0, -1, 0, 0, 0, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz - offset, 0, -1, 0, 1, 0, texture, vcolor));
 	}
 
 	// Test the top:
 	if (!b[1][2][1])
 	{
 		// On the +Y, facing -Y
-		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz + offset, 0, +1, 0, 0, 1, texture, 0xff0000ff));
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, 0, +1, 0, 1, 1, texture, 0xffff8800));
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz - offset, 0, +1, 0, 1, 0, texture, 0xff00ff00));
+		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz + offset, 0, +1, 0, 0, 1, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, 0, +1, 0, 1, 1, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz - offset, 0, +1, 0, 1, 0, texture, vcolor));
 
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz - offset, 0, +1, 0, 1, 0, texture, 0xff00ff00));
-		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz - offset, 0, +1, 0, 0, 0, texture, 0xffff0000));
-		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz + offset, 0, +1, 0, 0, 1, texture, 0xff0000ff));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz - offset, 0, +1, 0, 1, 0, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz - offset, 0, +1, 0, 0, 0, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz + offset, 0, +1, 0, 0, 1, texture, vcolor));
 	}
 
 	// Test the near side:
 	if (!b[1][1][0])
 	{
 		// On the -Z, facing -Z
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz - offset, 0, 0, -1, 1, 1, texture, 0xff00ff00));
-		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz - offset, 0, 0, -1, 1, 0, texture, 0xffff8800));
-		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz - offset, 0, 0, -1, 0, 0, texture, 0xff0000ff));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz - offset, 0, 0, -1, 1, 1, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz - offset, 0, 0, -1, 1, 0, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz - offset, 0, 0, -1, 0, 0, texture, vcolor));
 
-		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz - offset, 0, 0, -1, 0, 0, texture, 0xff0000ff));
-		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz - offset, 0, 0, -1, 0, 1, texture, 0xffff0000));
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz - offset, 0, 0, -1, 1, 1, texture, 0xff00ff00));
+		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz - offset, 0, 0, -1, 0, 0, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz - offset, 0, 0, -1, 0, 1, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz - offset, 0, 0, -1, 1, 1, texture, vcolor));
 	}
 
 	// Test the far side:
 	if (!b[1][1][2])
 	{
 		// On the +Z, facing -Z
-		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz + offset, 0, 0, +1, 0, 0, texture, 0xffff8800));
-		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz + offset, 0, 0, +1, 1, 0, texture, 0xff00ff00));
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, 0, 0, +1, 1, 1, texture, 0xffff8800));
+		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz + offset, 0, 0, +1, 0, 0, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px + offset, py - offset, pz + offset, 0, 0, +1, 1, 0, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, 0, 0, +1, 1, 1, texture, vcolor));
 
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, 0, 0, +1, 1, 1, texture, 0xffff8800));
-		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz + offset, 0, 0, +1, 0, 1, texture, 0xff0000ff));
-		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz + offset, 0, 0, +1, 0, 0, texture, 0xffff8800));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, 0, 0, +1, 1, 1, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px - offset, py + offset, pz + offset, 0, 0, +1, 0, 1, texture, vcolor));
+		mGeometryVector.push_back(Vertex(px - offset, py - offset, pz + offset, 0, 0, +1, 0, 0, texture, vcolor));
 	}
 }

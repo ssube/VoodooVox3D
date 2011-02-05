@@ -17,7 +17,7 @@ Camera * camera;
 bool render = true;
 
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-void Input();
+void Input(float delta);
 void Cleanup();
 
 INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in_opt LPSTR lpCmdLine, __in int nShowCmd )
@@ -50,6 +50,8 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 	BringWindowToTop(hWnd);
 	UpdateWindow(hWnd);
 
+	float inputDelay = 0.0f;
+
 	MSG msg;
 	while ( GetMessage(&msg, NULL, 0, 0) )
 	{
@@ -58,7 +60,14 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 
 		if ( render )
 		{
-			Input();
+			if ( inputDelay > 0.02f )
+			{
+				Input(inputDelay);
+				inputDelay = 0.0f;
+			} else {
+				inputDelay += engine->GetFrameDelta();
+			}
+
 			engine->Render();
 		} else {
 			input->Poll();
@@ -113,7 +122,7 @@ LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-void Input()
+void Input(float delta)
 {
 	input->Poll();
 
@@ -125,7 +134,7 @@ void Input()
 	}
 
 	float defaultSpeed = 20.0f; // two meters
-	float frameTime = engine->GetFrameDelta();
+	float frameTime = delta; //engine->GetFrameDelta();
 
 	D3DXVECTOR3 translate(0, 0, 0);
 

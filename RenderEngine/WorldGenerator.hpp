@@ -1,7 +1,6 @@
 #pragma once
 
-#include <stdlib.h>
-#include <math.h> 
+#include "Includes.hpp"
 
 class __declspec(dllexport) Generator
 {

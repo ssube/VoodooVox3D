@@ -9,7 +9,8 @@ Generator::Generator(int seed)
 	mValues = new int[NOISESIZE * NOISESIZE * NOISESIZE];
 
 	// Fill the noise bin
-	srand(seed);
+	DWORD ticks = GetTickCount();
+	srand(ticks);
 	
 	for ( int x = 0; x < 16; ++x )
 	{

@@ -1,6 +1,7 @@
 #include "RenderEngine.hpp"
 
 RenderEngine::RenderEngine(HWND hWnd)
+	: mFrameTime(0.0f)
 {
 	mObject = Direct3DCreate9(D3D_SDK_VERSION);
 	if ( !mObject )
@@ -45,13 +46,15 @@ RenderEngine::RenderEngine(HWND hWnd)
 
 	mCamera = new Camera();
 
-	D3DXCreateFontA(mDevice, 12, 8, 1, 0, FALSE, NULL, NULL, NULL, NULL, "Arial", &mFont);
+	D3DXCreateFontA(mDevice, 10, 8, 1, 0, FALSE, NULL, NULL, NULL, NULL, "Courier", &mFont);
 	LONG left = 5;
 	LONG top = 5;
-	mTextRect.left = left; mTextRect.right = left + 250;
+	mTextRect.left = left; mTextRect.right = left + 630;
 	mTextRect.top = top; mTextRect.bottom = top + 150;
 
 	HRESULT hrTex = D3DXCreateVolumeTextureFromFile(mDevice, L"texture.dds", &mLandTexture);
+
+	mLastTicks = mTicks = GetTickCount();
 }
 
 RenderEngine::~RenderEngine(void)
@@ -95,7 +98,7 @@ float RenderEngine::GetFrameDelta()
 }
 
 char msg[256];
-int counter = 0;
+DWORD fpsTicks, frames;
 
 void RenderEngine::Render()
 {
@@ -103,12 +106,15 @@ void RenderEngine::Render()
 
 	mDevice->Clear(0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);	
 
-	mDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	mDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
 	mDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 	mDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 	mDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
 
 	mDevice->SetTexture(0, mLandTexture);
+	mDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+	mDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	mDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 
 	vector<RenderObject*>::iterator ittr = mRenderObjects.begin();
 	while ( ittr != mRenderObjects.end() )
@@ -119,7 +125,7 @@ void RenderEngine::Render()
 	}
 
 	mDevice->BeginScene();
-	mFont->DrawTextA(NULL, msg, -1, &mTextRect, DT_LEFT, D3DCOLOR_ARGB(0xFF, 0xFF, 0xFF, 0xFF));
+	mFont->DrawTextA(NULL, msg, strlen(msg), &mTextRect, DT_LEFT, D3DCOLOR_ARGB(0xFF, 0xFF, 0xFF, 0xFF));
 	mDevice->EndScene();
 
 	mDevice->Present(NULL, NULL, NULL, NULL);
@@ -128,9 +134,12 @@ void RenderEngine::Render()
 	mTicks = GetTickCount();
 	mFrameTime = ( mTicks - mLastTicks ) / 1000.0f;
 
-	if ( ++counter == 1000 )
-	{
-		sprintf_s(msg, 256, "Box Game [Native DirectX]; FPS: %f", 1.0f / mFrameTime);
-		counter = 0;
+	++frames;
+	if ( mTicks > fpsTicks )
+	{		
+		sprintf(msg, "Box Game [Native DirectX]; FPS: %d\0", frames);
+
+		frames = 0;
+		fpsTicks = mTicks + 1000;
 	}
 }

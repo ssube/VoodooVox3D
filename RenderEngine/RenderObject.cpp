@@ -50,7 +50,7 @@ void RenderObject::SetGeometry(size_t vertCount, Vertex * verts)
 
 	UINT vbSize = sizeof(Vertex) * vertCount;
 
-	mDevice->CreateVertexBuffer(vbSize, 0, NULL, D3DPOOL_DEFAULT, &mVertBuffer, NULL);
+	mDevice->CreateVertexBuffer(vbSize, D3DUSAGE_WRITEONLY, NULL, D3DPOOL_DEFAULT, &mVertBuffer, NULL);
 
 	VOID * vbVerts;
 
@@ -58,8 +58,7 @@ void RenderObject::SetGeometry(size_t vertCount, Vertex * verts)
 
 	if ( FAILED(hrVB) )
 	{
-		MessageBox(NULL, L"Error locking vertex buffer.", L"D3D Error", MB_ICONERROR|MB_OK);
-		return;
+		throw std::runtime_error("Error locking vertex buffer.");
 	}
 
 	memcpy(vbVerts, verts, vbSize);
