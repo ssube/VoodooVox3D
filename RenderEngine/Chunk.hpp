@@ -20,11 +20,14 @@ public:
 	size_t GetGeometryCount();
 	void GenerateGeometry();
 
-private:
-	static const size_t ChunkSize = 16;
+	Block * GetBlock(size_t x, size_t y, size_t z);
 
+	static const size_t ChunkBlocks = 8;
+	static const size_t ChunkSize = ChunkBlocks * Block::BlockSize;
+
+private:
 	Generator * mGen;
-	Block * mBlocks[ChunkSize][ChunkSize][ChunkSize];
+	Block * mBlocks[ChunkBlocks][ChunkBlocks][ChunkBlocks];
 
 	bool mDirty;
 
@@ -34,4 +37,6 @@ private:
 
 	void ProcessPoint(int x, int y, int z);
 	void AddVertex(float x, float y, float z, float nx, float ny, float nz, float tu, float tv, float tw, unsigned long color);
+
+	D3DXVECTOR3 mOrigin;
 };

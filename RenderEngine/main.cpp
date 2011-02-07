@@ -7,12 +7,15 @@
 #include "InputManager.hpp"
 
 #include "BlockDictionary.hpp"
+#include "Block.hpp"
 #include "Chunk.hpp"
+#include "World.hpp"
 
-RenderEngine * engine;
+RenderEngine * engine = NULL;
 RenderObject * obj = NULL;
-InputManager * input;
-Camera * camera;
+InputManager * input = NULL;
+Camera * camera = NULL;
+World * world = NULL;
 
 bool render = true;
 
@@ -76,7 +79,7 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 				render = true;
 				input->Grab();
 			} else {
-				Sleep(25);
+				Sleep(100);
 			}
 		}
 	}

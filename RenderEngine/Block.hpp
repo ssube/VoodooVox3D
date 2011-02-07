@@ -9,4 +9,6 @@ class Block :
 public:
 	Block(BlockTemplate * temp);
 	~Block(void);
+
+	static const size_t BlockSize = 10;
 };

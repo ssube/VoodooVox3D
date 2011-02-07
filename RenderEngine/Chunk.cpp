@@ -9,11 +9,11 @@ Chunk::Chunk(BlockDictionary * dict)
 
 	vector<int> idList = dict->GetTemplateList();
 
-	for ( size_t x = 0; x < Chunk::ChunkSize; ++x )
+	for ( size_t x = 0; x < Chunk::ChunkBlocks; ++x )
 	{
-		for ( size_t y = 0; y < Chunk::ChunkSize; ++y )
+		for ( size_t y = 0; y < Chunk::ChunkBlocks; ++y )
 		{
-			for ( size_t z = 0; z < Chunk::ChunkSize; ++z )
+			for ( size_t z = 0; z < Chunk::ChunkBlocks; ++z )
 			{
 				float raw = mGen->GetPoint(x, y, z);
 				int cid = (int)(raw * 1000.0f) % idList.size();
@@ -32,6 +32,11 @@ Chunk::~Chunk(void)
 	delete mGen;
 }
 
+Block * Chunk::GetBlock(size_t x, size_t y, size_t z)
+{
+	return mBlocks[x][y][z];
+}
+
 Vertex * Chunk::GetGeometry()
 {
 	return mGeometry;
@@ -43,11 +48,11 @@ void Chunk::GenerateGeometry()
 	{
 		mDirty = false;
 
-		for (int px = 0; px < Chunk::ChunkSize; ++px)
+		for (int px = 0; px < Chunk::ChunkBlocks; ++px)
 		{
-			for (int py = 0; py < Chunk::ChunkSize; ++py)
+			for (int py = 0; py < Chunk::ChunkBlocks; ++py)
 			{
-				for (int pz = 0; pz < Chunk::ChunkSize; ++pz)
+				for (int pz = 0; pz < Chunk::ChunkBlocks; ++pz)
 				{
 					ProcessPoint(px, py, pz);
 				}
@@ -112,7 +117,7 @@ void Chunk::ProcessPoint(int x, int y, int z)
 		}
 	}
 
-	if ( x < (Chunk::ChunkSize-1) )
+	if ( x < (Chunk::ChunkBlocks-1) )
 	{
 		block = mBlocks[x+1][y][z];
 		if ( block )
@@ -130,7 +135,7 @@ void Chunk::ProcessPoint(int x, int y, int z)
 		}
 	}
 
-	if ( y < (Chunk::ChunkSize-1) )
+	if ( y < (Chunk::ChunkBlocks-1) )
 	{
 		block = mBlocks[x][y+1][z];
 		if ( block )
@@ -148,7 +153,7 @@ void Chunk::ProcessPoint(int x, int y, int z)
 		}
 	}
 
-	if ( z < (Chunk::ChunkSize-1) )
+	if ( z < (Chunk::ChunkBlocks-1) )
 	{
 		block = mBlocks[x][y][z+1];
 		if ( block )
@@ -158,11 +163,10 @@ void Chunk::ProcessPoint(int x, int y, int z)
 	}
 
 	// Calculate the offset and positions
-	float BOXENGINE_BLOCK_UNITS = 10.0f;
-	float offset = (BOXENGINE_BLOCK_UNITS / 2);
-	float px = (float)x * BOXENGINE_BLOCK_UNITS;
-	float py = (float)y * BOXENGINE_BLOCK_UNITS;
-	float pz = (float)z * BOXENGINE_BLOCK_UNITS;
+	float offset = ( Block::BlockSize / 2);
+	float px = (float)x * Block::BlockSize;
+	float py = (float)y * Block::BlockSize;
+	float pz = (float)z * Block::BlockSize;
 
 	// Now, build geometry. We'll test each of the 6 surfaces and create a quad
 	// if one should exist. The important thing here is to make sure the quad
