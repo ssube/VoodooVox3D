@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="BoxGame"
-	ProjectGUID="{8124F62C-98DA-4E21-8B94-A0E521D51E88}"
-	RootNamespace="RenderEngine"
+	Name="BlockLibrary"
+	ProjectGUID="{C060C6A8-FFC0-466A-B981-C864D45A80E3}"
+	RootNamespace="BlockLibrary"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -20,7 +20,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			>
 			<Tool
@@ -41,15 +41,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\BlockLibrary&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;BLOCKLIBRARY_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderThrough="Includes.hpp"
 				WarningLevel="3"
-				DebugInformationFormat="3"
+				DebugInformationFormat="4"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -62,9 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dxguid.lib BlockLibrary.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(TargetDir)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -95,7 +91,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -118,12 +114,10 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\BlockLibrary&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;BLOCKLIBRARY_EXPORTS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderThrough="Includes.hpp"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -138,9 +132,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dxguid.lib BlockLibrary.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(TargetDir)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -171,31 +163,6 @@
 		</Configuration>
 	</Configurations>
 	<References>
-		<AssemblyReference
-			RelativePath="System.dll"
-			AssemblyName="System, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
-			MinFrameworkVersion="131072"
-		/>
-		<AssemblyReference
-			RelativePath="System.Data.dll"
-			AssemblyName="System.Data, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=x86"
-			MinFrameworkVersion="131072"
-		/>
-		<AssemblyReference
-			RelativePath="System.Drawing.dll"
-			AssemblyName="System.Drawing, Version=2.0.0.0, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL"
-			MinFrameworkVersion="131072"
-		/>
-		<AssemblyReference
-			RelativePath="System.Windows.Forms.dll"
-			AssemblyName="System.Windows.Forms, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
-			MinFrameworkVersion="131072"
-		/>
-		<AssemblyReference
-			RelativePath="System.XML.dll"
-			AssemblyName="System.Xml, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
-			MinFrameworkVersion="131072"
-		/>
 	</References>
 	<Files>
 		<Filter
@@ -204,39 +171,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\Camera.cpp"
+				RelativePath=".\Block.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Includes.cpp"
+				RelativePath=".\BlockDictionary.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\InputManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\main.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\RenderEngine.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\RenderObject.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\VertexHeader.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\World.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\WorldGenerator.cpp"
+				RelativePath=".\BlockTemplate.cpp"
 				>
 			</File>
 		</Filter>
@@ -246,39 +189,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\Camera.hpp"
+				RelativePath=".\Block.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\DataStream.hpp"
+				RelativePath=".\BlockDictionary.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BlockTemplate.hpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Includes.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\InputManager.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\RenderEngine.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\RenderObject.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\VertexHeader.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\World.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\WorldGenerator.hpp"
 				>
 			</File>
 		</Filter>

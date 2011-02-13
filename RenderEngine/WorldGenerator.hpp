@@ -11,7 +11,7 @@ public:
 	float GetPoint(float x, float y, float z);
 
 private:
-	int * mValues;
+	int mValues[WORLD_BLOCKS][WORLD_BLOCKS][WORLD_BLOCKS];
 
 	float Interp(float a, float b, float x);
 	float ToFloat(int i);

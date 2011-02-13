@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\ChunkEngine&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\BlockLibrary&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ChunkEngine.lib"
+				AdditionalDependencies="BlockLibrary.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(TargetDir)&quot;"
 				GenerateDebugInformation="true"
@@ -117,7 +117,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\ChunkEngine&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\BlockLibrary&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ChunkEngine.lib"
+				AdditionalDependencies="BlockLibrary.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(TargetDir)&quot;"
 				GenerateDebugInformation="true"

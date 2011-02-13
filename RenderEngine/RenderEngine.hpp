@@ -32,7 +32,7 @@ private:
 
 	D3DXMATRIX mProj;
 
-	LPDIRECT3DVOLUMETEXTURE9 mLandTexture;
+	LPDIRECT3DTEXTURE9 mLandTexture;
 	LPDIRECT3DVERTEXDECLARATION9 mVertDecl;
 
 	vector<RenderObject*> mRenderObjects;

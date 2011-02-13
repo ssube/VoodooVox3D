@@ -41,7 +41,7 @@ RenderEngine::RenderEngine(HWND hWnd)
 
 	mDevice->CreateVertexDeclaration(vertElems, &mVertDecl);
 
-	D3DXMatrixPerspectiveFovLH(&mProj, D3DXToRadian(90.0f), 640.0f/480.0f, 1.0f, 1000.0f);
+	D3DXMatrixPerspectiveFovLH(&mProj, D3DXToRadian(70.0f), 640.0f/480.0f, 1.0f, 1000.0f);
 	mDevice->SetTransform(D3DTS_PROJECTION, &mProj);
 
 	mCamera = new Camera();
@@ -52,7 +52,7 @@ RenderEngine::RenderEngine(HWND hWnd)
 	mTextRect.left = left; mTextRect.right = left + 630;
 	mTextRect.top = top; mTextRect.bottom = top + 150;
 
-	HRESULT hrTex = D3DXCreateVolumeTextureFromFile(mDevice, L"texture.dds", &mLandTexture);
+	HRESULT hrTex = D3DXCreateTextureFromFile(mDevice, L"texture.png", &mLandTexture);
 
 	mLastTicks = mTicks = GetTickCount();
 }
@@ -102,14 +102,19 @@ DWORD fpsTicks, frames;
 
 void RenderEngine::Render()
 {
+	D3DXVECTOR3 camPos = mCamera->GetPosition();
+
 	mDevice->SetTransform(D3DTS_VIEW, mCamera->GetViewMatrix());
 
-	mDevice->Clear(0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);	
+	mDevice->Clear(0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, D3DCOLOR_XRGB(32, 64, 72), 1.0f, 0);	
 
 	mDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	mDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 	mDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 	mDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
+	mDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	mDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	mDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 	mDevice->SetTexture(0, mLandTexture);
 	mDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
@@ -119,7 +124,18 @@ void RenderEngine::Render()
 	vector<RenderObject*>::iterator ittr = mRenderObjects.begin();
 	while ( ittr != mRenderObjects.end() )
 	{
-		(*ittr)->Render();
+		// Find distance from the camera
+		D3DXVECTOR3 objPos = (*ittr)->GetPosition();
+		D3DXVECTOR3 diff;
+		float dist = D3DXVec3LengthSq(D3DXVec3Subtract(&diff, &camPos, &objPos));
+		int lod = dist / ( 1000000 / LOD_COUNT );
+
+		if ( lod < 0 || lod >= LOD_COUNT )
+		{
+			// skip
+		} else {
+			(*ittr)->Render(lod);
+		}
 
 		++ittr;
 	}

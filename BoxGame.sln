@@ -2,8 +2,17 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoxGame", "RenderEngine\RenderEngine.vcproj", "{8124F62C-98DA-4E21-8B94-A0E521D51E88}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7ACD5E41-5EC7-4ACC-B89A-65426765FD21} = {7ACD5E41-5EC7-4ACC-B89A-65426765FD21}
+		{C060C6A8-FFC0-466A-B981-C864D45A80E3} = {C060C6A8-FFC0-466A-B981-C864D45A80E3}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlockDictTest", "BlockDictTest\BlockDictTest.vcproj", "{7ACD5E41-5EC7-4ACC-B89A-65426765FD21}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C060C6A8-FFC0-466A-B981-C864D45A80E3} = {C060C6A8-FFC0-466A-B981-C864D45A80E3}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlockLibrary", "BlockLibrary\BlockLibrary.vcproj", "{C060C6A8-FFC0-466A-B981-C864D45A80E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +44,16 @@ Global
 		{7ACD5E41-5EC7-4ACC-B89A-65426765FD21}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{7ACD5E41-5EC7-4ACC-B89A-65426765FD21}.Release|Win32.ActiveCfg = Release|Win32
 		{7ACD5E41-5EC7-4ACC-B89A-65426765FD21}.Release|Win32.Build.0 = Release|Win32
+		{C060C6A8-FFC0-466A-B981-C864D45A80E3}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{C060C6A8-FFC0-466A-B981-C864D45A80E3}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{C060C6A8-FFC0-466A-B981-C864D45A80E3}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{C060C6A8-FFC0-466A-B981-C864D45A80E3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C060C6A8-FFC0-466A-B981-C864D45A80E3}.Debug|Win32.Build.0 = Debug|Win32
+		{C060C6A8-FFC0-466A-B981-C864D45A80E3}.Release|Any CPU.ActiveCfg = Release|Win32
+		{C060C6A8-FFC0-466A-B981-C864D45A80E3}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{C060C6A8-FFC0-466A-B981-C864D45A80E3}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{C060C6A8-FFC0-466A-B981-C864D45A80E3}.Release|Win32.ActiveCfg = Release|Win32
+		{C060C6A8-FFC0-466A-B981-C864D45A80E3}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

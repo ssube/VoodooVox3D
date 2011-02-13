@@ -15,13 +15,10 @@
 
 #include <dinput.h>
 
-#define BOOL_NULL   (bool*)   NULL
-#define INT_NULL    (int*)    NULL
-#define FLOAT_NULL  (float*)  NULL
-#define STRING_NULL (string*) NULL
+#define LOD_COUNT 4
 
 #define CHUNK_BLOCKS 8
-#define WORLD_CHUNKS 3
+#define WORLD_CHUNKS 5
 #define WORLD_BLOCKS WORLD_CHUNKS * CHUNK_BLOCKS
 
 #define BLOCK_SIZE 10.0f

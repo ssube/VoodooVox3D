@@ -20,7 +20,7 @@ public:
 
 private:
 	void GenerateGeometry(size_t x, size_t y, size_t z);
-	void World::ProcessPoint(size_t x, size_t y, size_t z);
+	void ProcessPoint(size_t lod, size_t x, size_t y, size_t z, size_t cx, size_t cy, size_t cz);
 
 private:
 	Block * mBlocks[WORLD_BLOCKS][WORLD_BLOCKS][WORLD_BLOCKS];
