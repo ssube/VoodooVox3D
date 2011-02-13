@@ -1,6 +1,6 @@
 
-#include "BlockDictionary.hpp"
-#include "BlockTemplate.hpp"
+#include "../RenderEngine/BlockDictionary.hpp"
+#include "../RenderEngine/BlockTemplate.hpp"
 
 int main(int argc, char * argv[])
 {
@@ -11,13 +11,15 @@ int main(int argc, char * argv[])
 	dict->AddAttribute("iID");
 	dict->AddAttribute("bOcclude");
 	dict->AddAttribute("fTexture");
+	dict->AddAttribute("fSpeed");
 	dict->AddAttribute("sName");
-
+	
 	printf("\tCreating template\n");
 	BlockTemplate * temp1 = new BlockTemplate();
 	temp1->AddAttribute("iID", 1);
 	temp1->AddAttribute("bOcclude", false);
 	temp1->AddAttribute("fTexture", 0.0f);
+	temp1->AddAttribute("fSpeed", 1.0f);
 	temp1->AddAttribute("sName", "Noodles");
 
 	printf("\tCreating template\n");
@@ -25,18 +27,21 @@ int main(int argc, char * argv[])
 	temp2->AddAttribute("iID", 2);
 	temp2->AddAttribute("bOcclude", false);
 	temp2->AddAttribute("fTexture", 0.0f);
+	temp1->AddAttribute("fSpeed", 1.0f);
 	temp2->AddAttribute("sName", "Stuff");
 
 	BlockTemplate * temp3 = new BlockTemplate();
 	temp3->AddAttribute("iID", 13);
 	temp3->AddAttribute("bOcclude", true);
 	temp3->AddAttribute("fTexture", 0.0f);
+	temp1->AddAttribute("fSpeed", 0.2f);
 	temp3->AddAttribute("sName", "Stone");
 
 	BlockTemplate * temp4 = new BlockTemplate();
 	temp4->AddAttribute("iID", 14);
 	temp4->AddAttribute("bOcclude", true);
 	temp4->AddAttribute("fTexture", 1.0f);
+	temp1->AddAttribute("fSpeed", 0.2f);
 	temp4->AddAttribute("sName", "Wood");
 
 	printf("\tAdding templates\n");

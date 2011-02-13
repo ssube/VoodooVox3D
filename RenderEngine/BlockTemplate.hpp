@@ -22,7 +22,6 @@ public:
 	BlockTemplate(void);
 	~BlockTemplate(void);
 
-	//void AddAttribute(string name,       void   * value);
 	void AddAttribute(string name,       bool   * value);
 	void AddAttribute(string name,       int    * value);
 	void AddAttribute(string name,       float  * value);

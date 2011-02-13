@@ -8,7 +8,6 @@
 
 #include "BlockDictionary.hpp"
 #include "Block.hpp"
-#include "Chunk.hpp"
 #include "World.hpp"
 
 RenderEngine * engine = NULL;
@@ -37,13 +36,12 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 
 	// Block/chunk stuff
 	BlockDictionary * dict = BlockDictionary::FromFile("blocks.dict");
-	Chunk * mChunk = new Chunk(dict);
-	mChunk->GenerateGeometry();
-
-	obj = engine->CreateRenderObject();
-	obj->SetGeometry(mChunk->GetGeometryCount(), mChunk->GetGeometry());
+	world = new World(dict, engine);
+	//world->AddDictionary(dict);
 
 	camera = engine->GetCamera();
+	camera->TranslateRaw(D3DXVECTOR3(0, 15, -25));
+
 	input = new InputManager(hWnd);
 	input->Grab();
 
@@ -54,6 +52,7 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 	UpdateWindow(hWnd);
 
 	float inputDelay = 0.0f;
+	float updateDelay = 0.0f;
 
 	MSG msg;
 	while ( GetMessage(&msg, NULL, 0, 0) )
@@ -70,7 +69,13 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 			} else {
 				inputDelay += engine->GetFrameDelta();
 			}
-
+			if ( updateDelay > 0.50f )
+			{
+				world->Update();
+				updateDelay = 0.0f;
+			} else {
+				updateDelay += engine->GetFrameDelta();
+			}
 			engine->Render();
 		} else {
 			input->Poll();
@@ -158,7 +163,13 @@ void Input(float delta)
 		translate.x += defaultSpeed * frameTime;
 	}
 
-	camera->Translate(translate);
+	if ( translate.x != 0 || translate.y != 0 || translate.z != 0 )
+	{
+		translate = camera->Transform(translate);
+		translate = world->UpdatePosition(camera->GetPosition(), translate);
+		camera->SetPosition(translate);
+	}
+
 	camera->Rotate(input->MouseX() / 10.0f, input->MouseY() / 10.0f);
 }
 

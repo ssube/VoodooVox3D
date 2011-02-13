@@ -106,7 +106,7 @@ void RenderEngine::Render()
 
 	mDevice->Clear(0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);	
 
-	mDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+	mDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	mDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 	mDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 	mDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);

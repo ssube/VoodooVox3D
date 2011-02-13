@@ -9,7 +9,14 @@ public:
 	~Camera(void);
 
 	void Translate(D3DXVECTOR3 translate);
+	void TranslateRaw(D3DXVECTOR3 translate);
+
 	void Rotate(float yaw, float pitch);
+
+	D3DXVECTOR3 Transform(D3DXVECTOR3 shift);
+
+	D3DXVECTOR3 GetPosition();
+	void SetPosition(D3DXVECTOR3 pos);
 
 	D3DXMATRIX * GetViewMatrix();
 

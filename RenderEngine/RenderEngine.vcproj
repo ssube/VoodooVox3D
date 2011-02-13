@@ -220,10 +220,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Chunk.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Includes.cpp"
 				>
 			</File>
@@ -278,7 +274,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Chunk.hpp"
+				RelativePath=".\DataStream.hpp"
 				>
 			</File>
 			<File

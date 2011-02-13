@@ -12,6 +12,7 @@ public:
 	void Render();
 
 	void SetGeometry(size_t vertCount, Vertex * verts);
+	void SetTransform(D3DXMATRIX trans);
 
 private:
 	size_t mVertCount;

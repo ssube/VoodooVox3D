@@ -2,23 +2,32 @@
 
 #include "Includes.hpp"
 #include "Block.hpp"
-#include "Chunk.hpp"
+#include "BlockDictionary.hpp"
+#include "RenderEngine.hpp"
+#include "WorldGenerator.hpp"
 
 class World
 {
 public:
-	World(void);
+	World(BlockDictionary * dict, RenderEngine * render);
 	~World(void);
-
-	D3DXVECTOR3 ProcessCollision(D3DXVECTOR3 pos);
 
 	Block * GetBlock(D3DXVECTOR3 pos);
 
-	static const size_t WorldChunks = 5;
-	static const size_t WorldSize = WorldChunks * Chunk::ChunkSize;
+	void Update();
+	void UpdateChunks(D3DXVECTOR3 pos);
+	D3DXVECTOR3 UpdatePosition(D3DXVECTOR3 pos, D3DXVECTOR3 shift);
 
 private:
-	Chunk * mChunks[WorldChunks][WorldChunks][WorldChunks];
+	void GenerateGeometry(size_t x, size_t y, size_t z);
+	void World::ProcessPoint(size_t x, size_t y, size_t z);
 
-	D3DXVECTOR3 mLastPosition;
+private:
+	Block * mBlocks[WORLD_BLOCKS][WORLD_BLOCKS][WORLD_BLOCKS];
+	RenderObject * mObjects[WORLD_CHUNKS][WORLD_CHUNKS][WORLD_CHUNKS];
+
+	BlockDictionary * mDictionary;
+	RenderEngine * mRenderer;
+	vector<Vertex> mGeometryVector;
+	Generator * mGen;
 };

@@ -65,3 +65,8 @@ void RenderObject::SetGeometry(size_t vertCount, Vertex * verts)
 
 	mVertBuffer->Unlock();
 }
+
+void RenderObject::SetTransform(D3DXMATRIX trans)
+{
+	mTransform = trans;
+}
