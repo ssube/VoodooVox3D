@@ -32,14 +32,19 @@ RenderEngine::RenderEngine(HWND hWnd)
 
 	D3DVERTEXELEMENT9 vertElems[] = 
 	{
-		{0,  0, D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-		{0, 12, D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
-		{0, 24, D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
-		{0, 36, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,    0},
+		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		{0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
+		{0, 24, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+		{0, 36, D3DDECLTYPE_FLOAT4,	D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,    0},
 		D3DDECL_END()
 	};
 
-	mDevice->CreateVertexDeclaration(vertElems, &mVertDecl);
+	HRESULT hrVD = mDevice->CreateVertexDeclaration(vertElems, &mVertDecl);
+
+	if ( FAILED(hrVD) )
+	{
+		throw std::runtime_error("Error creating vertex decl.");
+	}
 
 	D3DXMatrixPerspectiveFovLH(&mProj, D3DXToRadian(70.0f), 640.0f/480.0f, 1.0f, 1000.0f);
 	mDevice->SetTransform(D3DTS_PROJECTION, &mProj);
@@ -61,6 +66,7 @@ RenderEngine::~RenderEngine(void)
 {
 	delete mCamera;
 
+	mVertDecl->Release();
 	mDevice->Release();
 	mObject->Release();
 }
@@ -112,9 +118,9 @@ void RenderEngine::Render()
 	mDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 	mDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 	mDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
-	mDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	mDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	mDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	//mDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	//mDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	//mDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 	mDevice->SetTexture(0, mLandTexture);
 	mDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);

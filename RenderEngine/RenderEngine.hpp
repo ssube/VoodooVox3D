@@ -1,5 +1,15 @@
 #pragma once
 
+#ifdef RENDERENGINE_INTERFACE
+#include "RenderObject.hpp"
+
+class RenderEngine
+{
+public:
+	RenderObject * CreateRenderObject();
+	void DestroyRenderObject(RenderObject * object);
+};
+#else
 #include "Includes.hpp"
 #include "RenderObject.hpp"
 #include "Camera.hpp"
@@ -37,3 +47,4 @@ private:
 
 	vector<RenderObject*> mRenderObjects;
 };
+#endif

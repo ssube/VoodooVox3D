@@ -15,12 +15,10 @@
 
 #include <dinput.h>
 
-#define LOD_COUNT 4
+// Common includes
+#define D3DX_CONVERSION_FUNCS
+#include "CommonTypes.hpp"
 
-#define CHUNK_BLOCKS 8
-#define WORLD_CHUNKS 5
-#define WORLD_BLOCKS WORLD_CHUNKS * CHUNK_BLOCKS
-
-#define BLOCK_SIZE 10.0f
-#define CHUNK_SIZE BLOCK_SIZE * CHUNK_BLOCKS
-#define WORLD_SIZE CHUNK_SIZE * WORLD_CHUNKS
+//#define TOD3DXVEC2(vec) D3DXVECTOR2(vec.x, vec.y)
+//#define TOD3DXVEC3(vec) D3DXVECTOR3(vec.x, vec.y, vec.z)
+//#define TOD3DXVEC4(vec) D3DXVECTOR4(vec.x, vec.y, vec.z, vec.w)

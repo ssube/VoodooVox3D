@@ -1,6 +1,5 @@
 
 #include "Includes.hpp"
-#include "VertexHeader.hpp"
 #include "RenderObject.hpp"
 #include "RenderEngine.hpp"
 #include "Camera.hpp"
