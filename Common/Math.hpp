@@ -66,7 +66,7 @@ namespace Common
 		 * curve than linear interpolation.
 		 */
 		template<typename T>
-		T CosLerp(T a, T b, float x)
+		T CosInterp(T a, T b, float x)
 		{
 			float ft = x * Pi;
 			float f = ( 1 - cos(ft) ) * 0.5f;

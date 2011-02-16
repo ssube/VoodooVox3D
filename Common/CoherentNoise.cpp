@@ -44,13 +44,13 @@ namespace Common
 			float x1y0z1 =	mValues[nextx][celly][nextz];
 			float x1y1z0 =	mValues[nextx][nexty][cellz];
 			float x1y1z1 =	mValues[nextx][nexty][nextz];
-			float x0y0 =	Math::CosLerp(x0y0z0, x0y0z1, offz);
-			float x0y1 =	Math::CosLerp(x0y1z0, x0y1z1, offz);
-			float x1y0 =	Math::CosLerp(x1y0z0, x1y0z1, offz);
-			float x1y1 =	Math::CosLerp(x1y1z0, x1y1z1, offz);
-			float x0 =		Math::CosLerp(x0y0, x0y1, offy);
-			float x1 =		Math::CosLerp(x1y0, x1y1, offy);
-			float final =	Math::CosLerp(x0, x1, offx);
+			float x0y0 =	Math::CosInterp(x0y0z0, x0y0z1, offz);
+			float x0y1 =	Math::CosInterp(x0y1z0, x0y1z1, offz);
+			float x1y0 =	Math::CosInterp(x1y0z0, x1y0z1, offz);
+			float x1y1 =	Math::CosInterp(x1y1z0, x1y1z1, offz);
+			float x0 =		Math::CosInterp(x0y0, x0y1, offy);
+			float x1 =		Math::CosInterp(x1y0, x1y1, offy);
+			float final =	Math::CosInterp(x0, x1, offx);
 
 			return final;
 		}

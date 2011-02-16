@@ -46,22 +46,39 @@ namespace Common
 			: x(x), y(y)
 		{ };
 
-		Vector2<T> operator+(Vector2<T> other)
+		Vector2<T> operator=(const Vector2<T> other)
+		{
+			return Vector2<T>(other.x, other.y);
+		}
+
+		bool operator==(const Vector2<T> other)
+		{
+			return ( this->x == other.x && this->y == other.y );
+		}
+
+		bool operator<(const Vector2<T> other)
+		{
+			T tmag = ( this->x * this->x ) + ( this->y * this->y );
+			T omag = ( other.x * other.x ) + ( other.y * other.y );
+			return ( tmag < omag );
+		}
+
+		Vector2<T> operator+(const Vector2<T> other)
 		{
 			return Vector2<T>(this->x + other.x, this->y + other.y);
 		}
 
-		Vector2<T> operator-(Vector2<T> other)
+		Vector2<T> operator-(const Vector2<T> other)
 		{
 			return Vector2<T>(this->x - other.x, this->y - other.y);
 		}
 
-		Vector2<T> operator*(float value)
+		Vector2<T> operator*(const float value)
 		{
 			return Vector2<T>(this->x * value, this->y * value);
 		}
 
-		Vector2<T> operator/(float value)
+		Vector2<T> operator/(const float value)
 		{
 			return Vector2<T>(this->x / value, this->y / value);
 		}
@@ -106,22 +123,39 @@ namespace Common
 			: x(x), y(y), z(z)
 		{ };
 
-		Vector3<T> operator+(Vector3<T> other)
+		Vector3<T> operator=(const Vector3<T> other)
+		{
+			return Vector3<T>(other.x, other.y, other.z);
+		}
+
+		bool operator==(const Vector3<T> other)
+		{
+			return ( this->x == other.x && this->y == other.y && this->z == other.z );
+		}
+
+		bool operator<(const Vector3<T> other)
+		{
+			T tmag = ( this->x * this->x ) + ( this->y * this->y ) + ( this->z * this->z );
+			T omag = ( other.x * other.x ) + ( other.y * other.y ) + ( other.z * other.z );
+			return ( tmag < omag );
+		}
+
+		Vector3<T> operator+(const Vector3<T> other)
 		{
 			return Vector3<T>(this->x + other.x, this->y + other.y, this->z + other.z);
 		}
 
-		Vector3<T> operator-(Vector3<T> other)
+		Vector3<T> operator-(const Vector3<T> other)
 		{
 			return Vector3<T>(this->x - other.x, this->y - other.y, this->z - other.z);
 		}
 
-		Vector3<T> operator*(float value)
+		Vector3<T> operator*(const float value)
 		{
 			return Vector3<T>(this->x * value, this->y * value, this->z * value);
 		}
 
-		Vector3<T> operator/(float value)
+		Vector3<T> operator/(const float value)
 		{
 			return Vector3<T>(this->x / value, this->y / value, this->z / value);
 		}
@@ -160,6 +194,23 @@ namespace Common
 		Vector4(T x, T y, T z, T w)
 			: x(x), y(y), z(z), w(w)
 		{ };
+
+		Vector4<T> operator=(const Vector4<T> other)
+		{
+			return Vector4<T>(other.x, other.y, other.z, other.w);
+		}
+
+		bool operator==(const Vector4<T> other)
+		{
+			return ( this->x == other.x && this->y == other.y && this->z == other.z && this->w == other.w );
+		}
+
+		bool operator<(const Vector4<T> other)
+		{
+			T tmag = ( this->x * this->x ) + ( this->y * this->y ) + ( this->z * this->z ) + ( this->w * this->w );
+			T omag = ( other.x * other.x ) + ( other.y * other.y ) + ( other.z * other.z ) + ( other.w * other.w );
+			return ( tmag < omag );
+		}
 
 		Vector4<T> operator+(Vector4<T> other)
 		{

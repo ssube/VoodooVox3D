@@ -33,9 +33,9 @@ World::World(BlockDictionary * dict, RenderEngine * render)
 		{
 			for ( size_t z = 0; z < WORLD_CHUNKS; ++z )
 			{
-				RenderObject * ro = NULL; //render->CreateRenderObject();
+				RenderObject * ro = render->CreateRenderObject(); // Cross dependency
 
-				//ro->SetPosition(fvec3(CHUNK_SIZE * x, CHUNK_SIZE * y, CHUNK_SIZE * z));
+				ro->SetPosition(fvec3(CHUNK_SIZE * x, CHUNK_SIZE * y, CHUNK_SIZE * z)); // Cross dependency
 
 				mObjects[x][y][z] = ro;
 
@@ -59,6 +59,16 @@ World::~World(void)
 	}
 }
 
+ivec3 World::GetBlockPos(fvec3 pos)
+{
+	return Common::Math::Floor(pos / BLOCK_SIZE);
+}
+
+ivec3 World::GetChunkPos(fvec3 pos)
+{
+	return ( Common::Math::Floor(pos / CHUNK_SIZE) + mOriginChunk );
+}
+
 void World::Update()
 {
 	// Handle block physics
@@ -69,22 +79,24 @@ void World::UpdateChunks(fvec3 pos)
 	using namespace Common::Math;
 
 	// Find if we've left the central chunk
-	bool needUpdate = ( pos.x < CHUNK_SIZE ) || ( pos.y < CHUNK_SIZE ) || ( pos.z < CHUNK_SIZE ) ||
-		( pos.x > (CHUNK_SIZE*2) ) || ( pos.y > (CHUNK_SIZE*2) ) || ( pos.z > (CHUNK_SIZE*2) );
+	//bool needUpdate = All(pos, CHUNK_SIZE) && !Any(pos, CHUNK_SIZE*2);
 
-	if ( !needUpdate ) return;
+	// Find the new center chunk
+	ivec3 newOrigin = GetChunkPos(pos);
 
-	// We need to update, find out how much
-	fvec3 relChunk = Vector3Div(pos, CHUNK_SIZE);
-	size_t dX = floor(relChunk.x);
-	size_t dY = floor(relChunk.y);
-	size_t dZ = floor(relChunk.z);
-
-	if ( dX < WORLD_CHUNKS && dY < WORLD_CHUNKS && dZ < WORLD_CHUNKS )
+	if ( newOrigin == mOriginChunk )
 	{
-		// Partial reload
+		return;
 	} else {
-		// Full reload
+		// We need to update, find out how much
+		ivec3 shift = newOrigin - mOriginChunk;
+
+		if ( Any(shift, WORLD_CHUNKS) )
+		{
+			// Full reload
+		} else {
+			// Partial reload
+		}
 	}
 }
 
@@ -95,18 +107,16 @@ fvec3 World::UpdatePosition(fvec3 pos, fvec3 shift)
 	// Need to find the newPos' block, get the speed from that, and lerp
 	//	between oldPos and newPos based on that
 	fvec3 final;
-	fvec3 tempPos;
-	tempPos = Vector3Add(pos, shift);
-	Block * newBlock = GetBlock(tempPos);
+	Block * newBlock = GetBlock(pos + shift);
 
 	if ( newBlock )
 	{
 		fvec3 realShift = shift * newBlock->Speed;
-		final = Vector3Add(pos, realShift);
+		final = pos + realShift;
 	
 		this->UpdateChunks(final);
 	} else {
-		final = Vector3Add(pos, shift);
+		final = pos + shift;
 	}
 
 	return final;
@@ -114,21 +124,17 @@ fvec3 World::UpdatePosition(fvec3 pos, fvec3 shift)
 
 Block * World::GetBlock(fvec3 pos)
 {
-	if (	pos.x < 0	|| pos.y < 0	|| pos.z < 0	|| 
-			pos.x > WORLD_SIZE	|| pos.y > WORLD_SIZE	|| pos.z > WORLD_SIZE	)
+	using namespace Common::Math;
+
+	if ( !Within(0.0f, WORLD_SIZE, pos) )
 	{
 		return NULL;
 	}
 
 	// Is within the world, find the chunk
-	float cX = floor( pos.x / BLOCK_SIZE );
-	float cY = floor( pos.y / BLOCK_SIZE );
-	float cZ = floor( pos.z / BLOCK_SIZE );
-	//cX = max(0, min(WORLD_BLOCKS, cX));
-	//cY = max(0, min(WORLD_BLOCKS, cY));
-	//cZ = max(0, min(WORLD_BLOCKS, cZ));
+	ivec3 blockPos = GetBlockPos( pos / BLOCK_SIZE );
 
-	Block * block = mBlocks[(size_t)cX][(size_t)cY][(size_t)cZ];
+	Block * block = INDEX3(mBlocks, blockPos);
 
 	return block;
 }
@@ -139,19 +145,21 @@ void World::GenerateGeometry(uvec3 position)
 	{
 		mGeometryVector.clear();
 
-		for (int px = CHUNK_BLOCKS*position.x; px < CHUNK_BLOCKS*(position.x+1); px += pow(2.0f, (int)lod))
+		uvec3 blockpos(0);
+
+		for (blockpos.x = CHUNK_BLOCKS*position.x; blockpos.x < CHUNK_BLOCKS*(position.x+1); blockpos.x += pow(2.0f, (int)lod))
 		{
-			for (int py = CHUNK_BLOCKS*position.y; py < CHUNK_BLOCKS*(position.y+1); py += pow(2.0f, (int)lod))
+			for (blockpos.y = CHUNK_BLOCKS*position.y; blockpos.y < CHUNK_BLOCKS*(position.y+1); blockpos.y += pow(2.0f, (int)lod))
 			{
-				for (int pz = CHUNK_BLOCKS*position.z; pz < CHUNK_BLOCKS*(position.z+1); pz += pow(2.0f, (int)lod))
+				for (blockpos.z = CHUNK_BLOCKS*position.z; blockpos.z < CHUNK_BLOCKS*(position.z+1); blockpos.z += pow(2.0f, (int)lod))
 				{
-					this->ProcessPoint(lod, uvec3(px, py, pz), uvec3(position.x, position.y, position.z));
+					this->ProcessPoint(lod, blockpos, position);
 				}
 			}
 		}
 
 		size_t mGeometryCount = mGeometryVector.size();
-		//INDEX3(mObjects, position)->SetGeometry(lod, mGeometryCount, mGeometryVector.begin()._Myptr);
+		INDEX3(mObjects, position)->SetGeometry(lod, mGeometryCount, mGeometryVector.begin()._Myptr); // Cross dependency
 	}
 }
 

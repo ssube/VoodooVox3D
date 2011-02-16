@@ -22,6 +22,8 @@ public:
 	~World(void);
 
 	Block * GetBlock(fvec3 pos);
+	ivec3 GetBlockPos(fvec3 pos);
+	ivec3 GetChunkPos(fvec3 pos);
 
 	void Update();
 	void UpdateChunks(fvec3 pos);
@@ -41,4 +43,6 @@ private:
 	RenderEngine * mRenderer;
 	vector<Vertex> mGeometryVector;
 	WorldGenerator * mGen;
+
+	ivec3 mOriginChunk;
 };

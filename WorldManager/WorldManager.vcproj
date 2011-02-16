@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Common.lib WorldGenerator.lib"
+				AdditionalDependencies="Common.lib WorldGenerator.lib BoxGame.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(TargetDir)"
 				GenerateDebugInformation="true"
@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Common.lib WorldGenerator.lib"
+				AdditionalDependencies="Common.lib WorldGenerator.lib BoxGame.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(TargetDir)"
 				GenerateDebugInformation="true"

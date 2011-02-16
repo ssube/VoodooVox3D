@@ -65,5 +65,88 @@ namespace Common
 		{
 			return ( x.x * 0.27f + x.y * 0.67f + x.z * 0.06f );
 		}
+
+		float Luminance(Vector4<float> x)
+		{
+			return ( x.x * 0.27f + x.y * 0.67f + x.z * 0.06f );
+		}
+
+		Vector2<int> Floor(Vector2<float> x)
+		{
+			return Vector2<int>((int)floor(x.x), (int)floor(x.y));
+		}
+
+		Vector3<int> Floor(Vector3<float> x)
+		{
+			return Vector3<int>((int)floor(x.x), (int)floor(x.y), (int)floor(x.z));
+		}
+
+		Vector4<int> Floor(Vector4<float> x)
+		{
+			return Vector4<int>((int)floor(x.x), (int)floor(x.y), (int)floor(x.z), (int)floor(x.w));
+		}
+
+		template<typename T>
+		bool Any(Vector2<T> x, T y)
+		{
+			return ( x.x > y || x.y > y );
+		}
+
+		template<typename T>
+		bool Any(Vector3<T> x, T y)
+		{
+			return ( x.x > y || x.y > y || x.z > y );
+		}
+
+		template<typename T>
+		bool Any(Vector4<T> x, T y)
+		{
+			return ( x.x > y || x.y > y || x.z > y || x.w > y );
+		}
+
+		template<typename T>
+		bool All(Vector2<T> x, T y)
+		{
+			return ( x.x > y && x.y > y );
+		}
+
+		template<typename T>
+		bool All(Vector3<T> x, T y)
+		{
+			return ( x.x > y && x.y > y && x.z > y );
+		}
+
+		template<typename T>
+		bool All(Vector4<T> x, T y)
+		{
+			return ( x.x > y && x.y > y && x.z > y && x.w > y );
+		}
+
+		template<typename T>
+		bool Within(T bottom, T top, Vector2<T> x)
+		{
+			return ( 
+				x.x >= bottom && x.x < top && 
+				x.y >= bottom && x.y < top );
+		}
+
+		template<typename T>
+		bool Within(T bottom, T top, Vector3<T> x)
+		{
+			return ( 
+				x.x >= bottom && x.x < top && 
+				x.y >= bottom && x.y < top && 
+				x.z >= bottom && x.z < top );
+		}
+
+		template<typename T>
+		bool Within(T bottom, T top, Vector4<T> x)
+		{
+			return ( 
+				x.x >= bottom && x.x < top && 
+				x.y >= bottom && x.y < top && 
+				x.z >= bottom && x.z < top &&
+				x.w >= bottom && x.w < top );
+		}
 	}
 }
