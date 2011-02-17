@@ -6,6 +6,7 @@ RenderObject::RenderObject(LPDIRECT3DDEVICE9 device, LPDIRECT3DVERTEXDECLARATION
 	: mDevice(device), mVertDecl(vertDecl)
 {
 	ZeroMemory(mVertBuffer, sizeof(LPDIRECT3DVERTEXBUFFER9)*4);
+	ZeroMemory(mVertCount, sizeof(size_t) * 4);
 
 	mDevice->AddRef();
 	mVertDecl->AddRef();
@@ -87,13 +88,23 @@ void RenderObject::SetGeometry(size_t lod, size_t vertCount, Vertex * verts)
 }*/
 
 
-void RenderObject::SetPosition(D3DXVECTOR3 pos)
+void RenderObject::SetPosition(fvec3 pos)
 {
 	mPosition = pos;
 	D3DXMatrixTranslation(&mTransform, pos.x, pos.y, pos.z);
 }
 
-D3DXVECTOR3 RenderObject::GetPosition()
+fvec3 RenderObject::GetPosition()
 {
 	return mPosition;
+}
+
+size_t RenderObject::GetVertCount(size_t lod)
+{
+	return mVertCount[lod];
+}
+
+D3DXMATRIX * RenderObject::GetTransform()
+{
+	return &mTransform;
 }

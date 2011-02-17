@@ -35,7 +35,7 @@ RenderEngine::RenderEngine(HWND hWnd)
 		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
 		{0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
 		{0, 24, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
-		{0, 36, D3DDECLTYPE_FLOAT4,	D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,    0},
+		{0, 36, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,    0},
 		D3DDECL_END()
 	};
 
@@ -58,6 +58,19 @@ RenderEngine::RenderEngine(HWND hWnd)
 	mTextRect.top = top; mTextRect.bottom = top + 150;
 
 	HRESULT hrTex = D3DXCreateTextureFromFile(mDevice, L"texture.png", &mLandTexture);
+
+	LPD3DXBUFFER shaderErrors;
+	HRESULT hrShader = D3DXCreateEffectFromFile(mDevice, L"render.fx", NULL, NULL, NULL, NULL, &mDefaultShader, &shaderErrors); 
+	if ( FAILED(hrShader) )
+	{
+		MessageBoxA(hWnd, (char*)shaderErrors->GetBufferPointer(), "Shader Error", NULL);
+	}
+
+	HRESULT hrValid = mDefaultShader->FindNextValidTechnique(NULL, &mShader_Technique);
+	mDefaultShader->SetTechnique(mShader_Technique);
+
+	mShader_MVPMatrix = mDefaultShader->GetParameterByName(NULL, "ModelViewProj");
+	mShader_BaseTexture = mDefaultShader->GetParameterByName(NULL, "BaseTexture");
 
 	mLastTicks = mTicks = GetTickCount();
 }
@@ -122,10 +135,16 @@ void RenderEngine::Render()
 	//mDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	//mDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
-	mDevice->SetTexture(0, mLandTexture);
+	//mDevice->SetTexture(0, mLandTexture);
+	mDefaultShader->SetTexture(mShader_BaseTexture, mLandTexture);
+
 	mDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 	mDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 	mDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+
+	size_t tris = 0;
+
+	UINT passes;
 
 	vector<RenderObject*>::iterator ittr = mRenderObjects.begin();
 	while ( ittr != mRenderObjects.end() )
@@ -134,13 +153,27 @@ void RenderEngine::Render()
 		D3DXVECTOR3 objPos = (*ittr)->GetPosition();
 		D3DXVECTOR3 diff;
 		float dist = D3DXVec3LengthSq(D3DXVec3Subtract(&diff, &camPos, &objPos));
-		int lod = dist / ( 1000000 / LOD_COUNT );
+		int lod = min(dist / ( 1000000 / LOD_COUNT ), LOD_COUNT - 1);
 
-		if ( lod < 0 || lod >= LOD_COUNT )
+		if ( lod < 0 )
 		{
 			// skip
 		} else {
+			tris += (*ittr)->GetVertCount(lod);
+
+			D3DXMATRIX mvp = *(*ittr)->GetTransform();
+			D3DXMatrixMultiply(&mvp, &mvp, (mCamera->GetViewMatrix()));
+			D3DXMatrixMultiply(&mvp, &mvp, &mProj);
+
+			mDefaultShader->SetMatrix(mShader_MVPMatrix, &mvp);
+
+			mDefaultShader->Begin(&passes, NULL);
+			mDefaultShader->BeginPass(0);
+
 			(*ittr)->Render(lod);
+
+			mDefaultShader->EndPass();
+			mDefaultShader->End();
 		}
 
 		++ittr;
@@ -159,7 +192,7 @@ void RenderEngine::Render()
 	++frames;
 	if ( mTicks > fpsTicks )
 	{		
-		sprintf(msg, "Box Game [Native DirectX]; FPS: %d\0", frames);
+		sprintf(msg, "Box Game [Native DirectX]; %u tris @ %u FPS\0", tris, frames);
 
 		frames = 0;
 		fpsTicks = mTicks + 1000;

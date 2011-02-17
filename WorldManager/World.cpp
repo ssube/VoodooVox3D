@@ -18,7 +18,7 @@ World::World(BlockDictionary * dict, RenderEngine * render)
 				//float raw = mGen->GetPoint(x/D3DX_PI, y/D3DX_PI, z/D3DX_PI);
 				//int cid = floor(raw * idList.size());
 
-				BlockTemplate * temp = dict->GetTemplate(segment->Blocks[segment->Index(x, y, z)]);
+				BlockTemplate * temp = dict->GetTemplate(idList[segment->Blocks[segment->Index(x, y, z)]]);
 
 				mBlocks[x][y][z] = new Block(temp);
 			}

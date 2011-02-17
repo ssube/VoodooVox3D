@@ -14,24 +14,25 @@ namespace Common
 #ifdef D3DX_CONVERSION_FUNCS
 		operator D3DXVECTOR2()
 		{
-			return D3DXVECTOR2((float)x, (float)y);
-		}
+			//return D3DXVECTOR2((float)x, (float)y);
+			return *(D3DXVECTOR2*)this;
+		};
 
 		operator D3DXVECTOR3()
 		{
 			return D3DXVECTOR3((float)x, (float)y, 0.0f);
-		}
+		};
 
 		operator D3DXVECTOR4()
 		{
 			return D3DXVECTOR4((float)x, (float)y, 0.0f, 1.0f);
-		}
+		};
 
 		Vector2(D3DXVECTOR2 v)
 			: x(v.x), y(v.y)
 		{
 
-		}
+		};
 #endif
 
 		Vector2()
@@ -48,40 +49,43 @@ namespace Common
 
 		Vector2<T> operator=(const Vector2<T> other)
 		{
-			return Vector2<T>(other.x, other.y);
-		}
+			this->x = other.x;
+			this->y = other.y;
+
+			return *this;
+		};
 
 		bool operator==(const Vector2<T> other)
 		{
 			return ( this->x == other.x && this->y == other.y );
-		}
+		};
 
 		bool operator<(const Vector2<T> other)
 		{
 			T tmag = ( this->x * this->x ) + ( this->y * this->y );
 			T omag = ( other.x * other.x ) + ( other.y * other.y );
 			return ( tmag < omag );
-		}
+		};
 
 		Vector2<T> operator+(const Vector2<T> other)
 		{
 			return Vector2<T>(this->x + other.x, this->y + other.y);
-		}
+		};
 
 		Vector2<T> operator-(const Vector2<T> other)
 		{
 			return Vector2<T>(this->x - other.x, this->y - other.y);
-		}
+		};
 
 		Vector2<T> operator*(const float value)
 		{
 			return Vector2<T>(this->x * value, this->y * value);
-		}
+		};
 
 		Vector2<T> operator/(const float value)
 		{
 			return Vector2<T>(this->x / value, this->y / value);
-		}
+		};
 	};
 
 	/**
@@ -96,19 +100,20 @@ namespace Common
 #ifdef D3DX_CONVERSION_FUNCS
 		operator D3DXVECTOR3()
 		{
-			return D3DXVECTOR3((float)x, (float)y, (float)z);
-		}
+			//return D3DXVECTOR3((float)x, (float)y, (float)z);
+			return *(D3DXVECTOR3*)this;
+		};
 
 		operator D3DXVECTOR4()
 		{
 			return D3DXVECTOR4((float)x, (float)y, (float)z, 1.0f);
-		}
+		};
 
 		Vector3(D3DXVECTOR3 v)
 			: x(v.x), y(v.y), z(v.z)
 		{
 
-		}
+		};
 #endif
 
 		Vector3()
@@ -125,40 +130,44 @@ namespace Common
 
 		Vector3<T> operator=(const Vector3<T> other)
 		{
-			return Vector3<T>(other.x, other.y, other.z);
-		}
+			this->x = other.x;
+			this->y = other.y;
+			this->z = other.z;
+
+			return *this;
+		};
 
 		bool operator==(const Vector3<T> other)
 		{
 			return ( this->x == other.x && this->y == other.y && this->z == other.z );
-		}
+		};
 
 		bool operator<(const Vector3<T> other)
 		{
 			T tmag = ( this->x * this->x ) + ( this->y * this->y ) + ( this->z * this->z );
 			T omag = ( other.x * other.x ) + ( other.y * other.y ) + ( other.z * other.z );
 			return ( tmag < omag );
-		}
+		};
 
 		Vector3<T> operator+(const Vector3<T> other)
 		{
 			return Vector3<T>(this->x + other.x, this->y + other.y, this->z + other.z);
-		}
+		};
 
 		Vector3<T> operator-(const Vector3<T> other)
 		{
 			return Vector3<T>(this->x - other.x, this->y - other.y, this->z - other.z);
-		}
+		};
 
 		Vector3<T> operator*(const float value)
 		{
 			return Vector3<T>(this->x * value, this->y * value, this->z * value);
-		}
+		};
 
 		Vector3<T> operator/(const float value)
 		{
 			return Vector3<T>(this->x / value, this->y / value, this->z / value);
-		}
+		};
 	};
 
 	/**
@@ -173,14 +182,15 @@ namespace Common
 #ifdef D3DX_CONVERSION_FUNCS
 		operator D3DXVECTOR4()
 		{
-			return D3DXVECTOR4((float)x, (float)y, (float)z, (float)w);
-		}
+			//return D3DXVECTOR4((float)x, (float)y, (float)z, (float)w);
+			return *(D3DXVECTOR3*)this;
+		};
 
 		Vector4(D3DXVECTOR4 v)
 			: x(v.x), y(v.y), z(v.z), w(v.w)
 		{
 
-		}
+		};
 #endif
 
 		Vector4()
@@ -197,40 +207,45 @@ namespace Common
 
 		Vector4<T> operator=(const Vector4<T> other)
 		{
-			return Vector4<T>(other.x, other.y, other.z, other.w);
-		}
+			this->x = other.x;
+			this->y = other.y;
+			this->z = other.z;
+			this->w = other.w;
+
+			return *this;
+		};
 
 		bool operator==(const Vector4<T> other)
 		{
 			return ( this->x == other.x && this->y == other.y && this->z == other.z && this->w == other.w );
-		}
+		};
 
 		bool operator<(const Vector4<T> other)
 		{
 			T tmag = ( this->x * this->x ) + ( this->y * this->y ) + ( this->z * this->z ) + ( this->w * this->w );
 			T omag = ( other.x * other.x ) + ( other.y * other.y ) + ( other.z * other.z ) + ( other.w * other.w );
 			return ( tmag < omag );
-		}
+		};
 
 		Vector4<T> operator+(Vector4<T> other)
 		{
 			return Vector4<T>(this->x + other.x, this->y + other.y, this->z + other.z, this->w + other.w);
-		}
+		};
 
 		Vector4<T> operator-(Vector4<T> other)
 		{
 			return Vector4<T>(this->x - other.x, this->y - other.y, this->z - other.z, this->w - other.w);
-		}
+		};
 
 		Vector4<T> operator*(float value)
 		{
 			return Vector4<T>(this->x * value, this->y * value, this->z * value, this->w * value);
-		}
+		};
 
 		Vector4<T> operator/(float value)
 		{
 			return Vector4<T>(this->x / value, this->y / value, this->z / value, this->w / value);
-		}
+		};
 	};
 
 #	define INDEX2(o, n) o[n.x][n.y]
@@ -274,7 +289,5 @@ namespace Common
 		)
 			: Position(x, y, z), Normal(nx, ny, nz), Texture(tu, tv, tw), Color(cr, cg, cb, ca)
 		{ };
-
-		unsigned long DXColor();
 	};
 }

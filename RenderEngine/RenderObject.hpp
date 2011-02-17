@@ -10,9 +10,14 @@ using namespace Common;
 class RenderObject
 {
 public:
-	void SetGeometry(size_t lod, size_t vertCount, Vertex * verts);
-	void SetPosition(Vector3<float> position);
-	Vector3<float> GetPosition();
+	virtual void Render(size_t lod);
+
+	virtual size_t GetVertCount(size_t lod);
+	virtual void SetGeometry(size_t lod, size_t vertCount, Vertex * verts);
+
+	virtual void SetPosition(fvec3 position);
+	virtual fvec3 GetPosition();
+
 };
 #else
 #include "Includes.hpp"
@@ -23,12 +28,16 @@ public:
 	RenderObject(LPDIRECT3DDEVICE9 device, LPDIRECT3DVERTEXDECLARATION9 vertDecl);
 	~RenderObject(void);
 
-	void Render(size_t lod);
+	virtual void Render(size_t lod);
 
-	void SetGeometry(size_t lod, size_t vertCount, Vertex * verts);
+	virtual size_t GetVertCount(size_t lod);
+	virtual void SetGeometry(size_t lod, size_t vertCount, Vertex * verts);
 
-	void SetPosition(D3DXVECTOR3 pos);
-	D3DXVECTOR3 GetPosition();
+	virtual void SetPosition(fvec3 pos);
+	virtual fvec3 GetPosition();
+
+	virtual D3DXMATRIX * GetTransform();
+
 
 private:
 	LPDIRECT3DDEVICE9 mDevice;
@@ -36,6 +45,7 @@ private:
 
 	size_t mVertCount[LOD_COUNT];
 	LPDIRECT3DVERTEXBUFFER9 mVertBuffer[LOD_COUNT];
+
 
 	D3DXVECTOR3 mPosition;
 	D3DXMATRIX mTransform;

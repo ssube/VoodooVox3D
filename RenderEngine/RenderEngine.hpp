@@ -6,8 +6,12 @@
 class RenderEngine
 {
 public:
-	RenderObject * CreateRenderObject();
-	void DestroyRenderObject(RenderObject * object);
+	virtual RenderObject * CreateRenderObject();
+	virtual void DestroyRenderObject(RenderObject * object);
+
+	virtual void * GetCamera();
+	virtual float GetFrameDelta();
+	virtual void Render();
 };
 #else
 #include "Includes.hpp"
@@ -22,13 +26,13 @@ public:
 	RenderEngine(HWND hWnd);
 	~RenderEngine(void);
 
-	RenderObject * CreateRenderObject();
-	void DestroyRenderObject(RenderObject * object);
+	virtual RenderObject * CreateRenderObject();
+	virtual void DestroyRenderObject(RenderObject * object);
 
-	Camera * GetCamera();
-	float GetFrameDelta();
+	virtual Camera * GetCamera();
+	virtual float GetFrameDelta();
 
-	void Render();
+	virtual void Render();
 
 private:
 	LPDIRECT3D9 mObject;
@@ -44,6 +48,11 @@ private:
 
 	LPDIRECT3DTEXTURE9 mLandTexture;
 	LPDIRECT3DVERTEXDECLARATION9 mVertDecl;
+	LPD3DXEFFECT mDefaultShader;
+
+	D3DXHANDLE mShader_Technique;
+	D3DXHANDLE mShader_BaseTexture;
+	D3DXHANDLE mShader_MVPMatrix;
 
 	vector<RenderObject*> mRenderObjects;
 };
