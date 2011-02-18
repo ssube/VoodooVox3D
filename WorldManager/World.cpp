@@ -253,9 +253,9 @@ void World::ProcessPoint(size_t lod, uvec3 position, uvec3 chunk)
 	}
 
 	//mBlocks[x][y][z]->Light = lighting;
-	float vrshade = ( 255.0f - ( rand() % 32 ) );// * lighting;
-	float vgshade = ( 255.0f - ( rand() % 24 ) );// * lighting;
-	float vbshade = ( 255.0f - ( rand() % 48 ) );// * lighting;
+	float vrshade = ( 255.0f - ( rand() % 32 ) ) / 255.0f;// * lighting;
+	float vgshade = ( 255.0f - ( rand() % 24 ) ) / 255.0f;// * lighting;
+	float vbshade = ( 255.0f - ( rand() % 48 ) ) / 255.0f;// * lighting;
 
 	// Calculate the offset and positions
 	float offset = BLOCK_SIZE * (lod + 1);
@@ -270,78 +270,78 @@ void World::ProcessPoint(size_t lod, uvec3 position, uvec3 chunk)
 	// Test the left:
 	if (!b[0][1][1])
 	{
-		// On the -X, facing -X, with b[1][1][]'s texture
-		mGeometryVector.push_back(Vertex(px, py, pz,			-1, 0, 0, texX, texY, 0,		vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px, py, pz + offset,	-1, 0, 0, texX, texY+0.5f, 0,	vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px, py + offset, pz + offset, -1, 0, 0, texX+0.5f, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		// On the -X, facing -X
+		mGeometryVector.push_back(Vertex(         px,          py,          pz, -1, 0, 0,        texX,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px,          py, pz + offset, -1, 0, 0,        texX, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px, py + offset, pz + offset, -1, 0, 0, texX + 0.5f, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
 
-		mGeometryVector.push_back(Vertex(px , py + offset, pz + offset, -1, 0, 0, texX+0.5f, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px , py + offset, pz , -1, 0, 0, texX+0.5f, texY, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px , py , pz , -1, 0, 0, texX, texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px, py + offset, pz + offset, -1, 0, 0, texX + 0.5f, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px, py + offset,          pz, -1, 0, 0, texX + 0.5f,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px,          py,          pz, -1, 0, 0,        texX,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
 	}
 
 	// Test the right:
 	if (!b[2][1][1])
 	{
-		// On the +X, facing -X
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, +1, 0, 0, texX+0.5f, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px + offset, py , pz + offset, +1, 0, 0, texX, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px + offset, py , pz , +1, 0, 0, texX, texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		// On the +X, facing +X
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, +1, 0, 0, texX + 0.5f, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset,          py, pz + offset, +1, 0, 0,        texX, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset,          py,          pz, +1, 0, 0,        texX,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
 
-		mGeometryVector.push_back(Vertex(px + offset, py , pz , +1, 0, 0, texX, texY, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz , +1, 0, 0, texX+0.5f, texY, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, +1, 0, 0, texX+0.5f, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset,          py,          pz, +1, 0, 0,        texX,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset,          pz, +1, 0, 0, texX + 0.5f,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, +1, 0, 0, texX + 0.5f, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
 	}
 
 	// Test the bottom:
 	if (!b[1][0][1])
 	{
 		// On the -Y, facing -Y
-		mGeometryVector.push_back(Vertex(px + offset, py , pz , 0, -1, 0, texX+0.5f, texY, texture, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px + offset, py , pz + offset, 0, -1, 0, texX+0.5f, texY+0.5f, texture, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px , py , pz + offset, 0, -1, 0, texX, texY+0.5f, texture, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset,          py,          pz, 0, -1, 0, texX + 0.5f,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset,          py, pz + offset, 0, -1, 0, texX + 0.5f, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px,          py, pz + offset, 0, -1, 0,        texX, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
 
-		mGeometryVector.push_back(Vertex(px , py , pz + offset, 0, -1, 0, texX, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px , py , pz , 0, -1, 0, texX, texY, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px + offset, py , pz , 0, -1, 0, texX+0.5f, texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px,          py, pz + offset, 0, -1, 0,        texX, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px,          py,          pz, 0, -1, 0,        texX,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset,          py,          pz, 0, -1, 0, texX + 0.5f,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
 	}
 
 	// Test the top:
 	if (!b[1][2][1])
 	{
 		// On the +Y, facing -Y
-		mGeometryVector.push_back(Vertex(px , py + offset, pz + offset, 0, +1, 0, texX, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, 0, +1, 0, texX+0.5f, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz , 0, +1, 0, texX+0.5f, texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px,          py + offset, pz + offset, 0, +1, 0,        texX, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset,          py + offset, pz + offset, 0, +1, 0, texX + 0.5f, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset,          py + offset,          pz, 0, +1, 0, texX + 0.5f,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
 
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz , 0, +1, 0, texX+0.5f, texY, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px , py + offset, pz , 0, +1, 0, texX, texY, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px , py + offset, pz + offset, 0, +1, 0, texX, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset,          py + offset,          pz, 0, +1, 0, texX + 0.5f,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px,          py + offset,          pz, 0, +1, 0,        texX,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px,          py + offset, pz + offset, 0, +1, 0,        texX, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
 	}
 
 	// Test the near side:
 	if (!b[1][1][0])
 	{
 		// On the -Z, facing -Z
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz , 0, 0, -1, texX+0.5f, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px + offset, py , pz , 0, 0, -1, texX+0.5f, texY, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px , py , pz , 0, 0, -1, texX, texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset,          pz, 0, 0, -1, texX + 0.5f, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset,          py,          pz, 0, 0, -1, texX + 0.5f,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px,          py,          pz, 0, 0, -1,        texX,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
 
-		mGeometryVector.push_back(Vertex(px , py , pz , 0, 0, -1, texX, texY, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px , py + offset, pz , 0, 0, -1, texX, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz , 0, 0, -1, texX+0.5f, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px,          py,          pz, 0, 0, -1,        texX,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px, py + offset,          pz, 0, 0, -1,        texX, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset,          pz, 0, 0, -1, texX + 0.5f, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
 	}
 
 	// Test the far side:
 	if (!b[1][1][2])
 	{
 		// On the +Z, facing -Z
-		mGeometryVector.push_back(Vertex(px , py , pz + offset, 0, 0, +1, texX, texY, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px + offset, py , pz + offset, 0, 0, +1, texX+0.5f, texY, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, 0, 0, +1, texX+0.5f, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px,          py, pz + offset, 0, 0, +1,        texX,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset,          py, pz + offset, 0, 0, +1, texX + 0.5f,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, 0, 0, +1, texX + 0.5f, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
 
-		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, 0, 0, +1, texX+0.5f, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px , py + offset, pz + offset, 0, 0, +1, texX, texY+0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px , py , pz + offset, 0, 0, +1, texX, texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, 0, 0, +1, texX + 0.5f, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px, py + offset, pz + offset, 0, 0, +1,        texX, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px,          py, pz + offset, 0, 0, +1,        texX,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
 	}
 }

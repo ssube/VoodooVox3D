@@ -32,10 +32,10 @@ RenderEngine::RenderEngine(HWND hWnd)
 
 	D3DVERTEXELEMENT9 vertElems[] = 
 	{
-		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-		{0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
-		{0, 24, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
-		{0, 36, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,    0},
+		{0,  0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		{0, 16, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
+		{0, 28, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+		{0, 40, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1},
 		D3DDECL_END()
 	};
 
@@ -69,8 +69,8 @@ RenderEngine::RenderEngine(HWND hWnd)
 	HRESULT hrValid = mDefaultShader->FindNextValidTechnique(NULL, &mShader_Technique);
 	mDefaultShader->SetTechnique(mShader_Technique);
 
-	mShader_MVPMatrix = mDefaultShader->GetParameterByName(NULL, "ModelViewProj");
-	mShader_BaseTexture = mDefaultShader->GetParameterByName(NULL, "BaseTexture");
+	mShader_MVPMatrix = mDefaultShader->GetParameterBySemantic(NULL, "MATRIX_MVP");
+	mShader_BaseTexture = mDefaultShader->GetParameterBySemantic(NULL, "TEXTURE_BASE");
 
 	mLastTicks = mTicks = GetTickCount();
 }
@@ -83,7 +83,6 @@ RenderEngine::~RenderEngine(void)
 	mDevice->Release();
 	mObject->Release();
 }
-
 
 RenderObject * RenderEngine::CreateRenderObject()
 {
@@ -161,9 +160,7 @@ void RenderEngine::Render()
 		} else {
 			tris += (*ittr)->GetVertCount(lod);
 
-			D3DXMATRIX mvp = *(*ittr)->GetTransform();
-			D3DXMatrixMultiply(&mvp, &mvp, (mCamera->GetViewMatrix()));
-			D3DXMatrixMultiply(&mvp, &mvp, &mProj);
+			D3DXMATRIX mvp = (*(*ittr)->GetTransform()) * (*(mCamera->GetViewMatrix())) * mProj;
 
 			mDefaultShader->SetMatrix(mShader_MVPMatrix, &mvp);
 

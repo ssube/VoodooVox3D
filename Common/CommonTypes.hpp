@@ -271,7 +271,7 @@ namespace Common
 	 */
 	struct __declspec(dllexport) Vertex
 	{
-		Vector3<float> Position;
+		Vector4<float> Position;
 		Vector3<float> Normal;
 		Vector3<float> Texture;
 		Vector4<float> Color;
@@ -282,12 +282,12 @@ namespace Common
 
 		Vertex
 		(
-			float x, float y, float z, 
+			float x, float y, float z,
 			float nx, float ny, float nz, 
 			float tu, float tv, float tw, 
 			float cr, float cg, float cb, float ca
 		)
-			: Position(x, y, z), Normal(nx, ny, nz), Texture(tu, tv, tw), Color(cr, cg, cb, ca)
+			: Position(x, y, z, 1.0f), Normal(nx, ny, nz), Texture(tu, tv, tw), Color(cr, cg, cb, ca)
 		{ };
 	};
 }
