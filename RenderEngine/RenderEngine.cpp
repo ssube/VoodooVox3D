@@ -73,6 +73,8 @@ RenderEngine::RenderEngine(HWND hWnd)
 	mShader_BaseTexture = mDefaultShader->GetParameterBySemantic(NULL, "TEXTURE_BASE");
 
 	mLastTicks = mTicks = GetTickCount();
+
+	this->CreateOcclusionData();
 }
 
 RenderEngine::~RenderEngine(void)
@@ -84,9 +86,97 @@ RenderEngine::~RenderEngine(void)
 	mObject->Release();
 }
 
+void RenderEngine::CreateOcclusionData()
+{
+	D3DVERTEXELEMENT9 vertElemsOccl[] = 
+	{
+		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		D3DDECL_END()
+	};
+
+	HRESULT hrVD = mDevice->CreateVertexDeclaration(vertElemsOccl, &mVertOcclDecl);
+
+	if ( FAILED(hrVD) )
+	{
+		throw std::runtime_error("Error creating occlusion vertex decl.");
+	}
+
+	HRESULT hrOG = mDevice->CreateVertexBuffer(36 * sizeof(fvec3), D3DUSAGE_WRITEONLY, NULL, D3DPOOL_DEFAULT, &mOcclGeometry, NULL);
+
+	float CHUNK_SIZE = 80.0f;
+
+	fvec3 occlGeom[] = 
+	{
+		// Face 1
+		fvec3(      0.0f,       0.0f,       0.0f),
+		fvec3(      0.0f,       0.0f, CHUNK_SIZE),
+		fvec3(      0.0f, CHUNK_SIZE, CHUNK_SIZE),
+		fvec3(      0.0f, CHUNK_SIZE, CHUNK_SIZE),
+		fvec3(      0.0f, CHUNK_SIZE,       0.0f),
+		fvec3(      0.0f,       0.0f,       0.0f),
+		// Face 2
+		fvec3(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE),
+		fvec3(CHUNK_SIZE,       0.0f, CHUNK_SIZE),
+		fvec3(CHUNK_SIZE,       0.0f,       0.0f),
+		fvec3(CHUNK_SIZE,       0.0f,       0.0f),
+		fvec3(CHUNK_SIZE, CHUNK_SIZE,       0.0f),
+		fvec3(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE),
+		// Face 3
+		fvec3(CHUNK_SIZE,       0.0f,       0.0f),
+		fvec3(CHUNK_SIZE,       0.0f, CHUNK_SIZE),
+		fvec3(      0.0f,       0.0f, CHUNK_SIZE),
+		fvec3(      0.0f,       0.0f, CHUNK_SIZE),
+		fvec3(      0.0f,       0.0f,       0.0f),
+		fvec3(CHUNK_SIZE,       0.0f,       0.0f),
+		// Face 4
+		fvec3(      0.0f, CHUNK_SIZE, CHUNK_SIZE),
+		fvec3(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE),
+		fvec3(CHUNK_SIZE, CHUNK_SIZE,       0.0f),
+		fvec3(CHUNK_SIZE, CHUNK_SIZE,       0.0f),
+		fvec3(      0.0f, CHUNK_SIZE,       0.0f),
+		fvec3(      0.0f, CHUNK_SIZE, CHUNK_SIZE),
+		// Face 5
+		fvec3(CHUNK_SIZE, CHUNK_SIZE,       0.0f),
+		fvec3(CHUNK_SIZE,       0.0f,       0.0f),
+		fvec3(      0.0f,       0.0f,       0.0f),
+		fvec3(      0.0f,       0.0f,       0.0f),
+		fvec3(      0.0f, CHUNK_SIZE,       0.0f),
+		fvec3(CHUNK_SIZE, CHUNK_SIZE,       0.0f),
+		// Face 6
+		fvec3(      0.0f,       0.0f, CHUNK_SIZE),
+		fvec3(CHUNK_SIZE,       0.0f, CHUNK_SIZE),
+		fvec3(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE),
+		fvec3(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE),
+		fvec3(      0.0f, CHUNK_SIZE, CHUNK_SIZE),
+		fvec3(      0.0f,       0.0f, CHUNK_SIZE),
+	};
+
+	VOID * vbVerts;
+
+	HRESULT hrVB = mOcclGeometry->Lock(0, 36 * sizeof(fvec3), &vbVerts, 0);
+
+	if ( FAILED(hrVB) )
+	{
+		throw std::runtime_error("Error locking occlusion vertex buffer.");
+	}
+
+	memcpy(vbVerts, occlGeom, 36 * sizeof(fvec3));
+
+	mOcclGeometry->Unlock();
+
+	D3DXCreateTexture(mDevice, 256, 256, 1, D3DUSAGE_RENDERTARGET, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &mOcclusionTexture);
+	
+	D3DSURFACE_DESC desc;
+	mOcclusionTexture->GetSurfaceLevel(0, &mOcclusionSurface);
+	mOcclusionSurface->GetDesc(&desc);
+
+	D3DXCreateRenderToSurface(mDevice, desc.Width, desc.Height, D3DFMT_X8R8G8B8, TRUE, D3DFMT_D24S8, &mOcclusionRTS);
+}
+
 RenderObject * RenderEngine::CreateRenderObject()
 {
 	RenderObject * obj = new RenderObject(mDevice, mVertDecl);
+	obj->SetOcclusionData(mOcclGeometry, mVertOcclDecl);
 	mRenderObjects.push_back(obj);
 	return obj;
 }
@@ -120,26 +210,36 @@ DWORD fpsTicks, frames;
 
 void RenderEngine::Render()
 {
-	D3DXVECTOR3 camPos = mCamera->GetPosition();
-
-	mDevice->SetTransform(D3DTS_VIEW, mCamera->GetViewMatrix());
-
-	mDevice->Clear(0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, D3DCOLOR_XRGB(32, 64, 72), 1.0f, 0);	
-
 	mDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	mDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 	mDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 	mDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
-	//mDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	//mDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	//mDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
-	//mDevice->SetTexture(0, mLandTexture);
+	D3DXVECTOR3 camPos = mCamera->GetPosition();
+	mDevice->SetTransform(D3DTS_VIEW, mCamera->GetViewMatrix());
+
+	// Depth-sort objects
+
+	// Perform occlusion checking
+	if ( SUCCEEDED( mOcclusionRTS->BeginScene(mOcclusionSurface, NULL) ) )
+	{
+		mDevice->Clear(0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);	
+
+		vector<RenderObject*>::iterator ittr = mRenderObjects.begin();
+		while ( ittr != mRenderObjects.end() )
+		{
+			(*ittr)->UpdateOcclusion();
+
+			++ittr;
+		}
+
+		mOcclusionRTS->EndScene(NULL);
+
+	}
+
+	mDevice->Clear(0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, D3DCOLOR_XRGB(32, 64, 72), 1.0f, 0);	
+
 	mDefaultShader->SetTexture(mShader_BaseTexture, mLandTexture);
-
-	mDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-	mDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-	mDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 
 	size_t tris = 0;
 
@@ -149,28 +249,31 @@ void RenderEngine::Render()
 	while ( ittr != mRenderObjects.end() )
 	{
 		// Find distance from the camera
-		D3DXVECTOR3 objPos = (*ittr)->GetPosition();
-		D3DXVECTOR3 diff;
-		float dist = D3DXVec3LengthSq(D3DXVec3Subtract(&diff, &camPos, &objPos));
-		int lod = min(dist / ( 1000000 / LOD_COUNT ), LOD_COUNT - 1);
-
-		if ( lod < 0 )
+		if ( (*ittr)->GetVisible() )
 		{
-			// skip
-		} else {
-			tris += (*ittr)->GetVertCount(lod);
+			D3DXVECTOR3 objPos = (*ittr)->GetPosition();
+			D3DXVECTOR3 diff;
+			float dist = D3DXVec3LengthSq(D3DXVec3Subtract(&diff, &camPos, &objPos));
+			int lod = min(dist / ( 1000000 / LOD_COUNT ), LOD_COUNT - 1);
 
-			D3DXMATRIX mvp = (*(*ittr)->GetTransform()) * (*(mCamera->GetViewMatrix())) * mProj;
+			if ( lod < 0 )
+			{
+				// skip
+			} else {
+				tris += (*ittr)->GetVertCount(lod);
 
-			mDefaultShader->SetMatrix(mShader_MVPMatrix, &mvp);
+				D3DXMATRIX mvp = (*(*ittr)->GetTransform()) * (*(mCamera->GetViewMatrix())) * mProj;
 
-			mDefaultShader->Begin(&passes, NULL);
-			mDefaultShader->BeginPass(0);
+				mDefaultShader->SetMatrix(mShader_MVPMatrix, &mvp);
 
-			(*ittr)->Render(lod);
+				mDefaultShader->Begin(&passes, NULL);
+				mDefaultShader->BeginPass(0);
 
-			mDefaultShader->EndPass();
-			mDefaultShader->End();
+				(*ittr)->Render(lod);
+
+				mDefaultShader->EndPass();
+				mDefaultShader->End();
+			}
 		}
 
 		++ittr;
@@ -189,7 +292,8 @@ void RenderEngine::Render()
 	++frames;
 	if ( mTicks > fpsTicks )
 	{		
-		sprintf(msg, "Box Game [Native DirectX]; %u tris @ %u FPS\0", tris, frames);
+		float trueFPS = frames / ( ( 1000.0f + ( mTicks - fpsTicks ) ) / 1000.0f );
+		sprintf(msg, "Box Game [Native DirectX]; %u tris @ %f FPS\0", tris, trueFPS);
 
 		frames = 0;
 		fpsTicks = mTicks + 1000;

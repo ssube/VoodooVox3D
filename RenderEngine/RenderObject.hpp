@@ -1,6 +1,7 @@
 #pragma once
 
 #define LOD_COUNT 4
+#define OCCL_THRESHOLD 8
 
 using namespace Common;
 
@@ -17,6 +18,9 @@ public:
 
 	virtual void SetPosition(fvec3 position);
 	virtual fvec3 GetPosition();
+
+	virtual bool GetVisible();
+	virtual void UpdateOcclusion();
 
 };
 #else
@@ -36,20 +40,27 @@ public:
 	virtual void SetPosition(fvec3 pos);
 	virtual fvec3 GetPosition();
 
+	virtual bool GetVisible();
+	virtual void UpdateOcclusion();
+
 	virtual D3DXMATRIX * GetTransform();
+	virtual void SetOcclusionData(LPDIRECT3DVERTEXBUFFER9 buffer, LPDIRECT3DVERTEXDECLARATION9 decl);
 
 
 private:
 	LPDIRECT3DDEVICE9 mDevice;
 	LPDIRECT3DVERTEXDECLARATION9 mVertDecl;
 
+	LPDIRECT3DQUERY9 mOcclQuery;
+	LPDIRECT3DVERTEXDECLARATION9 mVertOcclDecl;
+	LPDIRECT3DVERTEXBUFFER9 mOcclGeometry;
+
 	size_t mVertCount[LOD_COUNT];
 	LPDIRECT3DVERTEXBUFFER9 mVertBuffer[LOD_COUNT];
-
 
 	D3DXVECTOR3 mPosition;
 	D3DXMATRIX mTransform;
 
-	bool mHasGeometry;
+	bool mHasGeometry, mOccluded;
 };
 #endif

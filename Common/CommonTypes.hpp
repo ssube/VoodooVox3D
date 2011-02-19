@@ -264,10 +264,9 @@ namespace Common
 	typedef Vector3<int>	ivec3;
 	typedef Vector4<int>	ivec4;
 
-
 	/**
-	 * Standard vertex format. Contains position, normal, texture and color (stored as an OpenGL
-	 * compatible set of floats, with a helper method to get a DirectX DWORD).
+	 * Standard vertex format. Contains position, normal, texture and color.
+	 * Not compatible with DirectX without a shader.
 	 */
 	struct __declspec(dllexport) Vertex
 	{

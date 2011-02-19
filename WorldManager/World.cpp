@@ -310,13 +310,13 @@ void World::ProcessPoint(size_t lod, uvec3 position, uvec3 chunk)
 	if (!b[1][2][1])
 	{
 		// On the +Y, facing -Y
-		mGeometryVector.push_back(Vertex(         px,          py + offset, pz + offset, 0, +1, 0,        texX, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px + offset,          py + offset, pz + offset, 0, +1, 0, texX + 0.5f, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(px + offset,          py + offset,          pz, 0, +1, 0, texX + 0.5f,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px, py + offset, pz + offset, 0, +1, 0,        texX, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset, pz + offset, 0, +1, 0, texX + 0.5f, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset,          pz, 0, +1, 0, texX + 0.5f,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
 
-		mGeometryVector.push_back(Vertex(px + offset,          py + offset,          pz, 0, +1, 0, texX + 0.5f,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(         px,          py + offset,          pz, 0, +1, 0,        texX,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
-		mGeometryVector.push_back(Vertex(         px,          py + offset, pz + offset, 0, +1, 0,        texX, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(px + offset, py + offset,          pz, 0, +1, 0, texX + 0.5f,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px, py + offset,          pz, 0, +1, 0,        texX,        texY, 0, vrshade, vgshade, vbshade, 1.0f));
+		mGeometryVector.push_back(Vertex(         px, py + offset, pz + offset, 0, +1, 0,        texX, texY + 0.5f, 0, vrshade, vgshade, vbshade, 1.0f));
 	}
 
 	// Test the near side:

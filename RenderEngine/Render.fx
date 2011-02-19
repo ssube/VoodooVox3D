@@ -2,7 +2,10 @@
 texture BaseTexture : TEXTURE_BASE;
 sampler2D DiffuseSampler = sampler_state
 {
-	texture = BaseTexture; 
+	Texture = <BaseTexture>; 
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	MipFilter = LINEAR;
 };
 
 float4x4 ModelViewProj : MATRIX_MVP;
@@ -26,8 +29,7 @@ void vstage(in VertexIn iv, out VertexOut ov)
 {
 	ov.Position = mul(iv.Position, ModelViewProj);
 	ov.TexCoord = iv.TexCoord.xy;
-	ov.Color.xyz = floor(iv.Color.xyz + 0.1f);
-	ov.Color.w = 1.0f;
+	ov.Color = iv.Color;
 }
 
 void pstage(in VertexOut iv, out float4 color : COLOR)
