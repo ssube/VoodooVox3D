@@ -8,13 +8,13 @@
 #include <windows.h>
 
 #ifndef WORLDMANAGER_IMPORT
-#	define WORLDMANAGER_API __declspec(dllexport)
+#    define WORLDMANAGER_API __declspec(dllexport)
 #else
-#	define WORLDMANAGER_API __declspec(dllimport)
+#    define WORLDMANAGER_API __declspec(dllimport)
 #endif
 
 #define CHUNK_BLOCKS 8
-#define WORLD_CHUNKS 13
+#define WORLD_CHUNKS 9
 #define WORLD_BLOCKS WORLD_CHUNKS * CHUNK_BLOCKS
 
 #define BLOCK_SIZE 10.0f

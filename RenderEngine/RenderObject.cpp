@@ -4,177 +4,182 @@
 
 RenderObject::RenderObject
 (
-	LPDIRECT3DDEVICE9 device, 
-	LPDIRECT3DVERTEXDECLARATION9 vertDecl
+    LPDIRECT3DDEVICE9 device, 
+    LPDIRECT3DVERTEXDECLARATION9 vertDecl
 )
-	: mDevice(device), mVertDecl(vertDecl), mVertBuffer(NULL)
+    : mDevice(device), mVertDecl(vertDecl), mVertBuffer(NULL)
 {
-	ZeroMemory(mVertOffset, sizeof(size_t) * 4);
-	ZeroMemory(mVertCount, sizeof(size_t) * 4);
+    ZeroMemory(mVertOffset, sizeof(size_t) * 4);
+    ZeroMemory(mVertCount, sizeof(size_t) * 4);
 
-	mDevice->AddRef();
-	mVertDecl->AddRef();
+    mDevice->AddRef();
+    mVertDecl->AddRef();
 
-	D3DXMatrixIdentity(&mTransform);
+    D3DXMatrixIdentity(&mTransform);
 
-	HRESULT hrOQ = mDevice->CreateQuery(D3DQUERYTYPE_OCCLUSION, &mOcclQuery);
+    HRESULT hrOQ = mDevice->CreateQuery(D3DQUERYTYPE_OCCLUSION, &mOcclQuery);
 }
 
 RenderObject::~RenderObject(void)
 {
-	//mEngine->DestroyRenderObject(this);
+    //mEngine->DestroyRenderObject(this);
 
-	if ( mVertBuffer )
-	{
-		mVertBuffer->Release();
-	}
-	if ( mVertDecl )
-	{
-		mVertDecl->Release();
-	}
-	if ( mVertOcclDecl )
-	{
-		mVertOcclDecl->Release();
-	}
-	if ( mOcclQuery )
-	{
-		mOcclQuery->Release();
-	}
-	if ( mOcclGeometry )
-	{
-		mOcclGeometry->Release();
-	}
-	if ( mDevice )
-	{
-		mDevice->Release();
-	}
+    if ( mVertBuffer )
+    {
+        mVertBuffer->Release();
+    }
+    if ( mVertDecl )
+    {
+        mVertDecl->Release();
+    }
+    if ( mVertOcclDecl )
+    {
+        mVertOcclDecl->Release();
+    }
+    if ( mOcclQuery )
+    {
+        mOcclQuery->Release();
+    }
+    if ( mOcclGeometry )
+    {
+        mOcclGeometry->Release();
+    }
+    if ( mDevice )
+    {
+        mDevice->Release();
+    }
+}
+
+void RenderObject::SetLOD(size_t lod)
+{
+    mLOD = lod;
+}
+
+size_t RenderObject::GetLOD()
+{
+    return mLOD;
 }
 
 void RenderObject::Render(size_t lod)
 {
-	if ( ! mHasGeometry ) return;
-	if ( ! mVertBuffer ) return;
+    if ( ! mHasGeometry ) return;
+    if ( ! mVertBuffer ) return;
 
-	mDevice->SetTransform(D3DTS_WORLD, &mTransform);
+    mDevice->SetTransform(D3DTS_WORLD, &mTransform);
 
-	if ( SUCCEEDED(mDevice->BeginScene()) )
-	{
-		mDevice->SetStreamSource(0, mVertBuffer, sizeof(Vertex) * mVertOffset[lod], sizeof(Vertex));
-		mDevice->SetVertexDeclaration(mVertDecl);
+    //if ( SUCCEEDED(mDevice->BeginScene()) )
+    //{
+        mDevice->SetStreamSource(0, mVertBuffer, sizeof(Vertex) * mVertOffset[lod], sizeof(Vertex));
+        mDevice->SetVertexDeclaration(mVertDecl);
 
-		mDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, mVertCount[lod] / 3);
+        mDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, mVertCount[lod] / 3);
 
-		mDevice->EndScene();
-	}
+    //    mDevice->EndScene();
+    //}
 }
 
 void RenderObject::SetGeometry(size_t total, size_t * offsets, size_t * counts, Vertex * verts)
 {
-	memcpy(mVertOffset, offsets, sizeof(size_t) * LOD_COUNT);
-	memcpy(mVertCount,  counts,  sizeof(size_t) * LOD_COUNT);
+    memcpy(mVertOffset, offsets, sizeof(size_t) * LOD_COUNT);
+    memcpy(mVertCount,  counts,  sizeof(size_t) * LOD_COUNT);
 
-	// Check for counts
-	if ( total == 0 )
-	{
-		mHasGeometry = false;
-	} else {
-		mHasGeometry = true;
+    // Check for counts
+    if ( total == 0 )
+    {
+        mHasGeometry = false;
+    } else {
+        mHasGeometry = true;
 
-		UINT vbSize = sizeof(Vertex) * total;
+        UINT vbSize = sizeof(Vertex) * total;
 
-		if ( FAILED(mDevice->CreateVertexBuffer(vbSize, D3DUSAGE_WRITEONLY, NULL, D3DPOOL_DEFAULT, &mVertBuffer, NULL) ) )
-		{
-			throw std::runtime_error("Unable to create vertex buffer.");
-		}
+        if ( FAILED(mDevice->CreateVertexBuffer(vbSize, D3DUSAGE_WRITEONLY, NULL, D3DPOOL_DEFAULT, &mVertBuffer, NULL) ) )
+        {
+            throw std::runtime_error("Unable to create vertex buffer.");
+        }
 
-		VOID * vbVerts;
+        VOID * vbVerts;
 
-		HRESULT hrVB = mVertBuffer->Lock(0, vbSize, &vbVerts, 0);
+        HRESULT hrVB = mVertBuffer->Lock(0, vbSize, &vbVerts, 0);
 
-		if ( FAILED(hrVB) )
-		{
-			throw std::runtime_error("Error locking vertex buffer.");
-		}
+        if ( FAILED(hrVB) )
+        {
+            throw std::runtime_error("Error locking vertex buffer.");
+        }
 
-		memcpy(vbVerts, verts, vbSize);
+        memcpy(vbVerts, verts, vbSize);
 
-		mVertBuffer->Unlock();
-	}
+        mVertBuffer->Unlock();
+    }
 }
 
 void RenderObject::SetOcclusionData(LPDIRECT3DVERTEXBUFFER9 buffer, LPDIRECT3DVERTEXDECLARATION9 decl)
 {
-	mOcclGeometry = buffer;
-	mVertOcclDecl = decl;
+    //mOcclGeometry = buffer;
+    //mVertOcclDecl = decl;
 
-	mOcclGeometry->AddRef();
-	mVertOcclDecl->AddRef();
+    //mOcclGeometry->AddRef();
+    //mVertOcclDecl->AddRef();
 }
 
 /*void RenderObject::SetTransform(D3DXMATRIX trans)
 {
-	mTransform = trans;
+    mTransform = trans;
 }*/
 
 
 void RenderObject::SetPosition(fvec3 pos)
 {
-	mPosition = pos;
-	D3DXMatrixTranslation(&mTransform, pos.x, pos.y, pos.z);
+    mPosition = pos;
+    D3DXMatrixTranslation(&mTransform, pos.x, pos.y, pos.z);
 }
 
 fvec3 RenderObject::GetPosition()
 {
-	return mPosition;
+    return mPosition;
 }
 
 size_t RenderObject::GetVertCount(size_t lod)
 {
-	return mVertCount[lod];
+    return mVertCount[lod];
 }
 
 D3DXMATRIX * RenderObject::GetTransform()
 {
-	return &mTransform;
+    return &mTransform;
 }
 
 bool RenderObject::GetVisible()
 {
-	return ( mHasGeometry && !mOccluded );
+    return ( mHasGeometry && !mOccluded );
 }
 
 void RenderObject::UpdateOcclusion()
 {
-	if ( !mHasGeometry )
-	{
-		mOccluded = true;
-		return;
-	}
+    if ( !mHasGeometry )
+    {
+        mOccluded = true;
+        return;
+    }
 
-	DWORD pixels;
-	HRESULT queryDone = mOcclQuery->GetData(&pixels, sizeof(DWORD), 0);
+    DWORD pixels;
+    HRESULT queryDone = mOcclQuery->GetData(&pixels, sizeof(DWORD), 0);
 
-	if ( queryDone == S_OK )
-	{
-		// Process
-		mOccluded = ( pixels < 4 );
-	}
+    if ( queryDone == S_OK )
+    {
+        // Process
+        mOccluded = !( pixels > 0 );
+    }
 
-	mOcclQuery->Issue(D3DISSUE_BEGIN);
+    mOcclQuery->Issue(D3DISSUE_BEGIN);
 
-	mDevice->SetTransform(D3DTS_WORLD, &mTransform);
+    mDevice->SetTransform(D3DTS_WORLD, &mTransform);
 
-	//if ( SUCCEEDED(mDevice->BeginScene()) )
-	//{
-		mDevice->SetStreamSource(0, mOcclGeometry, 0, sizeof(fvec3));
-		mDevice->SetVertexDeclaration(mVertOcclDecl);
+    mDevice->SetStreamSource(0, mVertBuffer, sizeof(Vertex) * mVertOffset[0], sizeof(Vertex));
+    mDevice->SetVertexDeclaration(mVertDecl);
 
-		mDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 12);
+    mDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, mVertCount[0] / 3);
 
-	//	mDevice->EndScene();
-	//}
+    mOcclQuery->Issue(D3DISSUE_END);
 
-	mOcclQuery->Issue(D3DISSUE_END);
-
-	return;
+    return;
 }

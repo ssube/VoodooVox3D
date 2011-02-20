@@ -18,31 +18,31 @@
 class __declspec(dllexport) World
 {
 public:
-	World(BlockDictionary * dict, RenderEngine * render);
-	~World(void);
+    World(BlockDictionary * dict, RenderEngine * render);
+    ~World(void);
 
-	Block * GetBlock(fvec3 pos);
-	ivec3 GetBlockPos(fvec3 pos);
-	ivec3 GetChunkPos(fvec3 pos);
+    Block * GetBlock(fvec3 pos);
+    ivec3 GetBlockPos(fvec3 pos);
+    ivec3 GetChunkPos(fvec3 pos);
 
-	void Update();
-	void UpdateChunks(fvec3 pos);
-	fvec3 UpdatePosition(fvec3 pos, fvec3 shift);
+    void Update();
+    void UpdateChunks(fvec3 pos);
+    fvec3 UpdatePosition(fvec3 pos, fvec3 shift);
 
-	//GeometryBuffer * GenerateChunkGeometry(Vector3<size_t> position);
-
-private:
-	void GenerateGeometry(uvec3 position);
-	void ProcessPoint(size_t lod, uvec3 position, uvec3 chunk);
+    //GeometryBuffer * GenerateChunkGeometry(Vector3<size_t> position);
 
 private:
-	Block * mBlocks[WORLD_BLOCKS][WORLD_BLOCKS][WORLD_BLOCKS];
-	RenderObject * mObjects[WORLD_CHUNKS][WORLD_CHUNKS][WORLD_CHUNKS];
+    void GenerateGeometry(uvec3 position);
+    void ProcessPoint(size_t lod, uvec3 position, uvec3 chunk);
 
-	BlockDictionary * mDictionary;
-	RenderEngine * mRenderer;
-	vector<Vertex> mGeometryVector;
-	WorldGenerator * mGen;
+private:
+    Block * mBlocks[WORLD_BLOCKS][WORLD_BLOCKS][WORLD_BLOCKS];
+    RenderObject * mObjects[WORLD_CHUNKS][WORLD_CHUNKS][WORLD_CHUNKS];
 
-	ivec3 mOriginChunk;
+    BlockDictionary * mDictionary;
+    RenderEngine * mRenderer;
+    vector<Vertex> mGeometryVector;
+    WorldGenerator * mGen;
+
+    ivec3 mOriginChunk;
 };

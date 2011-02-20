@@ -1,29 +1,34 @@
 #pragma once
 
-#include "Includes.hpp"
+#ifndef RENDERENGINE_INTERFACE
+#    include "Includes.hpp"
+#endif
+
+#include "CommonTypes.hpp"
+using namespace Common;
 
 class Camera
 {
 public:
-	Camera(void);
-	~Camera(void);
+    Camera(void);
+    ~Camera(void);
 
-	void Translate(D3DXVECTOR3 translate);
-	void TranslateRaw(D3DXVECTOR3 translate);
+    void Translate(fvec3 translate);
+    void TranslateRaw(fvec3 translate);
 
-	void Rotate(float yaw, float pitch);
+    void Rotate(float yaw, float pitch);
 
-	D3DXVECTOR3 Transform(D3DXVECTOR3 shift);
+    fvec3 Transform(fvec3 shift);
 
-	D3DXVECTOR3 GetPosition();
-	void SetPosition(D3DXVECTOR3 pos);
+    fvec3 GetPosition();
+    void SetPosition(fvec3 pos);
 
-	D3DXMATRIX * GetViewMatrix();
+    fmat4x4 * GetViewMatrix();
 
 private:
-	D3DXVECTOR3 mPos, mForward, mUp;
-	float mYaw, mPitch;
+    fvec3 mPos, mForward, mUp;
+    float mYaw, mPitch;
 
-	bool mDirty;
-	D3DXMATRIX mViewMat;
+    bool mDirty;
+    fmat4x4 mViewMat;
 };

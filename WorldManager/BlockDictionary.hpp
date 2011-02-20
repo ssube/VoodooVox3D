@@ -8,21 +8,21 @@ using namespace std;
 class __declspec(dllexport) BlockDictionary
 {
 public:
-	// Serialization functions
-	static BlockDictionary * Deserialize(void * buffer);
-	void * Serialize(unsigned long * size);
+    // Serialization functions
+    static BlockDictionary * Deserialize(void * buffer);
+    void * Serialize(unsigned long * size);
 
-	static BlockDictionary * FromFile(string filename);
-	void ToFile(string filename);
+    static BlockDictionary * FromFile(string filename);
+    void ToFile(string filename);
 
-	BlockDictionary(void);
-	~BlockDictionary(void);
+    BlockDictionary(void);
+    ~BlockDictionary(void);
 
-	void AddTemplate(BlockTemplate * temp);
+    void AddTemplate(BlockTemplate * temp);
 
-	vector<int> GetTemplateList();
-	BlockTemplate * GetTemplate(int id);
+    vector<int> GetTemplateList();
+    BlockTemplate * GetTemplate(int id);
 
 private:
-	map<int, BlockTemplate*> mTemplates;
+    map<int, BlockTemplate*> mTemplates;
 };

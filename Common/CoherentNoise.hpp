@@ -10,18 +10,18 @@
 
 namespace Common
 {
-	namespace Noise
-	{
-		class COMMON_API CoherentNoise
-		{
-		public:
-			CoherentNoise(int seed);
+    namespace Noise
+    {
+        class COMMON_API CoherentNoise
+        {
+        public:
+            CoherentNoise(int seed);
 
-			float GetPoint(fvec3 position);
-			float GetOctavePoint(fvec3 position, size_t octaves);
+            float GetPoint(fvec3 position);
+            float GetOctavePoint(fvec3 position, size_t octaves);
 
-		private:
-			float mValues[COHERENTNOISE_SIZE][COHERENTNOISE_SIZE][COHERENTNOISE_SIZE];
-		};
-	}
+        private:
+            float mValues[COHERENTNOISE_SIZE][COHERENTNOISE_SIZE][COHERENTNOISE_SIZE];
+        };
+    }
 }

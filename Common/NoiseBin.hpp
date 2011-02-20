@@ -5,20 +5,20 @@
 
 namespace Common
 {
-	namespace Noise
-	{
-		class __declspec(dllexport) NoiseBin
-		{
-		public:
-			NoiseBin(size_t seed, size_t items);
-			~NoiseBin(void);
+    namespace Noise
+    {
+        class __declspec(dllexport) NoiseBin
+        {
+        public:
+            NoiseBin(size_t seed, size_t items);
+            ~NoiseBin(void);
 
-			float Next();
-			void Fill();
+            float Next();
+            void Fill();
 
-		private:
-			size_t mSeed, mCount;
-			std::vector<float> mBin;
-		};
-	}
+        private:
+            size_t mSeed, mCount;
+            std::vector<float> mBin;
+        };
+    }
 }

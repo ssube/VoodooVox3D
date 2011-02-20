@@ -4,12 +4,12 @@
 #include "BlockTemplate.hpp"
 
 class __declspec(dllexport) Block :
-	public BlockTemplate
+    public BlockTemplate
 {
 public:
-	Block(BlockTemplate * temp);
-	~Block(void);
+    Block(BlockTemplate * temp);
+    ~Block(void);
 
-	int Health;
-	float Light;
+    int Health;
+    float Light;
 };
