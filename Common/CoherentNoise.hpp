@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CommonDefs.hpp"
+
 #include <stdlib.h>
 #include "CommonTypes.hpp"
 #include "Math.hpp"
@@ -10,7 +12,7 @@ namespace Common
 {
 	namespace Noise
 	{
-		class __declspec(dllexport) CoherentNoise
+		class COMMON_API CoherentNoise
 		{
 		public:
 			CoherentNoise(int seed);

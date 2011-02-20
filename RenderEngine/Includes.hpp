@@ -17,5 +17,8 @@
 #include <dinput.h>
 
 // Common includes
+#define COMMON_IMPORT
 #define D3DX_CONVERSION_FUNCS
 #include "CommonTypes.hpp"
+#include "Math.hpp"
+#include "VectorMath.hpp"

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CommonDefs.hpp"
+
 namespace Common
 {
 	/**
@@ -7,7 +9,7 @@ namespace Common
 	 * with D3DXVECTOR2.
 	 */
 	template<typename T>
-	struct __declspec(dllexport) Vector2
+	struct Vector2
 	{
 		T x, y;
 
@@ -93,7 +95,7 @@ namespace Common
 	 * with D3DXVECTOR3.
 	 */
 	template<typename T>
-	struct __declspec(dllexport) Vector3
+	struct Vector3
 	{
 		T x, y, z;
 
@@ -175,7 +177,7 @@ namespace Common
 	 * with D3DXVECTOR4.
 	 */
 	template<typename T>
-	struct __declspec(dllexport) Vector4
+	struct Vector4
 	{
 		T x, y, z, w;
 
@@ -268,7 +270,7 @@ namespace Common
 	 * Standard vertex format. Contains position, normal, texture and color.
 	 * Not compatible with DirectX without a shader.
 	 */
-	struct __declspec(dllexport) Vertex
+	struct Vertex
 	{
 		Vector4<float> Position;
 		Vector3<float> Normal;

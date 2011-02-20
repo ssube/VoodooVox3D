@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CommonDefs.hpp"
+
 #include <math.h>
 
 namespace Common

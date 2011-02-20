@@ -1,5 +1,6 @@
 #include "RenderEngine.hpp"
 
+
 RenderEngine::RenderEngine(HWND hWnd)
 	: mFrameTime(0.0f)
 {
@@ -14,8 +15,8 @@ RenderEngine::RenderEngine(HWND hWnd)
 	pp.Windowed = TRUE;
 	pp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	pp.BackBufferCount = 1;
-	pp.BackBufferWidth = 640;
-	pp.BackBufferHeight = 480;
+	pp.BackBufferWidth = 800;
+	pp.BackBufferHeight = 600;
 	pp.BackBufferFormat = D3DFMT_X8R8G8B8;
 	pp.AutoDepthStencilFormat = D3DFMT_D24S8;
 	pp.EnableAutoDepthStencil = TRUE;
@@ -183,7 +184,7 @@ RenderObject * RenderEngine::CreateRenderObject()
 
 void RenderEngine::DestroyRenderObject(RenderObject * object)
 {
-	vector<RenderObject*>::iterator ittr = mRenderObjects.begin();
+	list<RenderObject*>::iterator ittr = mRenderObjects.begin();
 	while ( ittr != mRenderObjects.end() )
 	{
 		if ( (*ittr) == object )
@@ -205,38 +206,72 @@ float RenderEngine::GetFrameDelta()
 	return mFrameTime;
 }
 
+fvec3 camPos;
+DWORD sortOps;
+bool DistanceSort(RenderObject * a, RenderObject * b)
+{
+	using namespace Common::Math;
+
+	++sortOps;
+
+	float adist = DistSq(a->GetPosition(), camPos);
+	float bdist = DistSq(b->GetPosition(), camPos);
+	return ( adist < bdist );
+}
+
 char msg[256];
 DWORD fpsTicks, frames;
+D3DXMATRIX lastPos;
 
 void RenderEngine::Render()
 {
+	using namespace Common::Math;
+
 	mDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	mDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 	mDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 	mDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
 
-	D3DXVECTOR3 camPos = mCamera->GetPosition();
-	mDevice->SetTransform(D3DTS_VIEW, mCamera->GetViewMatrix());
+	int sortTime = -1, occlTime = -1;
+	DWORD occlOps = 0, drawOps = 0;
 
-	// Depth-sort objects
+	camPos = mCamera->GetPosition();
+	D3DXMATRIX * nowPos = mCamera->GetViewMatrix();
 
-	// Perform occlusion checking
-	if ( SUCCEEDED( mOcclusionRTS->BeginScene(mOcclusionSurface, NULL) ) )
+	if ( lastPos != *nowPos )
 	{
-		mDevice->Clear(0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);	
+		mDevice->SetTransform(D3DTS_VIEW, nowPos);
 
-		vector<RenderObject*>::iterator ittr = mRenderObjects.begin();
-		while ( ittr != mRenderObjects.end() )
+		// Depth-sort objects
+		sortOps = 0;
+		sortTime = GetTickCount();
+		mRenderObjects.sort(DistanceSort);
+		sortTime = GetTickCount() - sortTime;
+
+		// Perform occlusion checking
+		occlOps = 0;
+		occlTime = GetTickCount();
+		if ( SUCCEEDED( mOcclusionRTS->BeginScene(mOcclusionSurface, NULL) ) )
 		{
-			(*ittr)->UpdateOcclusion();
+			mDevice->Clear(0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);	
 
-			++ittr;
+			list<RenderObject*>::iterator ittr = mRenderObjects.begin();
+			while ( ittr != mRenderObjects.end() )
+			{
+				(*ittr)->UpdateOcclusion();
+
+				++occlOps;
+				++ittr;
+			}
+
+			mOcclusionRTS->EndScene(NULL);
 		}
+		occlTime = GetTickCount() - occlTime;
 
-		mOcclusionRTS->EndScene(NULL);
-
+		lastPos = *nowPos;
 	}
 
+	DWORD drawTime = GetTickCount();
 	mDevice->Clear(0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, D3DCOLOR_XRGB(32, 64, 72), 1.0f, 0);	
 
 	mDefaultShader->SetTexture(mShader_BaseTexture, mLandTexture);
@@ -245,22 +280,20 @@ void RenderEngine::Render()
 
 	UINT passes;
 
-	vector<RenderObject*>::iterator ittr = mRenderObjects.begin();
+	list<RenderObject*>::iterator ittr = mRenderObjects.begin();
 	while ( ittr != mRenderObjects.end() )
 	{
 		// Find distance from the camera
 		if ( (*ittr)->GetVisible() )
 		{
-			D3DXVECTOR3 objPos = (*ittr)->GetPosition();
-			D3DXVECTOR3 diff;
-			float dist = D3DXVec3LengthSq(D3DXVec3Subtract(&diff, &camPos, &objPos));
+			float dist = DistSq((*ittr)->GetPosition(), camPos);
 			int lod = min(dist / ( 1000000 / LOD_COUNT ), LOD_COUNT - 1);
 
 			if ( lod < 0 )
 			{
 				// skip
 			} else {
-				tris += (*ittr)->GetVertCount(lod);
+				tris += (*ittr)->GetVertCount(lod) / 3;
 
 				D3DXMATRIX mvp = (*(*ittr)->GetTransform()) * (*(mCamera->GetViewMatrix())) * mProj;
 
@@ -273,11 +306,14 @@ void RenderEngine::Render()
 
 				mDefaultShader->EndPass();
 				mDefaultShader->End();
+
+				++drawOps;
 			}
 		}
 
 		++ittr;
 	}
+	drawTime = GetTickCount() - drawTime;
 
 	mDevice->BeginScene();
 	mFont->DrawTextA(NULL, msg, strlen(msg), &mTextRect, DT_LEFT, D3DCOLOR_ARGB(0xFF, 0xFF, 0xFF, 0xFF));
@@ -293,7 +329,7 @@ void RenderEngine::Render()
 	if ( mTicks > fpsTicks )
 	{		
 		float trueFPS = frames / ( ( 1000.0f + ( mTicks - fpsTicks ) ) / 1000.0f );
-		sprintf(msg, "Box Game [Native DirectX]; %u tris @ %f FPS\0", tris, trueFPS);
+		sprintf(msg, "Box Game [Native DirectX]; %u tris @ %.2f FPS\nTiming (ticks/ops): %d/%u sort; %d/%u occl; %u/%u draw\0", tris, trueFPS, sortTime, sortOps, occlTime, occlOps, drawTime, drawOps);
 
 		frames = 0;
 		fpsTicks = mTicks + 1000;

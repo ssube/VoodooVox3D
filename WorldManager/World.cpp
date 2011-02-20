@@ -141,9 +141,13 @@ Block * World::GetBlock(fvec3 pos)
 
 void World::GenerateGeometry(uvec3 position)
 {
+	size_t lodOffset[4], lodVCount[4];
+
+	mGeometryVector.clear();
+
 	for ( size_t lod = 0; lod < LOD_COUNT; ++lod )
 	{
-		mGeometryVector.clear();
+		lodOffset[lod] = mGeometryVector.size();
 
 		uvec3 blockpos(0);
 
@@ -158,9 +162,10 @@ void World::GenerateGeometry(uvec3 position)
 			}
 		}
 
-		size_t mGeometryCount = mGeometryVector.size();
-		INDEX3(mObjects, position)->SetGeometry(lod, mGeometryCount, mGeometryVector.begin()._Myptr); // Cross dependency
+		lodVCount[lod] = mGeometryVector.size() - lodOffset[lod];
 	}
+
+	INDEX3(mObjects, position)->SetGeometry(mGeometryVector.size(), lodOffset, lodVCount, mGeometryVector.begin()._Myptr); // Cross dependency
 }
 
 void World::ProcessPoint(size_t lod, uvec3 position, uvec3 chunk)

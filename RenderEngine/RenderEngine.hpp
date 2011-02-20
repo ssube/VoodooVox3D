@@ -66,6 +66,6 @@ private:
 	D3DXHANDLE mShader_BaseTexture;
 	D3DXHANDLE mShader_MVPMatrix;
 
-	vector<RenderObject*> mRenderObjects;
+	list<RenderObject*> mRenderObjects;
 };
 #endif

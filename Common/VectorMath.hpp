@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CommonDefs.hpp"
+
 #include "CommonTypes.hpp"
 #include "Math.hpp"
 
@@ -61,30 +63,15 @@ namespace Common
 			return Vector4<T>(x.x / y, x.y / y, x.z / y, x.w / y);
 		}
 
-		float Luminance(Vector3<float> x)
-		{
-			return ( x.x * 0.27f + x.y * 0.67f + x.z * 0.06f );
-		}
+		float COMMON_API Luminance(Vector3<float> x);
 
-		float Luminance(Vector4<float> x)
-		{
-			return ( x.x * 0.27f + x.y * 0.67f + x.z * 0.06f );
-		}
+		float COMMON_API Luminance(Vector4<float> x);
 
-		Vector2<int> Floor(Vector2<float> x)
-		{
-			return Vector2<int>((int)floor(x.x), (int)floor(x.y));
-		}
+		Vector2<int> COMMON_API Floor(Vector2<float> x);
 
-		Vector3<int> Floor(Vector3<float> x)
-		{
-			return Vector3<int>((int)floor(x.x), (int)floor(x.y), (int)floor(x.z));
-		}
+		Vector3<int> COMMON_API Floor(Vector3<float> x);
 
-		Vector4<int> Floor(Vector4<float> x)
-		{
-			return Vector4<int>((int)floor(x.x), (int)floor(x.y), (int)floor(x.z), (int)floor(x.w));
-		}
+		Vector4<int> COMMON_API Floor(Vector4<float> x);
 
 		template<typename T>
 		bool Any(Vector2<T> x, T y)
@@ -149,15 +136,19 @@ namespace Common
 				x.w >= bottom && x.w < top );
 		}
 
-		unsigned long DXColor(fvec4 Color)
+		unsigned long COMMON_API DXColor(fvec4 Color);
+
+		float COMMON_API LengthSq(fvec2 a);
+
+		float COMMON_API LengthSq(fvec3 a);
+
+		float COMMON_API LengthSq(fvec4 a);
+
+		template<typename T>
+		float DistSq(T a, T b)
 		{
-			unsigned long color = 0;
-			unsigned char r = (size_t)(Color.x * 255.0f);
-			unsigned char g = (size_t)(Color.y * 255.0f);
-			unsigned char b = (size_t)(Color.z * 255.0f);
-			unsigned char a = (size_t)(Color.w * 255.0f);
-			color = ( a << 24 ) | ( r << 16 ) | ( g << 8 ) | b;
-			return color;
+			T diff = a - b;
+			return LengthSq(diff);
 		}
 	}
 }

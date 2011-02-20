@@ -29,7 +29,7 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 	RegisterClassEx(&wc);
 
 	// Create the window
-	HWND hWnd = CreateWindow(L"BoxGame", L"Box Game [DirectX Native]", WS_OVERLAPPEDWINDOW, 100, 300, 640, 480, GetDesktopWindow(), NULL, wc.hInstance, NULL);
+	HWND hWnd = CreateWindow(L"BoxGame", L"Box Game [DirectX Native]", WS_OVERLAPPEDWINDOW, 100, 300, 800, 600, GetDesktopWindow(), NULL, wc.hInstance, NULL);
 
 	engine = new RenderEngine(hWnd);
 

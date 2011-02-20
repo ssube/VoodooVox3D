@@ -4,14 +4,14 @@
 
 using namespace std;
 
-struct __declspec(dllexport) BlockTemplate
+struct WORLDMANAGER_API BlockTemplate
 {
 public:
-	int ID;
+	unsigned char ID;
+	unsigned char DefaultHealth;
 	char Name[16];
 	float Speed;
 	size_t Texture;
 	bool Occludes;
 	bool Visible;
-	int DefaultHealth;
 };

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="Common"
-	ProjectGUID="{7E58BDAB-A610-4F48-A1EF-426CB9481DE3}"
-	RootNamespace="Common"
+	Name="FileSystem"
+	ProjectGUID="{C8FEF444-855F-425B-A1BE-A8E10D507329}"
+	RootNamespace="FileSystem"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -41,7 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;COMMON_EXPORTS"
+				AdditionalIncludeDirectories="$(SolutionDir)\Common"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FILESYSTEM_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -114,7 +115,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;COMMON_EXPORTS"
+				AdditionalIncludeDirectories="$(SolutionDir)\Common"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FILESYSTEM_EXPORTS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -171,19 +173,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\CoherentNoise.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CommonTypes.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\NoiseBin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\VectorMath.cpp"
+				RelativePath=".\WorldLoader.cpp"
 				>
 			</File>
 		</Filter>
@@ -193,27 +183,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\CoherentNoise.hpp"
+				RelativePath=".\Includes.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\CommonDefs.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CommonTypes.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Math.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\NoiseBin.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\VectorMath.hpp"
+				RelativePath=".\WorldLoader.hpp"
 				>
 			</File>
 		</Filter>

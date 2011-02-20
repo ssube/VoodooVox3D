@@ -1,6 +1,6 @@
 #pragma once
 
-#define LOD_COUNT 4
+#define LOD_COUNT 3
 #define OCCL_THRESHOLD 8
 
 using namespace Common;
@@ -14,7 +14,7 @@ public:
 	virtual void Render(size_t lod);
 
 	virtual size_t GetVertCount(size_t lod);
-	virtual void SetGeometry(size_t lod, size_t vertCount, Vertex * verts);
+	virtual void SetGeometry(size_t total, size_t * offsets, size_t * counts, Vertex * verts);
 
 	virtual void SetPosition(fvec3 position);
 	virtual fvec3 GetPosition();
@@ -35,7 +35,7 @@ public:
 	virtual void Render(size_t lod);
 
 	virtual size_t GetVertCount(size_t lod);
-	virtual void SetGeometry(size_t lod, size_t vertCount, Vertex * verts);
+	virtual void SetGeometry(size_t total, size_t * offsets, size_t * counts, Vertex * verts);
 
 	virtual void SetPosition(fvec3 pos);
 	virtual fvec3 GetPosition();
@@ -56,7 +56,8 @@ private:
 	LPDIRECT3DVERTEXBUFFER9 mOcclGeometry;
 
 	size_t mVertCount[LOD_COUNT];
-	LPDIRECT3DVERTEXBUFFER9 mVertBuffer[LOD_COUNT];
+	size_t mVertOffset[LOD_COUNT];
+	LPDIRECT3DVERTEXBUFFER9 mVertBuffer;
 
 	D3DXVECTOR3 mPosition;
 	D3DXMATRIX mTransform;

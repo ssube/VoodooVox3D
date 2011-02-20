@@ -23,11 +23,13 @@ namespace Common
 			{
 				// Empty, refill
 				Fill();
-			} else {
-				float item = *current;
-				mBin.erase(current);
-				return item;
+
+				current = mBin.begin();
 			}
+
+			float item = *current;
+			mBin.erase(current);
+			return item;
 		}
 
 		void NoiseBin::Fill()
