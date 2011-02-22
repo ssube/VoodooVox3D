@@ -12,6 +12,7 @@
 using namespace Common;
 
 class RenderObject
+    : OctreeObject
 {
 public:
 #ifndef RENDERENGINE_INTERFACE
@@ -20,31 +21,30 @@ public:
 #endif
 
     virtual bool    GetVisible();
-    virtual size_t  GetLOD();
+    virtual int32   GetLOD();
     virtual fvec3   GetPosition();
     virtual fmat4x4 GetTransform();
 
     virtual void    SetVisible(bool visible);
-    virtual void    SetLOD(size_t lod);
+    virtual void    SetLOD(int32 lod);
     virtual void    SetPosition(fvec3 pos);
     virtual void    SetTransform(fmat4x4 transform);
 
-    virtual size_t  GetVertCount(size_t lod);
-    virtual size_t  GetVertOffset(size_t lod);
-    virtual void    SetGeometry(size_t total, size_t * offsets, size_t * counts, Vertex * verts);
+    virtual uint32  GetVertCount(int32 lod);
+    virtual uint32  GetVertOffset(int32 lod);
+    virtual void    SetGeometry(uint32 total, uint32 * offsets, uint32 * counts, Vertex * verts);
 
-    virtual void    Render();
-    virtual void    UpdateOcclusion();
-
+    virtual void    Render(int32 lod = -1);
+    virtual uint32  UpdateOcclusion();
 
 #ifndef RENDERENGINE_INTERFACE
 private:
-    size_t mLOD;
-    size_t mVertCount[LOD_COUNT];
-    size_t mVertOffset[LOD_COUNT];
+    int32 mLOD;
+    uint32 mVertCount[LOD_COUNT];
+    uint32 mVertOffset[LOD_COUNT];
 
     fvec3 mPosition;
-    fmat4x4 mTransform;
+    D3DXMATRIX mTransform;
 
     bool mHasGeometry, mOccluded, mVisible;
 

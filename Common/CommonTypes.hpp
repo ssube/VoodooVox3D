@@ -4,6 +4,19 @@
 
 namespace Common
 {
+#    define INDEX2(o, n) o[n.x][n.y]
+#    define INDEX3(o, n) o[n.x][n.y][n.z]
+#    define INDEX4(o, n) o[n.x][n.y][n.z][n.w]
+
+    typedef unsigned __int8   uint8;
+    typedef __int8            int8;
+    typedef unsigned __int16  uint16;
+    typedef __int16           int16;
+    typedef unsigned __int32  uint32;
+    typedef __int32           int32;
+    typedef unsigned __int64  uint64;
+    typedef __int64           int64;
+
     /**
      * Simple 2-component vector. When declared with Vector2<float>, this is compatible
      * with D3DXVECTOR2.
@@ -11,14 +24,23 @@ namespace Common
     template<typename T>
     struct Vector2
     {
-        T x, y;
+        union
+        {
+            struct { T x, y; };
+            struct { T r, g; };
+            struct { T u, v; };
+        };
 
         Vector2()
             : x(), y()
         { };
 
-        Vector2(T val)
+        Vector2(const T & val)
             : x(val), y(val)
+        { };
+
+        Vector2(const T * val)
+            : x(val[0]), y(val[1])
         { };
 
         Vector2(T x, T y)
@@ -32,6 +54,16 @@ namespace Common
 
             return *this;
         };
+
+        Vector2<T> operator=(const T other)
+        {
+            this->x = this->y = other;
+        }
+
+        bool operator!=(const Vector2<T> other)
+        {
+            return !( *this == other );
+        }
 
         bool operator==(const Vector2<T> other)
         {
@@ -68,7 +100,6 @@ namespace Common
 #ifdef D3DX_CONVERSION_FUNCS
         operator D3DXVECTOR2()
         {
-            //return D3DXVECTOR2((float)x, (float)y);
             return *(D3DXVECTOR2*)this;
         };
 
@@ -97,14 +128,23 @@ namespace Common
     template<typename T>
     struct Vector3
     {
-        T x, y, z;
+        union
+        {
+            struct { T x, y, z; };
+            struct { T r, g, b; };
+            struct { T u, v, s; };
+        };
 
         Vector3()
             : x(), y(), z()
         { };
 
-        Vector3(T val)
+        Vector3(const T & val)
             : x(val), y(val), z(val)
+        { };
+
+        Vector3(const T * val)
+            : x(val[0]), y(val[1]), z(val[2])
         { };
 
         Vector3(T x, T y, T z)
@@ -119,6 +159,16 @@ namespace Common
 
             return *this;
         };
+
+        Vector3<T> operator=(const T other)
+        {
+            this->x = this->y = this->z = other;
+        }
+
+        bool operator!=(const Vector3<T> other)
+        {
+            return !( *this == other );
+        }
 
         bool operator==(const Vector3<T> other)
         {
@@ -179,14 +229,23 @@ namespace Common
     template<typename T>
     struct Vector4
     {
-        T x, y, z, w;
+        union
+        {
+            struct { T x, y, z, w; };
+            struct { T r, g, b, a; };
+            struct { T u, v, s, t; };
+        };
 
         Vector4()
             : x(), y(), z(), w()
         { };
 
-        Vector4(T val)
+        Vector4(const T & val)
             : x(val), y(val), z(val), w(val)
+        { };
+
+        Vector4(const T * val)
+            : x(val[0]), y(val[1]), z(val[2]), w(val[3])
         { };
 
         Vector4(T x, T y, T z, T w)
@@ -202,6 +261,16 @@ namespace Common
 
             return *this;
         };
+
+        Vector4<T> operator=(const T other)
+        {
+            this->x = this->y = this->z = this->w = other;
+        }
+
+        bool operator!=(const Vector4<T> other)
+        {
+            return !( *this == other );
+        }
 
         bool operator==(const Vector4<T> other)
         {
@@ -250,37 +319,69 @@ namespace Common
 #endif
     };
 
+    typedef Vector2<float>    fvec2;
+    typedef Vector3<float>    fvec3;
+    typedef Vector4<float>    fvec4;
+
+    typedef Vector2<uint32>   uvec2;
+    typedef Vector3<uint32>   uvec3;
+    typedef Vector4<uint32>   uvec4;
+
+    typedef Vector2<int32>    ivec2;
+    typedef Vector3<int32>    ivec3;
+    typedef Vector4<int32>    ivec4;
+
+    extern COMMON_API const fvec3 UnitX;
+    extern COMMON_API const fvec3 UnitY;
+    extern COMMON_API const fvec3 UnitZ;
+
     template<typename T>
-    struct Matrix
+    struct Matrix4x4
     {
         union
         {
-            Vector4<T> Vectors[4];
-            T Cells[4][4];
-            T Data[16];
+            T Cells[16];
+            T Data[4][4];
         };
 
-        Matrix()
+        Matrix4x4()
         {
             memset(Data, 0, sizeof(T)*16);
         }
 
-        Matrix(T value)
+        Matrix4x4(T value)
         {
             memset(Data, value, sizeof(T)*16);
         }
 
-        Matrix(T * values)
+        Matrix4x4(T * values)
         {
             memcpy(Data, values, sizeof(T)*16);
         }
 
-        Matrix(Vector4<T> * vecs)
+        Matrix4x4(Vector4<T> * vecs)
         {
-            Vectors[0] = vecs[0];
-            Vectors[1] = vecs[1];
-            Vectors[2] = vecs[2];
-            Vectors[3] = vecs[3];
+            memcpy(Data, vecs, sizeof(T)*16);
+        }
+
+        T * operator()(uint32 row)
+        {
+            return Data[row];
+        }
+
+        T operator()(uint32 row, uint32 col)
+        {
+            return Data[row][col];
+        }
+
+        Vector4<T> Row(uint32 row)
+        {
+            return Vector4<T>(Data[row][0], Data[row][1], Data[row][2], Data[row][3]);
+        }
+
+        Vector4<T> Col(uint32 col)
+        {
+            return Vector4<T>(Data[0][col], Data[1][col], Data[2][col], Data[3][col]);
         }
 
 #ifdef D3DX_CONVERSION_FUNCS
@@ -289,55 +390,66 @@ namespace Common
             return *(D3DXMATRIX*)this;
         };
 
-        Matrix<float>(D3DXMATRIX v)
+        Matrix4x4(D3DXMATRIX v)
         {
-            memcpy(mCells, v, sizeof(float)*16);
+            memcpy(Data, v, sizeof(float)*16);
         };
 #endif
     };
 
-#    define INDEX2(o, n) o[n.x][n.y]
-#    define INDEX3(o, n) o[n.x][n.y][n.z]
-#    define INDEX4(o, n) o[n.x][n.y][n.z][n.w]
+    typedef Matrix4x4<float>  fmat4x4;
+    typedef Matrix4x4<uint32> umat4x4;
+    typedef Matrix4x4<int32>  imat4x4;
 
-    typedef unsigned __int8  uint8;
-    typedef __int8           int8;
-    typedef unsigned __int16 uint16;
-    typedef __int16          int16;
-    typedef unsigned __int32 uint32;
-    typedef __int32          int32;
-    typedef unsigned __int64 uint64;
-    typedef __int64          int64;
+    struct COMMON_API Plane
+    {
+        fvec3 Normal;
+        float Offset;
 
-    typedef Vector2<float>   fvec2;
-    typedef Vector3<float>   fvec3;
-    typedef Vector4<float>   fvec4;
+        Plane()
+            : Normal(), Offset()
+        { };
 
-    typedef Vector2<uint32>  uvec2;
-    typedef Vector3<uint32>  uvec3;
-    typedef Vector4<uint32>  uvec4;
+        Plane(fvec3 normal)
+            : Normal(normal), Offset()
+        { };
 
-    typedef Vector2<int32>   ivec2;
-    typedef Vector3<int32>   ivec3;
-    typedef Vector4<int32>   ivec4;
+        Plane(fvec3 normal, float offset)
+            : Normal(normal), Offset(offset)
+        { };
 
-    typedef Matrix<float>    fmat4x4;
-    typedef Matrix<uint32>   umat4x4;
-    typedef Matrix<int32>    imat4x4;
+        int32 Clip(fvec3 minextreme, fvec3 maxextreme);
+    };
+
+    struct COMMON_API ViewFrustrum
+    {
+        Plane Planes[6];
+        fmat4x4 CurrentMatrix;
+
+        ViewFrustrum(fmat4x4 viewMatrix);
+
+        void Update(fmat4x4 * viewMatrix);
+
+        int32 Clip(fvec3 minextreme, fvec3 maxextreme);
+    };
 
     /**
      * Standard vertex format. Contains position, normal, texture and color.
      * Not compatible with DirectX without a shader.
      */
-    struct Vertex
+    struct COMMON_API Vertex
     {
-        fvec4 Position;
+        fvec3 Position;
         fvec3 Normal;
         fvec3 Texture;
         fvec4 Color;
 
         Vertex()
-            : Position(0.0f), Normal(0.0f), Texture(0.0f), Color(0.0f, 0.0f, 0.0f, 1.0f)
+            : Position(), Normal(), Texture(), Color()
+        { };
+
+        Vertex(fvec3 pos, fvec3 norm, fvec3 tex, fvec4 color)
+            : Position(pos), Normal(norm), Texture(tex), Color(color)
         { };
 
         Vertex
@@ -347,11 +459,20 @@ namespace Common
             float tu, float tv, float tw, 
             float cr, float cg, float cb, float ca
         )
-            : Position(x, y, z, 1.0f), Normal(nx, ny, nz), Texture(tu, tv, tw), Color(cr, cg, cb, ca)
+            : Position(x, y, z), Normal(nx, ny, nz), Texture(tu, tv, tw), Color(cr, cg, cb, ca)
         { };
+    };
 
-        Vertex(fvec4 pos, fvec3 norm, fvec3 tex, fvec4 color)
-            : Position(pos), Normal(norm), Texture(tex), Color(color)
-        { };
+#   define OBJECT_TYPE_UNKNOWN    0x00
+
+    class GenericObject
+    {
+    public:
+        GenericObject();
+
+        virtual uint32 GetObjectType() = 0;
+
+        virtual fvec3 GetPosition() = 0;
+        virtual fvec3 GetSize() = 0;
     };
 }

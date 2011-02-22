@@ -93,6 +93,8 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+    STEP_IN;
+
     if ( render && 
         ( msg == WM_SIZE && wParam == SIZE_MINIMIZED ) ||
         ( msg == WM_ENTERSIZEMOVE ) || ( msg == WM_ENTERMENULOOP ) )
@@ -127,10 +129,14 @@ LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
 
     return DefWindowProc(hWnd, msg, wParam, lParam);
+
+    STEP_OUT;
 }
 
 void Input(float delta)
 {
+    STEP_IN;
+
     input->Poll();
 
     if ( input->KeyDown(DIK_ESCAPE) )
@@ -169,14 +175,26 @@ void Input(float delta)
         camera->SetPosition(translate);
     }
 
-    camera->Rotate(input->MouseX() / 10.0f, input->MouseY() / 10.0f);
+    LONG mX = input->MouseX();
+    LONG mY = input->MouseY();
+
+    if ( mX != 0 || mY != 0 )
+    {
+        camera->Rotate(mX / 10.0f, mY / 10.0f);
+    }
+
+    STEP_OUT;
 }
 
 VOID Cleanup()
 {
+    STEP_IN;
+
     engine->DestroyRenderObject(obj);
 
     delete engine;
 
     render = false;
+
+    STEP_OUT;
 }

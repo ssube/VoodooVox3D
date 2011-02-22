@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\WorldGenerator&quot;;&quot;$(SolutionDir)\WorldManager&quot;;&quot;$(SolutionDir)\Common&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\InstrumentationLib&quot;;&quot;$(SolutionDir)\WorldGenerator&quot;;&quot;$(SolutionDir)\WorldManager&quot;;&quot;$(SolutionDir)\Common&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dxguid.lib WorldManager.lib WorldGenerator.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dxguid.lib WorldManager.lib WorldGenerator.lib InstrumentationLib.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(TargetDir)&quot;"
 				GenerateDebugInformation="true"
@@ -118,7 +118,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\WorldGenerator&quot;;&quot;$(SolutionDir)\WorldManager&quot;;&quot;$(SolutionDir)\Common&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\InstrumentationLib&quot;;&quot;$(SolutionDir)\WorldGenerator&quot;;&quot;$(SolutionDir)\WorldManager&quot;;&quot;$(SolutionDir)\Common&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -138,7 +138,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dxguid.lib WorldManager.lib WorldGenerator.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dxguid.lib WorldManager.lib WorldGenerator.lib InstrumentationLib.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(TargetDir)&quot;"
 				GenerateDebugInformation="true"

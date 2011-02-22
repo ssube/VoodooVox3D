@@ -141,15 +141,17 @@ Block * World::GetBlock(fvec3 pos)
 
 void World::GenerateGeometry(uvec3 position)
 {
-    size_t lodOffset[4], lodVCount[4];
+    using namespace Common;
+
+    uint32 lodOffset[LOD_COUNT], lodVCount[LOD_COUNT];
 
     mGeometryVector.clear();
 
-    for ( size_t lod = 0; lod < LOD_COUNT; ++lod )
+    for ( uint32 lod = 0; lod < LOD_COUNT; ++lod )
     {
         lodOffset[lod] = mGeometryVector.size();
 
-        uvec3 blockpos(0);
+        Common::uvec3 blockpos;
 
         for (blockpos.x = CHUNK_BLOCKS*position.x; blockpos.x < CHUNK_BLOCKS*(position.x+1); blockpos.x += pow(2.0f, (int)lod))
         {
@@ -168,10 +170,10 @@ void World::GenerateGeometry(uvec3 position)
     INDEX3(mObjects, position)->SetGeometry(mGeometryVector.size(), lodOffset, lodVCount, mGeometryVector.begin()._Myptr); // Cross dependency
 }
 
-void World::ProcessPoint(size_t lod, uvec3 position, uvec3 chunk)
+void World::ProcessPoint(uint32 lod, uvec3 position, uvec3 chunk)
 {
     // Flag names and chunk sizes
-    int minSize = 0, maxSize = 3;
+    int32 minSize = 0, maxSize = 3;
 
     Block * block = INDEX3(mBlocks, position);
 
@@ -264,9 +266,9 @@ void World::ProcessPoint(size_t lod, uvec3 position, uvec3 chunk)
 
     // Calculate the offset and positions
     float offset = BLOCK_SIZE * (lod + 1);
-    float px = (position.x * BLOCK_SIZE) - ( chunk.x * CHUNK_SIZE );
-    float py = (position.y * BLOCK_SIZE) - ( chunk.y * CHUNK_SIZE );
-    float pz = (position.z * BLOCK_SIZE) - ( chunk.z * CHUNK_SIZE );
+    float px = ( position.x * BLOCK_SIZE ) - ( chunk.x * CHUNK_SIZE );
+    float py = ( position.y * BLOCK_SIZE ) - ( chunk.y * CHUNK_SIZE );
+    float pz = ( position.z * BLOCK_SIZE ) - ( chunk.z * CHUNK_SIZE );
 
     // Now, build geometry. We'll test each of the 6 surfaces and create a quad
     // if one should exist. The important thing here is to make sure the quad

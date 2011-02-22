@@ -136,13 +136,20 @@ namespace Common
                 x.w >= bottom && x.w < top );
         }
 
-        unsigned long COMMON_API DXColor(fvec4 Color);
+        unsigned long COMMON_API PackColor(fvec4 Color);
+        fvec4 COMMON_API UnpackColor(unsigned long Color);
 
         float COMMON_API LengthSq(fvec2 a);
 
         float COMMON_API LengthSq(fvec3 a);
 
         float COMMON_API LengthSq(fvec4 a);
+
+        template<typename T>
+        T COMMON_API Dot(Vector3<T> a, Vector3<T> b)
+        {
+            return ( a.x * b.x + a.y * b.y + a.z * b.z );
+        }
 
         template<typename T>
         float DistSq(T a, T b)

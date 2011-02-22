@@ -7,7 +7,7 @@ RenderObject::RenderObject
     LPDIRECT3DDEVICE9 device, 
     LPDIRECT3DVERTEXDECLARATION9 vertDecl
 )
-    : mDevice(device), mVertDecl(vertDecl), mVertBuffer(NULL)
+    : mDevice(device), mVertDecl(vertDecl), mVertBuffer(NULL), mHasGeometry(false), mVisible(true), mOccluded(false)
 {
     ZeroMemory(mVertOffset, sizeof(size_t) * 4);
     ZeroMemory(mVertCount, sizeof(size_t) * 4);
@@ -50,38 +50,61 @@ RenderObject::~RenderObject(void)
     }
 }
 
-void RenderObject::SetLOD(size_t lod)
+bool RenderObject::GetVisible()
 {
-    mLOD = lod;
+    return ( mVisible && mHasGeometry && !mOccluded );
 }
 
-size_t RenderObject::GetLOD()
+int32 RenderObject::GetLOD()
 {
     return mLOD;
 }
 
-void RenderObject::Render(size_t lod)
+fvec3 RenderObject::GetPosition()
 {
-    if ( ! mHasGeometry ) return;
-    if ( ! mVertBuffer ) return;
-
-    mDevice->SetTransform(D3DTS_WORLD, &mTransform);
-
-    //if ( SUCCEEDED(mDevice->BeginScene()) )
-    //{
-        mDevice->SetStreamSource(0, mVertBuffer, sizeof(Vertex) * mVertOffset[lod], sizeof(Vertex));
-        mDevice->SetVertexDeclaration(mVertDecl);
-
-        mDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, mVertCount[lod] / 3);
-
-    //    mDevice->EndScene();
-    //}
+    return mPosition;
 }
 
-void RenderObject::SetGeometry(size_t total, size_t * offsets, size_t * counts, Vertex * verts)
+fmat4x4 RenderObject::GetTransform()
 {
-    memcpy(mVertOffset, offsets, sizeof(size_t) * LOD_COUNT);
-    memcpy(mVertCount,  counts,  sizeof(size_t) * LOD_COUNT);
+    return mTransform;
+}
+
+void RenderObject::SetVisible(bool visible)
+{
+    mVisible = visible;
+}
+
+void RenderObject::SetLOD(int32 lod)
+{
+    mLOD = lod;
+}
+
+void RenderObject::SetPosition(fvec3 pos)
+{
+    mPosition = pos;
+    D3DXMatrixTranslation(&mTransform, pos.x, pos.y, pos.z);
+}
+
+void RenderObject::SetTransform(fmat4x4 trans)
+{
+    mTransform = trans;
+}
+
+size_t RenderObject::GetVertCount(int32 lod)
+{
+    return mVertCount[lod];
+}
+
+size_t RenderObject::GetVertOffset(int32 lod)
+{
+    return mVertOffset[lod];
+}
+
+void RenderObject::SetGeometry(uint32 total, uint32 * offsets, uint32 * counts, Vertex * verts)
+{
+    memcpy(mVertOffset, offsets, sizeof(uint32) * LOD_COUNT);
+    memcpy(mVertCount,  counts,  sizeof(uint32) * LOD_COUNT);
 
     // Check for counts
     if ( total == 0 )
@@ -112,74 +135,43 @@ void RenderObject::SetGeometry(size_t total, size_t * offsets, size_t * counts, 
     }
 }
 
-void RenderObject::SetOcclusionData(LPDIRECT3DVERTEXBUFFER9 buffer, LPDIRECT3DVERTEXDECLARATION9 decl)
+void RenderObject::Render(int32 lod)
 {
-    //mOcclGeometry = buffer;
-    //mVertOcclDecl = decl;
+    using namespace Common::Math;
 
-    //mOcclGeometry->AddRef();
-    //mVertOcclDecl->AddRef();
+    int32 clod = ( lod == -1 ) ? mLOD : Clamp(0, LOD_COUNT, lod);
+
+    if ( this->mVertCount[0] == 0 ) return;
+
+    mDevice->SetTransform(D3DTS_WORLD, &mTransform);
+
+    mDevice->SetStreamSource(0, mVertBuffer, mVertOffset[0] * sizeof(Vertex), sizeof(Vertex));
+    mDevice->SetVertexDeclaration(mVertDecl);
+
+    mDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, mVertCount[0] / 3);
 }
 
-/*void RenderObject::SetTransform(D3DXMATRIX trans)
+uint32 RenderObject::UpdateOcclusion()
 {
-    mTransform = trans;
-}*/
-
-
-void RenderObject::SetPosition(fvec3 pos)
-{
-    mPosition = pos;
-    D3DXMatrixTranslation(&mTransform, pos.x, pos.y, pos.z);
-}
-
-fvec3 RenderObject::GetPosition()
-{
-    return mPosition;
-}
-
-size_t RenderObject::GetVertCount(size_t lod)
-{
-    return mVertCount[lod];
-}
-
-D3DXMATRIX * RenderObject::GetTransform()
-{
-    return &mTransform;
-}
-
-bool RenderObject::GetVisible()
-{
-    return ( mHasGeometry && !mOccluded );
-}
-
-void RenderObject::UpdateOcclusion()
-{
-    if ( !mHasGeometry )
+    if ( !mVisible || !mHasGeometry )
     {
         mOccluded = true;
-        return;
+        return 0;
     }
 
-    DWORD pixels;
+    DWORD pixels = 0;
     HRESULT queryDone = mOcclQuery->GetData(&pixels, sizeof(DWORD), 0);
 
     if ( queryDone == S_OK )
     {
-        // Process
-        mOccluded = !( pixels > 0 );
+        mOccluded = ( pixels < 8 );
     }
 
     mOcclQuery->Issue(D3DISSUE_BEGIN);
 
-    mDevice->SetTransform(D3DTS_WORLD, &mTransform);
-
-    mDevice->SetStreamSource(0, mVertBuffer, sizeof(Vertex) * mVertOffset[0], sizeof(Vertex));
-    mDevice->SetVertexDeclaration(mVertDecl);
-
-    mDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, mVertCount[0] / 3);
+    this->Render(mLOD);
 
     mOcclQuery->Issue(D3DISSUE_END);
 
-    return;
+    return pixels;
 }

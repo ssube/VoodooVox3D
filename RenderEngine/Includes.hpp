@@ -16,6 +16,9 @@
 
 #include <dinput.h>
 
+#define IMPORT_INSTRUMENT
+#include "Instrument.hpp"
+
 // Common includes
 #define COMMON_IMPORT
 #define D3DX_CONVERSION_FUNCS

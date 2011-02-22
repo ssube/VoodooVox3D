@@ -29,14 +29,24 @@ namespace Common
             return Vector4<int>((int)floor(x.x), (int)floor(x.y), (int)floor(x.z), (int)floor(x.w));
         }
 
-        unsigned long DXColor(fvec4 Color)
+        unsigned long PackColor(fvec4 Color)
         {
             unsigned long color = 0;
-            unsigned char r = (size_t)(Color.x * 255.0f);
-            unsigned char g = (size_t)(Color.y * 255.0f);
-            unsigned char b = (size_t)(Color.z * 255.0f);
-            unsigned char a = (size_t)(Color.w * 255.0f);
+            unsigned char r = (size_t)(Color.r * 255.0f);
+            unsigned char g = (size_t)(Color.g * 255.0f);
+            unsigned char b = (size_t)(Color.b * 255.0f);
+            unsigned char a = (size_t)(Color.a * 255.0f);
             color = ( a << 24 ) | ( r << 16 ) | ( g << 8 ) | b;
+            return color;
+        }
+
+        fvec4 UnpackColor(unsigned long Color)
+        {
+            fvec4 color = 0.0f;
+            color.a = ( (Color & 0xFF000000 ) >> 24 ) / 255.0f;
+            color.r = ( (Color & 0x00FF0000 ) >> 16 ) / 255.0f;
+            color.g = ( (Color & 0x0000FF00 ) >>  8 ) / 255.0f;
+            color.b = ( (Color & 0x000000FF ) >>  0 ) / 255.0f;
             return color;
         }
 

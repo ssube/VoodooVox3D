@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="Common"
-	ProjectGUID="{7E58BDAB-A610-4F48-A1EF-426CB9481DE3}"
-	RootNamespace="Common"
+	Name="InstrumentationLib"
+	ProjectGUID="{D73E7846-9D62-451A-AD04-EB52BE625182}"
+	RootNamespace="InstrumentationLib"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;COMMON_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;INSTRUMENTATIONLIB_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -114,7 +114,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;COMMON_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;INSTRUMENTATIONLIB_EXPORTS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -171,23 +171,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\CoherentNoise.cpp"
+				RelativePath=".\dllmain.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\CommonTypes.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\NoiseBin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Octree.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\VectorMath.cpp"
+				RelativePath=".\Instrument.cpp"
 				>
 			</File>
 		</Filter>
@@ -197,31 +185,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\CoherentNoise.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CommonDefs.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CommonTypes.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Math.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\NoiseBin.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Octree.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\VectorMath.hpp"
+				RelativePath=".\Instrument.hpp"
 				>
 			</File>
 		</Filter>

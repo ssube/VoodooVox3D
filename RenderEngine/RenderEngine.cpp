@@ -33,10 +33,10 @@ RenderEngine::RenderEngine(HWND hWnd)
 
     D3DVERTEXELEMENT9 vertElems[] = 
     {
-        {0,  0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-        {0, 16, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
-        {0, 28, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
-        {0, 40, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1},
+        {0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+        {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
+        {0, 24, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+        {0, 36, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1},
         D3DDECL_END()
     };
 
@@ -89,6 +89,8 @@ RenderEngine::~RenderEngine(void)
 
 void RenderEngine::CreateOcclusionData()
 {
+    STEP_IN;
+
     /*
     D3DVERTEXELEMENT9 vertElemsOccl[] = 
     {
@@ -174,19 +176,21 @@ void RenderEngine::CreateOcclusionData()
     mOcclusionSurface->GetDesc(&desc);
 
     D3DXCreateRenderToSurface(mDevice, desc.Width, desc.Height, D3DFMT_X8R8G8B8, TRUE, D3DFMT_D24S8, &mOcclusionRTS);
+
+    STEP_OUT;
 }
 
 RenderObject * RenderEngine::CreateRenderObject()
 {
     RenderObject * obj = new RenderObject(mDevice, mVertDecl);
-    obj->SetOcclusionData(mOcclGeometry, mVertOcclDecl);
+    //obj->SetOcclusionData(mOcclGeometry, mVertOcclDecl);
     mRenderObjects.push_back(obj);
     return obj;
 }
 
 void RenderEngine::DestroyRenderObject(RenderObject * object)
 {
-    list<RenderObject*>::iterator ittr = mRenderObjects.begin();
+    std::list<RenderObject*>::iterator ittr = mRenderObjects.begin();
     while ( ittr != mRenderObjects.end() )
     {
         if ( (*ittr) == object )
@@ -200,18 +204,28 @@ void RenderEngine::DestroyRenderObject(RenderObject * object)
 
 Camera * RenderEngine::GetCamera()
 {
+    STEP_IN;
+
     return mCamera;
+
+    STEP_OUT;
 }
 
 float RenderEngine::GetFrameDelta()
 {
+    STEP_IN;
+
     return mFrameTime;
+
+    STEP_OUT;
 }
 
 fvec3 camPos;
 DWORD sortOps;
 bool DistanceSort(RenderObject * a, RenderObject * b)
 {
+    STEP_IN;
+
     using namespace Common::Math;
 
     ++sortOps;
@@ -219,6 +233,8 @@ bool DistanceSort(RenderObject * a, RenderObject * b)
     float adist = DistSq(a->GetPosition(), camPos);
     float bdist = DistSq(b->GetPosition(), camPos);
     return ( adist < bdist );
+
+    STEP_OUT;
 }
 
 char msg[256];
@@ -227,28 +243,38 @@ D3DXMATRIX lastPos;
 
 void RenderEngine::Render()
 {
+    STEP_IN;
+
     using namespace Common::Math;
 
+    mDevice->SetRenderState(D3DRS_CLIPPING, TRUE);
     mDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
     mDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
     mDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
     mDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
 
     int sortTime = -1, occlTime = -1;
-    DWORD occlOps = 0, drawOps = 0;
+    DWORD occlOps = 0, drawOps = 0; sortOps = 0;
 
     camPos = mCamera->GetPosition();
-    D3DXMATRIX * nowPos = mCamera->GetViewMatrix();
+    D3DXMATRIX * nowPos = (D3DXMATRIX*)mCamera->GetViewMatrix();
 
     if ( lastPos != *nowPos )
     {
         mDevice->SetTransform(D3DTS_VIEW, nowPos);
 
         // Depth-sort objects
-        sortOps = 0;
         sortTime = GetTickCount();
         mRenderObjects.sort(DistanceSort);
         sortTime = GetTickCount() - sortTime;
+
+        std::list<RenderObject*>::iterator lodIttr = mRenderObjects.begin();
+        while ( lodIttr != mRenderObjects.end() )
+        {
+            float dist = DistSq((*lodIttr)->GetPosition(), camPos);
+            (*lodIttr)->SetLOD(dist / ( 1000000 / LOD_COUNT ));
+            ++lodIttr;
+        }
 
         // Perform occlusion checking
         occlOps = 0;
@@ -257,16 +283,13 @@ void RenderEngine::Render()
         {
             mDevice->Clear(0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);    
 
-            list<RenderObject*>::iterator ittr = mRenderObjects.begin();
-            while ( ittr != mRenderObjects.end() )
+            std::list<RenderObject*>::iterator occlIttr = mRenderObjects.begin();
+            while ( occlIttr != mRenderObjects.end() )
             {
-                float dist = DistSq((*ittr)->GetPosition(), camPos);
-                int lod = min(dist / ( 1000000 / LOD_COUNT ), LOD_COUNT - 1);
-
-                (*ittr)->UpdateOcclusion();
+                (*occlIttr)->UpdateOcclusion();
 
                 ++occlOps;
-                ++ittr;
+                ++occlIttr;
             }
 
             mOcclusionRTS->EndScene(NULL);
@@ -287,38 +310,32 @@ void RenderEngine::Render()
 
     mDevice->BeginScene();
 
-    list<RenderObject*>::iterator ittr = mRenderObjects.begin();
-    while ( ittr != mRenderObjects.end() )
+    std::list<RenderObject*>::iterator objIttr = mRenderObjects.begin();
+    while ( objIttr != mRenderObjects.end() )
     {
         // Find distance from the camera
-        if ( (*ittr)->GetVisible() )
+        if ( (*objIttr)->GetVisible() )
         {
-            float dist = DistSq((*ittr)->GetPosition(), camPos);
-            int lod = min(dist / ( 1000000 / LOD_COUNT ), LOD_COUNT - 1);
+            int32 lod = (*objIttr)->GetLOD();
 
-            if ( lod < 0 )
-            {
-                // skip
-            } else {
-                tris += (*ittr)->GetVertCount(lod) / 3;
+            tris += (*objIttr)->GetVertCount(lod) / 3;
 
-                D3DXMATRIX mvp = (*(*ittr)->GetTransform()) * (*(mCamera->GetViewMatrix())) * mProj;
+            D3DXMATRIX mvp = ((D3DXMATRIX)(*objIttr)->GetTransform()) * (*(D3DXMATRIX*)(mCamera->GetViewMatrix())) * mProj;
 
-                mDefaultShader->SetMatrix(mShader_MVPMatrix, &mvp);
+            mDefaultShader->SetMatrix(mShader_MVPMatrix, &mvp);
 
-                mDefaultShader->Begin(&passes, NULL);
-                mDefaultShader->BeginPass(0);
+            mDefaultShader->Begin(&passes, NULL);
+            mDefaultShader->BeginPass(0);
 
-                (*ittr)->Render(lod);
+            (*objIttr)->Render(lod);
 
-                mDefaultShader->EndPass();
-                mDefaultShader->End();
+            mDefaultShader->EndPass();
+            mDefaultShader->End();
 
-                ++drawOps;
-            }
+            ++drawOps;
         }
 
-        ++ittr;
+        ++objIttr;
     }
     drawTime = GetTickCount() - drawTime;
 
@@ -343,4 +360,6 @@ void RenderEngine::Render()
         frames = 0;
         fpsTicks = mTicks + 1000;
     }
+
+    STEP_OUT;
 }
