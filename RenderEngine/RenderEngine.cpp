@@ -1,5 +1,6 @@
 #include "RenderEngine.hpp"
 
+#include "World.hpp"
 
 RenderEngine::RenderEngine(HWND hWnd)
     : mFrameTime(0.0f)
@@ -47,10 +48,9 @@ RenderEngine::RenderEngine(HWND hWnd)
         throw std::runtime_error("Error creating vertex decl.");
     }
 
-    D3DXMatrixPerspectiveFovLH(&mProj, D3DXToRadian(70.0f), 640.0f/480.0f, 1.0f, 1000.0f);
-    mDevice->SetTransform(D3DTS_PROJECTION, &mProj);
 
-    mCamera = new Camera();
+    mCamera = new Camera(1.0f, 1000.0f, 70.0f, 800.0f/600.0f);
+    mDevice->SetTransform(D3DTS_PROJECTION, (D3DXMATRIX*)mCamera->GetProjMatrix());
 
     D3DXCreateFontA(mDevice, 10, 8, 1, 0, FALSE, NULL, NULL, NULL, NULL, "Courier", &mFont);
     LONG left = 5;
@@ -76,11 +76,14 @@ RenderEngine::RenderEngine(HWND hWnd)
     mLastTicks = mTicks = GetTickCount();
 
     this->CreateOcclusionData();
+
+    mSceneTree = new Common::Trees::Octree(0.0f, WORLD_SIZE);
 }
 
 RenderEngine::~RenderEngine(void)
 {
     delete mCamera;
+    delete mSceneTree;
 
     mVertDecl->Release();
     mDevice->Release();
@@ -90,84 +93,6 @@ RenderEngine::~RenderEngine(void)
 void RenderEngine::CreateOcclusionData()
 {
     STEP_IN;
-
-    /*
-    D3DVERTEXELEMENT9 vertElemsOccl[] = 
-    {
-        {0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-        D3DDECL_END()
-    };
-
-    HRESULT hrVD = mDevice->CreateVertexDeclaration(vertElemsOccl, &mVertOcclDecl);
-
-    if ( FAILED(hrVD) )
-    {
-        throw std::runtime_error("Error creating occlusion vertex decl.");
-    }
-
-    HRESULT hrOG = mDevice->CreateVertexBuffer(36 * sizeof(fvec3), D3DUSAGE_WRITEONLY, NULL, D3DPOOL_DEFAULT, &mOcclGeometry, NULL);
-
-    float CHUNK_SIZE = 80.0f;
-
-    fvec3 occlGeom[] = 
-    {
-        // Face 1
-        fvec3(      0.0f,       0.0f,       0.0f),
-        fvec3(      0.0f,       0.0f, CHUNK_SIZE),
-        fvec3(      0.0f, CHUNK_SIZE, CHUNK_SIZE),
-        fvec3(      0.0f, CHUNK_SIZE, CHUNK_SIZE),
-        fvec3(      0.0f, CHUNK_SIZE,       0.0f),
-        fvec3(      0.0f,       0.0f,       0.0f),
-        // Face 2
-        fvec3(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE),
-        fvec3(CHUNK_SIZE,       0.0f, CHUNK_SIZE),
-        fvec3(CHUNK_SIZE,       0.0f,       0.0f),
-        fvec3(CHUNK_SIZE,       0.0f,       0.0f),
-        fvec3(CHUNK_SIZE, CHUNK_SIZE,       0.0f),
-        fvec3(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE),
-        // Face 3
-        fvec3(CHUNK_SIZE,       0.0f,       0.0f),
-        fvec3(CHUNK_SIZE,       0.0f, CHUNK_SIZE),
-        fvec3(      0.0f,       0.0f, CHUNK_SIZE),
-        fvec3(      0.0f,       0.0f, CHUNK_SIZE),
-        fvec3(      0.0f,       0.0f,       0.0f),
-        fvec3(CHUNK_SIZE,       0.0f,       0.0f),
-        // Face 4
-        fvec3(      0.0f, CHUNK_SIZE, CHUNK_SIZE),
-        fvec3(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE),
-        fvec3(CHUNK_SIZE, CHUNK_SIZE,       0.0f),
-        fvec3(CHUNK_SIZE, CHUNK_SIZE,       0.0f),
-        fvec3(      0.0f, CHUNK_SIZE,       0.0f),
-        fvec3(      0.0f, CHUNK_SIZE, CHUNK_SIZE),
-        // Face 5
-        fvec3(CHUNK_SIZE, CHUNK_SIZE,       0.0f),
-        fvec3(CHUNK_SIZE,       0.0f,       0.0f),
-        fvec3(      0.0f,       0.0f,       0.0f),
-        fvec3(      0.0f,       0.0f,       0.0f),
-        fvec3(      0.0f, CHUNK_SIZE,       0.0f),
-        fvec3(CHUNK_SIZE, CHUNK_SIZE,       0.0f),
-        // Face 6
-        fvec3(      0.0f,       0.0f, CHUNK_SIZE),
-        fvec3(CHUNK_SIZE,       0.0f, CHUNK_SIZE),
-        fvec3(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE),
-        fvec3(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE),
-        fvec3(      0.0f, CHUNK_SIZE, CHUNK_SIZE),
-        fvec3(      0.0f,       0.0f, CHUNK_SIZE),
-    };
-
-    VOID * vbVerts;
-
-    HRESULT hrVB = mOcclGeometry->Lock(0, 36 * sizeof(fvec3), &vbVerts, 0);
-
-    if ( FAILED(hrVB) )
-    {
-        throw std::runtime_error("Error locking occlusion vertex buffer.");
-    }
-
-    memcpy(vbVerts, occlGeom, 36 * sizeof(fvec3));
-
-    mOcclGeometry->Unlock();
-    */
 
     D3DXCreateTexture(mDevice, 256, 256, 1, D3DUSAGE_RENDERTARGET, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &mOcclusionTexture);
     
@@ -182,24 +107,31 @@ void RenderEngine::CreateOcclusionData()
 
 RenderObject * RenderEngine::CreateRenderObject()
 {
-    RenderObject * obj = new RenderObject(mDevice, mVertDecl);
-    //obj->SetOcclusionData(mOcclGeometry, mVertOcclDecl);
-    mRenderObjects.push_back(obj);
-    return obj;
+    return new RenderObject(mDevice, mVertDecl);
 }
 
 void RenderEngine::DestroyRenderObject(RenderObject * object)
 {
-    std::list<RenderObject*>::iterator ittr = mRenderObjects.begin();
-    while ( ittr != mRenderObjects.end() )
-    {
-        if ( (*ittr) == object )
-        {
-            mRenderObjects.erase(ittr);
-            return;
-        }
-        ++ittr;
-    }
+//     std::list<RenderObject*>::iterator ittr = mRenderObjects.begin();
+//     while ( ittr != mRenderObjects.end() )
+//     {
+//         if ( (*ittr) == object )
+//         {
+//             mRenderObjects.erase(ittr);
+//             return;
+//         }
+//         ++ittr;
+//     }
+}
+
+void RenderEngine::AddRenderObject(RenderObject * object)
+{
+    mSceneTree->AddItem((GenericObject*)object);
+}
+
+void RenderEngine::RemoveRenderObject(RenderObject * object)
+{
+    //
 }
 
 Camera * RenderEngine::GetCamera()
@@ -254,7 +186,7 @@ void RenderEngine::Render()
     mDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
 
     int sortTime = -1, occlTime = -1;
-    DWORD occlOps = 0, drawOps = 0; sortOps = 0;
+    DWORD cullTime = 0, occlOps = 0, drawOps = 0; sortOps = 0;
 
     camPos = mCamera->GetPosition();
     D3DXMATRIX * nowPos = (D3DXMATRIX*)mCamera->GetViewMatrix();
@@ -263,10 +195,15 @@ void RenderEngine::Render()
     {
         mDevice->SetTransform(D3DTS_VIEW, nowPos);
 
+        // Get the octree objects
+        cullTime = GetTickCount();
+        mSceneTree->Cull(mCamera, (std::list<GenericObject*>*)&mRenderObjects);
+        cullTime = GetTickCount() - cullTime;
+
         // Depth-sort objects
-        sortTime = GetTickCount();
-        mRenderObjects.sort(DistanceSort);
-        sortTime = GetTickCount() - sortTime;
+        //sortTime = GetTickCount();
+        //mRenderObjects.sort(DistanceSort);
+        //sortTime = GetTickCount() - sortTime;
 
         std::list<RenderObject*>::iterator lodIttr = mRenderObjects.begin();
         while ( lodIttr != mRenderObjects.end() )
@@ -318,11 +255,14 @@ void RenderEngine::Render()
         {
             int32 lod = (*objIttr)->GetLOD();
 
-            tris += (*objIttr)->GetVertCount(lod) / 3;
+            tris += (*objIttr)->GetVertCount(0) / 3;
 
-            D3DXMATRIX mvp = ((D3DXMATRIX)(*objIttr)->GetTransform()) * (*(D3DXMATRIX*)(mCamera->GetViewMatrix())) * mProj;
+            D3DXMATRIX mvp = 
+                ((D3DXMATRIX)(*objIttr)->GetTransform()) * 
+                (*(D3DXMATRIX*)(mCamera->GetViewMatrix())) * 
+                (*(D3DXMATRIX*)(mCamera->GetProjMatrix()));
 
-            mDefaultShader->SetMatrix(mShader_MVPMatrix, &mvp);
+            mDefaultShader->SetMatrix(mShader_MVPMatrix, (D3DXMATRIX*)&mvp);
 
             mDefaultShader->Begin(&passes, NULL);
             mDefaultShader->BeginPass(0);
@@ -355,7 +295,7 @@ void RenderEngine::Render()
     if ( mTicks > fpsTicks )
     {        
         float trueFPS = frames / ( ( 1000.0f + ( mTicks - fpsTicks ) ) / 1000.0f );
-        sprintf(msg, "Box Game [Native DirectX]; %u tris @ %.2f FPS\nTiming (ticks/ops): %d/%u sort; %d/%u occl; %u/%u draw\0", tris, trueFPS, sortTime, sortOps, occlTime, occlOps, drawTime, drawOps);
+        sprintf(msg, "Box Game [Native DirectX]; %u tris @ %.2f FPS\nTiming (ticks/ops): %u cull; %d/%u sort; %d/%u occl; %u/%u draw\0", tris, trueFPS, cullTime, sortTime, sortOps, occlTime, occlOps, drawTime, drawOps);
 
         frames = 0;
         fpsTicks = mTicks + 1000;

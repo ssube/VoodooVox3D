@@ -401,38 +401,6 @@ namespace Common
     typedef Matrix4x4<uint32> umat4x4;
     typedef Matrix4x4<int32>  imat4x4;
 
-    struct COMMON_API Plane
-    {
-        fvec3 Normal;
-        float Offset;
-
-        Plane()
-            : Normal(), Offset()
-        { };
-
-        Plane(fvec3 normal)
-            : Normal(normal), Offset()
-        { };
-
-        Plane(fvec3 normal, float offset)
-            : Normal(normal), Offset(offset)
-        { };
-
-        int32 Clip(fvec3 minextreme, fvec3 maxextreme);
-    };
-
-    struct COMMON_API ViewFrustrum
-    {
-        Plane Planes[6];
-        fmat4x4 CurrentMatrix;
-
-        ViewFrustrum(fmat4x4 viewMatrix);
-
-        void Update(fmat4x4 * viewMatrix);
-
-        int32 Clip(fvec3 minextreme, fvec3 maxextreme);
-    };
-
     /**
      * Standard vertex format. Contains position, normal, texture and color.
      * Not compatible with DirectX without a shader.
@@ -463,13 +431,36 @@ namespace Common
         { };
     };
 
+    class GenericCamera
+    {
+    public:
+        virtual void      Rotate(float yaw, float pitch) = 0;
+        virtual float     GetYaw() = 0;
+        virtual void      SetYaw(float yaw) = 0;
+        virtual float     GetPitch() = 0;
+        virtual void      SetPitch(float pitch) = 0;
+        virtual fvec2     GetRotation() = 0;
+        virtual void      SetRotation(fvec2 rotation) = 0;
+        virtual void      SetRotation(float yaw, float pitch) = 0;
+
+        virtual void      Translate(fvec3 translate) = 0;
+        virtual void      TranslateRaw(fvec3 translate) = 0;
+        virtual fvec3     Transform(fvec3 shift) = 0;
+
+        virtual fvec3     GetPosition() = 0;
+        virtual void      SetPosition(fvec3 pos) = 0;
+
+        virtual fmat4x4 * GetViewMatrix() = 0;
+        virtual fmat4x4 * GetProjMatrix() = 0;
+
+        virtual int32     Clip(fvec3 aabbMin, fvec3 aabbMax) = 0;
+    };
+
 #   define OBJECT_TYPE_UNKNOWN    0x00
 
     class GenericObject
     {
     public:
-        GenericObject();
-
         virtual uint32 GetObjectType() = 0;
 
         virtual fvec3 GetPosition() = 0;

@@ -18,7 +18,7 @@ namespace Common
             }
         }
 
-        uint32 Octree::GetObjectType()
+        uint32 OctreeNode::GetObjectType()
         {
             return OBJECT_TYPE_OCTREENODE;
         }
@@ -35,19 +35,18 @@ namespace Common
 
         fvec3 OctreeNode::GetSize()
         {
-            return mOrigin + mSize;
+            return mSize;
         }
 
-        fvec3 OctreeNode::SetSize(fvec3 size)
+        void OctreeNode::SetSize(fvec3 size)
         {
             mSize = size;
         }
 
         void OctreeNode::AddItem(GenericObject * object)
         {
-            mLeaf = false;
-
-            fvec3 halfSpace = mSize / 2;
+            fvec3 halfSize = mSize / 2;
+            fvec3 halfSpace = mOrigin + halfSize;
             fvec3 nodePosition = object->GetPosition();
 
             // Find out which section it should be in
@@ -62,46 +61,64 @@ namespace Common
                 if ( mChildren[section]->GetObjectType() == OBJECT_TYPE_OCTREENODE )
                 {
                     OctreeNode * childNode = (OctreeNode*)mChildren[section];
+
                     childNode->AddItem(object);
                 } else {
+                    mLeaf = false;
+
                     // Object or other leaf type, create node and shift
                     GenericObject * previous = mChildren[section];
 
-                    OctreeNode * newnode = new OctreeNode();
-                    mChildren[section] = newnode;
+                    OctreeNode * newNode = new OctreeNode();
+                    mChildren[section] = newNode;
 
-                    newnode->AddItem(previous);
-                    newnode->AddItem(object);
+                    fvec3 childPos = mOrigin;
+                    if ( section & 0x01 ) { childPos.x += halfSize.x; }
+                    if ( section & 0x02 ) { childPos.y += halfSize.y; }
+                    if ( section & 0x04 ) { childPos.z += halfSize.z; }
+
+                    newNode->SetPosition(childPos);
+                    newNode->SetSize(halfSize);
+
+                    newNode->AddItem(previous);
+                    newNode->AddItem(object);
                 }
             } else {
                 mChildren[section] = object;
 
                 if ( object->GetObjectType() == OBJECT_TYPE_OCTREENODE )
                 {
-                    OctreeNode * childNode = (OctreeNode*)mChildren[section];
+                    mLeaf = false;
 
-                    childNode->SetPosition(mOrigin + halfSpace);
-                    childNode->SetSize(halfSpace);
+                    OctreeNode * newNode = (OctreeNode*)mChildren[section];
+
+                    fvec3 childPos = mOrigin;
+                    if ( section & 0x01 ) { childPos.x += halfSize.x; }
+                    if ( section & 0x02 ) { childPos.y += halfSize.y; }
+                    if ( section & 0x04 ) { childPos.z += halfSize.z; }
+
+                    newNode->SetPosition(childPos);
+                    newNode->SetSize(halfSize);
                 }
             }
         }
 
-        void OctreeNode::Cull(ViewFrustrum * view, std::list<GenericObject*> * objectlist)
+        void OctreeNode::Cull(GenericCamera * camera, std::list<GenericObject*> * objectlist)
         {
             for ( uint32 child = 0; child < 8; ++child )
             {
                 GenericObject * workingChild = mChildren[child];
                 if ( workingChild )
                 {
-                    if ( workingChild->GetObjectType() == OBJECT_TYPE_OCTREENODE )
-                    {
-                        ((OctreeNode*)workingChild)->Cull(view, objectlist)
-                    } else {
-                        fvec3 workingPosition = workingChild->GetPosition();
-                        int32 visible = view->Clip(workingPosition, workingPosition + workingChild->GetSize());
+                    fvec3 workingPosition = workingChild->GetPosition();
+                    int32 visible = camera->Clip(workingPosition, workingPosition + workingChild->GetSize());
 
-                        if ( visible >= 0 )
+                    if ( visible >= 0 )
+                    {
+                        if ( workingChild->GetObjectType() == OBJECT_TYPE_OCTREENODE )
                         {
+                            ((OctreeNode*)workingChild)->Cull(camera, objectlist);
+                        } else {
                             objectlist->push_back(workingChild);
                         }
                     }
@@ -109,10 +126,12 @@ namespace Common
             }
         }
 
-        Octree::Octree(uint32 expectedSize)
+        Octree::Octree(fvec3 origin, fvec3 size)
             : mRoot(0)
         {
             mRoot = new OctreeNode();
+            mRoot->SetPosition(origin);
+            mRoot->SetSize(size);
         }
 
         Octree::~Octree()
@@ -140,9 +159,11 @@ namespace Common
             mRoot->AddItem(object);
         }
 
-        void Octree::Cull(ViewFrustrum * view, std::list<GenericObject*> objectlist)
+        void Octree::Cull(GenericCamera * camera, std::list<GenericObject*> * objectlist)
         {
-            return mRoot->Cull(view, objectlist);
+            objectlist->clear();
+
+            return mRoot->Cull(camera, objectlist);
         }
     }
 }

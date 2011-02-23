@@ -1,6 +1,6 @@
-
-#include "Includes.hpp"
 #include "RenderObject.hpp"
+
+#include "World.hpp"
 
 RenderObject::RenderObject
 (
@@ -50,6 +50,11 @@ RenderObject::~RenderObject(void)
     }
 }
 
+uint32 RenderObject::GetObjectType()
+{
+    return OBJECT_TYPE_RENDEROBJECT;
+}
+
 bool RenderObject::GetVisible()
 {
     return ( mVisible && mHasGeometry && !mOccluded );
@@ -63,6 +68,11 @@ int32 RenderObject::GetLOD()
 fvec3 RenderObject::GetPosition()
 {
     return mPosition;
+}
+
+fvec3 RenderObject::GetSize()
+{
+    return fvec3(CHUNK_SIZE);
 }
 
 fmat4x4 RenderObject::GetTransform()

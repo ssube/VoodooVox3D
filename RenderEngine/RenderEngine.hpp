@@ -17,6 +17,8 @@ public:
 
     virtual RenderObject * CreateRenderObject();
     virtual void DestroyRenderObject(RenderObject * object);
+    virtual void AddRenderObject(RenderObject * object);
+    virtual void RemoveRenderObject(RenderObject * object);
 
     virtual Camera * GetCamera();
 
@@ -37,8 +39,6 @@ private:
     RECT mTextRect;
     Camera * mCamera;
 
-    D3DXMATRIX mProj;
-
     LPDIRECT3DTEXTURE9 mLandTexture;
     LPDIRECT3DVERTEXDECLARATION9 mVertDecl;
 
@@ -54,5 +54,6 @@ private:
     D3DXHANDLE mShader_MVPMatrix;
 
     std::list<RenderObject*> mRenderObjects;
+    Trees::Octree * mSceneTree;
 #endif
 };

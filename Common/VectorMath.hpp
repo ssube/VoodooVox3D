@@ -146,7 +146,7 @@ namespace Common
         float COMMON_API LengthSq(fvec4 a);
 
         template<typename T>
-        T COMMON_API Dot(Vector3<T> a, Vector3<T> b)
+        T Dot(Vector3<T> a, Vector3<T> b)
         {
             return ( a.x * b.x + a.y * b.y + a.z * b.z );
         }

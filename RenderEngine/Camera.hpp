@@ -8,9 +8,10 @@
 using namespace Common;
 
 class Camera
+    : public GenericCamera
 {
 public:
-    Camera(void);
+    Camera(float nearlimit, float farlimit, float fov, float aspect);
     ~Camera(void);
 
     virtual void      Rotate(float yaw, float pitch);
@@ -30,11 +31,23 @@ public:
     virtual void      SetPosition(fvec3 pos);
 
     virtual fmat4x4 * GetViewMatrix();
+    virtual fmat4x4 * GetProjMatrix();
 
+    virtual int32     Clip(fvec3 aabbMin, fvec3 aabbMax);
+
+protected:
+    virtual void      UpdateInternals();
+    virtual void      UpdateViewMatrix();
+    virtual void      UpdateFrustrumPlanes();
+
+#ifndef RENDERENGINE_INTERFACE
 private:
     fvec3 mPos, mForward, mUp;
     float mYaw, mPitch;
 
     bool mDirty;
-    fmat4x4 mViewMat;
+    fmat4x4 mViewMat, mProjMat;
+
+    D3DXPLANE mFrustrumPlanes[6];
+#endif
 };

@@ -10,9 +10,10 @@ namespace Common
 {
     namespace Trees
     {
-        class OctreeNode
+        class COMMON_API OctreeNode
             : public GenericObject
         {
+        public:
             OctreeNode();
             ~OctreeNode();
 
@@ -21,12 +22,12 @@ namespace Common
             virtual fvec3 GetPosition();
             virtual void  SetPosition(fvec3 position);
 
-            virtual void GetSize();
-            virtual fvec3 SetSize(fvec3 size);
+            virtual fvec3 GetSize();
+            virtual void SetSize(fvec3 size);
 
             virtual void AddItem(GenericObject * object);
 
-            virtual void Cull(ViewFrustrum * view, std::list<GenericObject*> objectlist);
+            virtual void Cull(GenericCamera * camera, std::list<GenericObject*> * objectlist);
 
         private:
             fvec3 mOrigin;
@@ -36,10 +37,11 @@ namespace Common
             GenericObject * mChildren[8];
         };
 
-        class Octree
+        class COMMON_API Octree
             : public GenericObject
         {
-            Octree();
+        public:
+            Octree(fvec3 origin, fvec3 size);
             ~Octree();
 
             virtual uint32 GetObjectType();
@@ -50,7 +52,7 @@ namespace Common
             virtual void AddItem(GenericObject * object);
 
             // Returns count and array in objectlist
-            virtual void Cull(ViewFrustrum * view, std::list<GenericObject*> objectlist);
+            virtual void Cull(GenericCamera * camera, std::list<GenericObject*> * objectlist);
 
         private:
             OctreeNode * mRoot;

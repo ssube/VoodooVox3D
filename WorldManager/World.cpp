@@ -1,31 +1,42 @@
 #include "World.hpp"
 
+#include "CoherentNoise.hpp"
+
 World::World(BlockDictionary * dict, RenderEngine * render)
     : mRenderer(render), mDictionary(dict)
 {
     ZeroMemory(mBlocks, sizeof(Block*)*WORLD_BLOCKS*WORLD_BLOCKS*WORLD_BLOCKS);
 
     vector<int> idList = dict->GetTemplateList();
-    mGen = new WorldGenerator(idList);
-    WorldSegment * segment = mGen->Generate(13, uvec3(), uvec3(WORLD_BLOCKS));
+    //mGen = new WorldGenerator(idList);
+    //WorldSegment * segment = mGen->Generate(13, uvec3(), uvec3(WORLD_BLOCKS));
+
+    Noise::CoherentNoise * noiseBlock = new Noise::CoherentNoise(rand());
 
     for ( size_t x = 0; x < WORLD_BLOCKS; ++x )
     {
-        for ( size_t y = 0; y < WORLD_BLOCKS; ++y )
+        for ( size_t z = 0; z < WORLD_BLOCKS; ++z )
         {
-            for ( size_t z = 0; z < WORLD_BLOCKS; ++z )
+            float height = noiseBlock->GetOctavePoint(fvec3(x / 36.0f, z / 36.0f, 0.0f), 5);
+
+            for ( size_t y = 0; y < WORLD_BLOCKS; ++y )
             {
-                //float raw = mGen->GetPoint(x/D3DX_PI, y/D3DX_PI, z/D3DX_PI);
-                //int cid = floor(raw * idList.size());
+                float ycomp = y / 72.0f;
 
-                BlockTemplate * temp = dict->GetTemplate(idList[segment->Blocks[segment->Index(x, y, z)]]);
+                if ( ycomp < height )
+                {
+                    int type = rand() % idList.size();
+                    BlockTemplate * temp = dict->GetTemplate(idList[type]);
+                    mBlocks[x][y][z] = new Block(temp);
+                } else {
+                    mBlocks[x][y][z] = NULL;
+                }
 
-                mBlocks[x][y][z] = new Block(temp);
             }
         }
     }
 
-    delete segment;
+    delete noiseBlock;
 
     for ( size_t x = 0; x < WORLD_CHUNKS; ++x )
     {
@@ -40,6 +51,8 @@ World::World(BlockDictionary * dict, RenderEngine * render)
                 mObjects[x][y][z] = ro;
 
                 GenerateGeometry(uvec3(x, y, z));
+
+                render->AddRenderObject(ro);
             }
         }
     }

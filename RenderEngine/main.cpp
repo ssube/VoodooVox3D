@@ -34,7 +34,26 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
     engine = new RenderEngine(hWnd);
 
     // Block/chunk stuff
-    BlockDictionary * dict = BlockDictionary::FromFile("blocks.dict");
+    BlockTemplate * typeA = new BlockTemplate();
+    typeA->ID = 0;
+    typeA->Occludes = true;
+    typeA->Visible = true;
+    typeA->Texture = 1;
+    BlockTemplate * typeB = new BlockTemplate();
+    typeB->ID = 2;
+    typeB->Occludes = true;
+    typeB->Visible = true;
+    typeB->Texture = 2;
+    BlockTemplate * typeC = new BlockTemplate();
+    typeC->ID = 3;
+    typeC->Occludes = true;
+    typeC->Visible = true;
+    typeC->Texture = 3;
+    BlockDictionary * dict = new BlockDictionary(); //BlockDictionary::FromFile("blocks.dict");
+    dict->AddTemplate(typeA);
+    dict->AddTemplate(typeB);
+    dict->AddTemplate(typeC);
+
     world = new World(dict, engine);
     //world->AddDictionary(dict);
 

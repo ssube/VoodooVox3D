@@ -42,7 +42,7 @@ private:
     BlockDictionary * mDictionary;
     RenderEngine * mRenderer;
     vector<Vertex> mGeometryVector;
-    WorldGenerator * mGen;
+    //WorldGenerator * mGen;
 
     ivec3 mOriginChunk;
 };

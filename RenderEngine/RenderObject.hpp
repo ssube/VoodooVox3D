@@ -12,7 +12,7 @@
 using namespace Common;
 
 class RenderObject
-    : OctreeObject
+    : GenericObject
 {
 public:
 #ifndef RENDERENGINE_INTERFACE
@@ -20,9 +20,11 @@ public:
     ~RenderObject(void);
 #endif
 
+    virtual uint32  GetObjectType();
     virtual bool    GetVisible();
     virtual int32   GetLOD();
     virtual fvec3   GetPosition();
+    virtual fvec3   GetSize();
     virtual fmat4x4 GetTransform();
 
     virtual void    SetVisible(bool visible);
