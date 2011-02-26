@@ -1,45 +1,21 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoxGame", "RenderEngine\RenderEngine.vcproj", "{8124F62C-98DA-4E21-8B94-A0E521D51E88}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F2C82F4B-76C9-4211-A971-026A4C404CBD} = {F2C82F4B-76C9-4211-A971-026A4C404CBD}
-		{61023655-17BA-4DF7-8792-EDA3BA666EB1} = {61023655-17BA-4DF7-8792-EDA3BA666EB1}
-		{7E58BDAB-A610-4F48-A1EF-426CB9481DE3} = {7E58BDAB-A610-4F48-A1EF-426CB9481DE3}
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoxGame", "RenderEngine\RenderEngine.vcxproj", "{8124F62C-98DA-4E21-8B94-A0E521D51E88}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlockDictTest", "BlockDictTest\BlockDictTest.vcproj", "{7ACD5E41-5EC7-4ACC-B89A-65426765FD21}"
-	ProjectSection(ProjectDependencies) = postProject
-		{61023655-17BA-4DF7-8792-EDA3BA666EB1} = {61023655-17BA-4DF7-8792-EDA3BA666EB1}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlockDictTest", "BlockDictTest\BlockDictTest.vcxproj", "{7ACD5E41-5EC7-4ACC-B89A-65426765FD21}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WorldGenerator", "WorldGenerator\WorldGenerator.vcproj", "{F2C82F4B-76C9-4211-A971-026A4C404CBD}"
-	ProjectSection(ProjectDependencies) = postProject
-		{7E58BDAB-A610-4F48-A1EF-426CB9481DE3} = {7E58BDAB-A610-4F48-A1EF-426CB9481DE3}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NoiseTest", "NoiseTest\NoiseTest.vcxproj", "{EC410B41-D676-4287-B770-36DDBBD7B402}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NoiseTest", "NoiseTest\NoiseTest.vcproj", "{EC410B41-D676-4287-B770-36DDBBD7B402}"
-	ProjectSection(ProjectDependencies) = postProject
-		{7E58BDAB-A610-4F48-A1EF-426CB9481DE3} = {7E58BDAB-A610-4F48-A1EF-426CB9481DE3}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WorldManager", "WorldManager\WorldManager.vcxproj", "{61023655-17BA-4DF7-8792-EDA3BA666EB1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WorldManager", "WorldManager\WorldManager.vcproj", "{61023655-17BA-4DF7-8792-EDA3BA666EB1}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C8FEF444-855F-425B-A1BE-A8E10D507329} = {C8FEF444-855F-425B-A1BE-A8E10D507329}
-		{F2C82F4B-76C9-4211-A971-026A4C404CBD} = {F2C82F4B-76C9-4211-A971-026A4C404CBD}
-		{7E58BDAB-A610-4F48-A1EF-426CB9481DE3} = {7E58BDAB-A610-4F48-A1EF-426CB9481DE3}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxproj", "{7E58BDAB-A610-4F48-A1EF-426CB9481DE3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcproj", "{7E58BDAB-A610-4F48-A1EF-426CB9481DE3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WorldLoader", "FileSystem\FileSystem.vcxproj", "{C8FEF444-855F-425B-A1BE-A8E10D507329}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FileSystem", "FileSystem\FileSystem.vcproj", "{C8FEF444-855F-425B-A1BE-A8E10D507329}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DBCompTest", "DBCompTest\DBCompTest.vcxproj", "{9861EE2D-EE04-465F-9713-06F92E398E86}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DBCompTest", "DBCompTest\DBCompTest.vcproj", "{9861EE2D-EE04-465F-9713-06F92E398E86}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C8FEF444-855F-425B-A1BE-A8E10D507329} = {C8FEF444-855F-425B-A1BE-A8E10D507329}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InstrumentationLib", "InstrumentationLib\InstrumentationLib.vcproj", "{D73E7846-9D62-451A-AD04-EB52BE625182}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InstrumentationLib", "InstrumentationLib\InstrumentationLib.vcxproj", "{D73E7846-9D62-451A-AD04-EB52BE625182}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,16 +47,6 @@ Global
 		{7ACD5E41-5EC7-4ACC-B89A-65426765FD21}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{7ACD5E41-5EC7-4ACC-B89A-65426765FD21}.Release|Win32.ActiveCfg = Release|Win32
 		{7ACD5E41-5EC7-4ACC-B89A-65426765FD21}.Release|Win32.Build.0 = Release|Win32
-		{F2C82F4B-76C9-4211-A971-026A4C404CBD}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{F2C82F4B-76C9-4211-A971-026A4C404CBD}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{F2C82F4B-76C9-4211-A971-026A4C404CBD}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{F2C82F4B-76C9-4211-A971-026A4C404CBD}.Debug|Win32.ActiveCfg = Debug|Win32
-		{F2C82F4B-76C9-4211-A971-026A4C404CBD}.Debug|Win32.Build.0 = Debug|Win32
-		{F2C82F4B-76C9-4211-A971-026A4C404CBD}.Release|Any CPU.ActiveCfg = Release|Win32
-		{F2C82F4B-76C9-4211-A971-026A4C404CBD}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{F2C82F4B-76C9-4211-A971-026A4C404CBD}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{F2C82F4B-76C9-4211-A971-026A4C404CBD}.Release|Win32.ActiveCfg = Release|Win32
-		{F2C82F4B-76C9-4211-A971-026A4C404CBD}.Release|Win32.Build.0 = Release|Win32
 		{EC410B41-D676-4287-B770-36DDBBD7B402}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{EC410B41-D676-4287-B770-36DDBBD7B402}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{EC410B41-D676-4287-B770-36DDBBD7B402}.Debug|Mixed Platforms.Build.0 = Debug|Win32

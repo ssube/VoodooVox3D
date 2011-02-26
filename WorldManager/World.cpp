@@ -11,35 +11,53 @@ World::World(BlockDictionary * dict, RenderEngine * render)
     //mGen = new WorldGenerator(idList);
     //WorldSegment * segment = mGen->Generate(13, uvec3(), uvec3(WORLD_BLOCKS));
 
+    srand(GetTickCount() * 13);
     Noise::CoherentNoise * noiseBlock = new Noise::CoherentNoise(rand());
+    float masslimit = ( ( rand() / 32768.0f ) * 0.5f ) + 0.25f;
+    float waterlevel = ( ( rand() / 32768.0f ) * 0.2f ) + 0.4f;
+    
+    fprintf(stdout, "Generating world.\n");
+    const float wbfloat = WORLD_BLOCKS;
 
     for ( size_t x = 0; x < WORLD_BLOCKS; ++x )
     {
+        fprintf(stdout, "Generating x:%u\n", x);
+
         for ( size_t z = 0; z < WORLD_BLOCKS; ++z )
         {
-            float height = noiseBlock->GetOctavePoint(fvec3(x / 36.0f, z / 36.0f, 0.0f), 5);
+           // fprintf(stdout, "Generating z:%u, height: %f\n", x, height);
 
             for ( size_t y = 0; y < WORLD_BLOCKS; ++y )
             {
-                float ycomp = y / 72.0f;
+                float mass = noiseBlock->GetOctavePoint(fvec3(x / wbfloat, y / wbfloat, z / wbfloat), 6);
+                float height = y / wbfloat;
 
-                if ( ycomp < height )
+                mass = pow(mass, height * 3);
+
+                if ( mass < masslimit )
                 {
-                    int type = rand() % idList.size();
+                    int type = 1 + min(2, ((y / wbfloat)+0.15f) * 2);
+                    //int type = rand() % idList.size();
                     BlockTemplate * temp = dict->GetTemplate(idList[type]);
+                    mBlocks[x][y][z] = new Block(temp);
+                } else if ( height < waterlevel ) {
+                    BlockTemplate * temp = dict->GetTemplate(idList[0]);
                     mBlocks[x][y][z] = new Block(temp);
                 } else {
                     mBlocks[x][y][z] = NULL;
                 }
-
             }
         }
     }
 
     delete noiseBlock;
 
+    fprintf(stdout, "Generating geometry.\n");
+
     for ( size_t x = 0; x < WORLD_CHUNKS; ++x )
     {
+        fprintf(stdout, "Generating x:%u\n", x);
+
         for ( size_t y = 0; y < WORLD_CHUNKS; ++y )
         {
             for ( size_t z = 0; z < WORLD_CHUNKS; ++z )
@@ -152,6 +170,89 @@ Block * World::GetBlock(fvec3 pos)
     return block;
 }
 
+bool World::GetBlockNeighbors(uvec3 block, uint8 & faces, uint8 & texture)
+{
+    using namespace Common::Math;
+
+    if ( Any<uint32>(block, WORLD_BLOCKS-1 ) )
+    {
+        return false;
+    }
+
+    Block * cblock = INDEX3(mBlocks, block);
+
+    if ( !cblock )
+    {
+        return false;
+    } else if ( !cblock->Visible ) {
+        return false;
+    }
+
+    texture = cblock->Texture;
+    faces = 0;
+
+    if ( block.x > 0 )
+    {
+        cblock = mBlocks[block.x-1][block.y][block.z];
+        if ( cblock && cblock->Occludes )
+        {
+            faces |= 0x01;
+        }
+    }
+
+    if ( block.x < (WORLD_BLOCKS-1) )
+    {
+        cblock = mBlocks[block.x+1][block.y][block.z];
+        if ( cblock && cblock->Occludes )
+        {
+            faces |= 0x02;
+        }
+    }
+
+    if ( block.y > 0 )
+    {
+        cblock = mBlocks[block.x][block.y-1][block.z];
+        if ( cblock && cblock->Occludes )
+        {
+            faces |= 0x04;
+        }
+    }
+
+    if ( block.y < (WORLD_BLOCKS-1) )
+    {
+        cblock = mBlocks[block.x][block.y+1][block.z];
+        if ( cblock && cblock->Occludes )
+        {
+            faces |= 0x08;
+        }
+    }
+
+    if ( block.z > 0 )
+    {
+        cblock = mBlocks[block.x][block.y][block.z-1];
+        if ( cblock && cblock->Occludes )
+        {
+            faces |= 0x10;
+        }
+    }
+
+    if ( block.z < (WORLD_BLOCKS-1) )
+    {
+        cblock = mBlocks[block.x][block.y][block.z+1];
+        if ( cblock && cblock->Occludes )
+        {
+            faces |= 0x20;
+        }
+    }
+
+    if ( faces == 0 )
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void World::GenerateGeometry(uvec3 position)
 {
     using namespace Common;
@@ -180,7 +281,7 @@ void World::GenerateGeometry(uvec3 position)
         lodVCount[lod] = mGeometryVector.size() - lodOffset[lod];
     }
 
-    INDEX3(mObjects, position)->SetGeometry(mGeometryVector.size(), lodOffset, lodVCount, mGeometryVector.begin()._Myptr); // Cross dependency
+    INDEX3(mObjects, position)->SetGeometry(mGeometryVector.size(), lodOffset, lodVCount, mGeometryVector.begin()._Ptr); // Cross dependency
 }
 
 void World::ProcessPoint(uint32 lod, uvec3 position, uvec3 chunk)

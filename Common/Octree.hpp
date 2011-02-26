@@ -34,7 +34,8 @@ namespace Common
             fvec3 mSize;
 
             bool mLeaf;
-            GenericObject * mChildren[8];
+            GenericObject * mChildNodes[8];
+            std::list<GenericObject*> mChildObjects;
         };
 
         class COMMON_API Octree

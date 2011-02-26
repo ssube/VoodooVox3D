@@ -4,7 +4,6 @@
 #include "Includes.hpp"
 #include "Block.hpp"
 #include "BlockDictionary.hpp"
-#include "WorldGenerator.hpp"
 
 // Common includes
 #include "CommonTypes.hpp"
@@ -30,6 +29,7 @@ public:
     fvec3 UpdatePosition(fvec3 pos, fvec3 shift);
 
     //GeometryBuffer * GenerateChunkGeometry(Vector3<size_t> position);
+    bool GetBlockNeighbors(uvec3 block, uint8 & faces, uint8 & texture);
 
 private:
     void GenerateGeometry(uvec3 position);

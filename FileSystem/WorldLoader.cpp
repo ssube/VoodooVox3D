@@ -14,6 +14,9 @@ WorldLoader::WorldLoader(const char * name)
 
     rc = sqlite3_prepare_v2(mDatabase, "SELECT blocks FROM chunks WHERE ( x = ?1 AND y = ?2 AND z = ?3 );", -1, &mStmtLoad, NULL);
     rc = sqlite3_prepare_v2(mDatabase, "INSERT OR REPLACE INTO chunks ( px, py, pz, blocks ) VALUES ( ?1, ?2, ?3, ?4 );", -1, &mStmtSave, NULL);
+
+    mMeta = new WorldMeta();
+    mDict = new BlockDictionary();
 }
 
 WorldLoader::~WorldLoader()
@@ -25,9 +28,99 @@ WorldLoader::~WorldLoader()
     {
         sqlite3_close(mDatabase);
     }
+
+    delete mMeta;
+    delete mDict;
 }
 
-bool WorldLoader::LoadChunk(ivec3 position, size_t * blocks, void * data)
+int BuildWorldMetaCallback(void * meta, int columns, char ** value, char ** colname)
+{
+    WorldMeta * Meta = (WorldMeta*)meta;
+
+    if ( strcmp(colname[0], "seed") == 0 )
+    {
+        Meta->WorldSeed = atoi(value[0]);
+        return 0;
+    } else if ( strcmp(colname[0], "spawnx") == 0 ) {
+        Meta->WorldSpawn.x = atof(value[0]);
+        Meta->WorldSpawn.y = atof(value[1]);
+        Meta->WorldSpawn.z = atof(value[2]);
+        return 0;
+    } else {
+        fprintf(stderr, "SQLite Error: World loader called back with unknown stage.\n");
+        return 1;
+    }
+
+    return 0;
+}
+
+void WorldLoader::BuildWorldMeta()
+{
+    char * error;
+
+    sqlite3_exec(mDatabase, "SELECT seed FROM world LIMIT 1;", &BuildWorldMetaCallback, this->mMeta, &error);
+
+    if ( error )
+    {
+        fprintf(stderr, "SQLite Error: %s\n", error);
+        sqlite3_free(error);
+        return;
+    }
+
+    sqlite3_exec(mDatabase, "SELECT spawnx, spawny, spawnz FROM world LIMIT 1;", &BuildWorldMetaCallback, this->mMeta, &error);
+
+    if ( error )
+    {
+        fprintf(stderr, "SQLite Error: %s\n", error);
+        sqlite3_free(error);
+        return;
+    }
+}
+
+int BuildWorldDictCallback(void * dict, int columns, char ** value, char ** colname)
+{
+    BlockDictionary * dictionary = (BlockDictionary*)dict;
+
+    BlockTemplate * temp = new BlockTemplate();
+    temp->ID = atoi(value[0]);
+    strcpy_s(temp->Name, value[1]);
+    temp->Texture = atoi(value[2]);
+
+    temp->DefaultHealth = atoi(value[3]);
+
+    temp->Speed = atof(value[4]);
+
+    temp->Occludes = ( value[5][0] == '1' );
+    temp->Visible = ( value[6][0] == '1' );
+
+    dictionary->AddTemplate(temp);
+
+    return 0;
+}
+
+void WorldLoader::BuildWorldDict()
+{
+    char * error;
+
+    sqlite3_exec(mDatabase, "SELECT id, name, texture, health, speed, occludes, visible FROM blocktypes;", &BuildWorldDictCallback, this->mDict, &error);
+
+    if ( error )
+    {
+        fprintf(stderr, "SQLite Error: %s\n", error);
+        sqlite3_free(error);
+        return;
+    }
+}
+
+bool WorldLoader::MakeChunk(ivec3 position, RawChunk ** data)
+{
+    // Need to generate a chunk because it doesn't exist
+    *data = nullptr;
+
+    return true;
+}
+
+bool WorldLoader::LoadChunk(ivec3 position, RawChunk ** data)
 {
     int rc = sqlite3_bind_int(mStmtLoad, 1, position.x);
     rc = sqlite3_bind_int(mStmtLoad, 1, position.y);
@@ -41,24 +134,31 @@ bool WorldLoader::LoadChunk(ivec3 position, size_t * blocks, void * data)
 
         if ( cdata )
         {
+            RawChunk * rawChunk = new RawChunk();
+
+            rawChunk->ChunkPosition = position;
+
             int size = sqlite3_column_bytes(mStmtLoad, 0);
-            *blocks = size / 2;
+            rawChunk->DataValid = true;
+            rawChunk->BlockCount = size / 2;
 
-            memcpy(data, cdata, size);
-        } else {
-            data = NULL;
-            *blocks = 0;
+            memset(rawChunk->BlockData, 0, sizeof(uint8) * CHUNK_BLOCKS * CHUNK_BLOCKS * CHUNK_BLOCKS * 2);
+            memcpy(rawChunk->BlockData, cdata, size);
+
+            *data = rawChunk;
+
+            sqlite3_reset(mStmtLoad);
+            return true;
         }
-
-        sqlite3_reset(mStmtLoad);
-
-        return true;
-    } else {
-        return false;
     }
+
+    *data = nullptr;
+
+    sqlite3_reset(mStmtLoad);
+    return false;
 }
 
-bool WorldLoader::SaveChunk(ivec3 position, size_t * blocks, void * data)
+bool WorldLoader::SaveChunk(ivec3 position, RawChunk * data)
 {
     return false;
 }
@@ -122,7 +222,7 @@ void * WorldLoader::Compress(size_t size, void * data, size_t * finalsize)
 
     *finalsize = buffer.size();
     void * endbuffer = malloc(buffer.size());
-    memcpy(endbuffer, buffer.begin()._Myptr, *finalsize);
+    memcpy(endbuffer, buffer.begin()._Ptr, *finalsize);
     return endbuffer;
 }
 
@@ -153,6 +253,6 @@ void * WorldLoader::Decompress(size_t size, void * data, size_t * finalsize)
 
     *finalsize = buffer.size();
     void * endbuffer = malloc(buffer.size());
-    memcpy(endbuffer, buffer.begin()._Myptr, *finalsize);
+    memcpy(endbuffer, buffer.begin()._Ptr, *finalsize);
     return endbuffer;
 }

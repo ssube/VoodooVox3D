@@ -116,5 +116,18 @@ namespace Common
             float f = ( 1 - cos(ft) ) * 0.5f;
             return ( a * ( 1 - f ) ) + ( b * f );
         };
+
+        template<typename T>
+        T Abs(T x)
+        {
+            return ( x < 0 ) ? -x : x;
+        }
+
+        template<typename T>
+        bool Compare(T a, T b, T epsilon)
+        {
+            T c = Abs(a - b);
+            return ( c < epsilon );
+        }
     }
 }

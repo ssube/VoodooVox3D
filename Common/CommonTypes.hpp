@@ -97,6 +97,12 @@ namespace Common
             return Vector2<T>(this->x / value, this->y / value);
         };
 
+        template<typename S>
+        operator Vector2<S>()
+        {
+            return Vector2<S>((S)this->x, (S)this->y);
+        }
+
 #ifdef D3DX_CONVERSION_FUNCS
         operator D3DXVECTOR2()
         {
@@ -202,6 +208,12 @@ namespace Common
             return Vector3<T>(this->x / value, this->y / value, this->z / value);
         };
 
+        template<typename S>
+        operator Vector3<S>()
+        {
+            return Vector3<S>((S)this->x, (S)this->y, (S)this->z);
+        }
+
 #ifdef D3DX_CONVERSION_FUNCS
         operator D3DXVECTOR3()
         {
@@ -303,6 +315,12 @@ namespace Common
         {
             return Vector4<T>(this->x / value, this->y / value, this->z / value, this->w / value);
         };
+
+        template<typename S>
+        operator Vector4<S>()
+        {
+            return Vector4<S>((S)this->x, (S)this->y, (S)this->z, (S)this->w);
+        }
 
 #ifdef D3DX_CONVERSION_FUNCS
         operator D3DXVECTOR4()

@@ -22,6 +22,7 @@ void Input(float delta);
 void Cleanup();
 
 INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in_opt LPSTR lpCmdLine, __in int nShowCmd )
+//int main(int argc, char * argv[])
 {
     // Register the window class
     WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, MsgProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, L"BoxGame", NULL};
@@ -31,6 +32,8 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
     // Create the window
     HWND hWnd = CreateWindow(L"BoxGame", L"Box Game [DirectX Native]", WS_OVERLAPPEDWINDOW, 100, 300, 800, 600, GetDesktopWindow(), NULL, wc.hInstance, NULL);
 
+    AllocConsole();
+
     engine = new RenderEngine(hWnd);
 
     // Block/chunk stuff
@@ -38,7 +41,12 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
     typeA->ID = 0;
     typeA->Occludes = true;
     typeA->Visible = true;
-    typeA->Texture = 1;
+    typeA->Texture = 0;
+    BlockTemplate * typeD = new BlockTemplate();
+    typeD->ID = 1;
+    typeD->Occludes = true;
+    typeD->Visible = true;
+    typeD->Texture = 1;
     BlockTemplate * typeB = new BlockTemplate();
     typeB->ID = 2;
     typeB->Occludes = true;
@@ -53,6 +61,7 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
     dict->AddTemplate(typeA);
     dict->AddTemplate(typeB);
     dict->AddTemplate(typeC);
+    dict->AddTemplate(typeD);
 
     world = new World(dict, engine);
     //world->AddDictionary(dict);
@@ -65,7 +74,7 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 
     // ----------
     ShowWindow(hWnd, nShowCmd);
-    //ShowWindow(hWnd, SW_SHOWNORMAL)
+    //ShowWindow(hWnd, SW_SHOWNORMAL);
     BringWindowToTop(hWnd);
     UpdateWindow(hWnd);
 
@@ -189,9 +198,10 @@ void Input(float delta)
 
     if ( translate.x != 0 || translate.y != 0 || translate.z != 0 )
     {
-        translate = camera->Transform(translate);
-        translate = world->UpdatePosition(camera->GetPosition(), translate);
-        camera->SetPosition(translate);
+        //translate = camera->Transform(translate);
+        //translate = world->UpdatePosition(camera->GetPosition(), translate);
+        //camera->SetPosition(translate);
+        camera->Translate(translate);
     }
 
     LONG mX = input->MouseX();

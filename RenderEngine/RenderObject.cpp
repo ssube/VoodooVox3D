@@ -113,6 +113,12 @@ size_t RenderObject::GetVertOffset(int32 lod)
 
 void RenderObject::SetGeometry(uint32 total, uint32 * offsets, uint32 * counts, Vertex * verts)
 {
+    if ( mVertBuffer )
+    {
+        mVertBuffer->Release();
+        mVertBuffer = NULL;
+    }
+
     memcpy(mVertOffset, offsets, sizeof(uint32) * LOD_COUNT);
     memcpy(mVertCount,  counts,  sizeof(uint32) * LOD_COUNT);
 
@@ -174,7 +180,7 @@ uint32 RenderObject::UpdateOcclusion()
 
     if ( queryDone == S_OK )
     {
-        mOccluded = ( pixels < 8 );
+        mOccluded = ( pixels == 0 );
     }
 
     mOcclQuery->Issue(D3DISSUE_BEGIN);

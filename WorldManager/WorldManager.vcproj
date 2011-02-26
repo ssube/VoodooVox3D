@@ -189,6 +189,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GeometryBuilder.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\World.cpp"
 				>
 			</File>
@@ -208,6 +212,10 @@
 			</File>
 			<File
 				RelativePath=".\BlockTemplate.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GeometryBuilder.hpp"
 				>
 			</File>
 			<File

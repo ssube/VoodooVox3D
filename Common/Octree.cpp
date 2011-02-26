@@ -7,14 +7,14 @@ namespace Common
         OctreeNode::OctreeNode()
             : mLeaf(true), mOrigin(), mSize()
         {
-            memset(mChildren, 0, sizeof(void*) * 8);
+            memset(mChildNodes, 0, sizeof(void*) * 8);
         }
 
         OctreeNode::~OctreeNode()
         {
             for ( uint8 child = 0; child < 8; ++child )
             {
-                delete mChildren[child];
+                delete mChildNodes[child];
             }
         }
 
@@ -55,22 +55,44 @@ namespace Common
             if ( nodePosition.y > halfSpace.y ) section |= 0x02;
             if ( nodePosition.z > halfSpace.z ) section |= 0x04;
 
-            if ( mChildren[section] )
+           /*
+             if ( object->GetSize() < halfSize )
+                        {
+                            // Send it down a level
+                            if ( object->GetObjectType() == OBJECT_TYPE_OCTREENODE )
+                            {
+                                // Is a node, get-or-create the one in that section
+                                OctreeNode * node = (OctreeNode*)mChildNodes[section];
+                                if ( !node )
+                                {
+                                    mChildNodes[section] = object;
+                                } else {                        
+                                    OctreeNode * newnode = (OctreeNode*)object;
+            
+            
+            
+                            } else {
+            
+                            }
+                        }*/
+            
+
+            if ( mChildNodes[section] )
             {
                 // Check if the existing object is a node
-                if ( mChildren[section]->GetObjectType() == OBJECT_TYPE_OCTREENODE )
+                if ( mChildNodes[section]->GetObjectType() == OBJECT_TYPE_OCTREENODE )
                 {
-                    OctreeNode * childNode = (OctreeNode*)mChildren[section];
+                    OctreeNode * childNode = (OctreeNode*)mChildNodes[section];
 
                     childNode->AddItem(object);
                 } else {
                     mLeaf = false;
 
                     // Object or other leaf type, create node and shift
-                    GenericObject * previous = mChildren[section];
+                    GenericObject * previous = mChildNodes[section];
 
                     OctreeNode * newNode = new OctreeNode();
-                    mChildren[section] = newNode;
+                    mChildNodes[section] = newNode;
 
                     fvec3 childPos = mOrigin;
                     if ( section & 0x01 ) { childPos.x += halfSize.x; }
@@ -84,13 +106,13 @@ namespace Common
                     newNode->AddItem(object);
                 }
             } else {
-                mChildren[section] = object;
+                mChildNodes[section] = object;
 
                 if ( object->GetObjectType() == OBJECT_TYPE_OCTREENODE )
                 {
                     mLeaf = false;
 
-                    OctreeNode * newNode = (OctreeNode*)mChildren[section];
+                    OctreeNode * newNode = (OctreeNode*)mChildNodes[section];
 
                     fvec3 childPos = mOrigin;
                     if ( section & 0x01 ) { childPos.x += halfSize.x; }
@@ -107,7 +129,7 @@ namespace Common
         {
             for ( uint32 child = 0; child < 8; ++child )
             {
-                GenericObject * workingChild = mChildren[child];
+                GenericObject * workingChild = mChildNodes[child];
                 if ( workingChild )
                 {
                     fvec3 workingPosition = workingChild->GetPosition();
