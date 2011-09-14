@@ -32,7 +32,7 @@ namespace Common
             T value = input;
             while ( value > max )
             {
-                value -= step;
+                value = value - step;
             }
             return value;
         };
@@ -43,7 +43,7 @@ namespace Common
             T value = input;
             while ( value < min )
             {
-                value += step;
+                value = value + step;
             }
             return value;
         }
@@ -56,15 +56,15 @@ namespace Common
             {
                 while ( value < min )
                 {
-                    value += step;
+                    value = value + step;
                 }
-                return value;
             } else if ( value > max ) {
                 while ( value > max )
                 {
-                    value -= step;
+                    value = value - step;
                 }
             }
+            return value;
         }
 
         /**

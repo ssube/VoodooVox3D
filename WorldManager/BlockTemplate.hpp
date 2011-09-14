@@ -1,17 +1,19 @@
 #pragma once
 
-#include "Includes.hpp"
+#include "Interface_WorldManager.hpp"
+#define IMPORT_COMMON
+#include "CommonTypes.hpp"
 
-using namespace std;
+using namespace Common;
 
 struct WORLDMANAGER_API BlockTemplate
 {
 public:
-    unsigned char ID;
-    unsigned char DefaultHealth;
+    uint8 ID;
+    uint8 DefaultHealth;
     char Name[16];
     float Speed;
-    size_t Texture;
+    uint32 Texture;
     bool Occludes;
     bool Visible;
 };

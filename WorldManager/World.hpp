@@ -1,48 +1,66 @@
 #pragma once
 
-// Internal includes
-#include "Includes.hpp"
-#include "Block.hpp"
-#include "BlockDictionary.hpp"
+#include "Interface_WorldManager.hpp"
 
-// Common includes
+#define IMPORT_COMMON
 #include "CommonTypes.hpp"
-#include "VectorMath.hpp"
+#include "WorldDefs.hpp"
 
 // Render engine includes
-#define RENDERENGINE_INTERFACE
-#include "RenderEngine.hpp"
-#include "RenderObject.hpp"
+#define IMPORT_RENDERENGINE
+#include "Interface_RenderEngine.hpp"
 
-class __declspec(dllexport) World
+#ifndef IMPORT_WORLDMANAGER
+#   include <vector>
+#   include "BlockDictionary.hpp"
+//  World loader includes
+#   define IMPORT_WORLDLOADER
+#   include "WorldLoader.hpp"
+#   include "RenderObject.hpp"
+#endif
+
+using namespace Common;
+
+class WORLDMANAGER_API World
 {
 public:
-    World(BlockDictionary * dict, RenderEngine * render);
-    ~World(void);
+    static World * Create(RenderEngine * render);
+    void Destroy();
 
-    Block * GetBlock(fvec3 pos);
-    ivec3 GetBlockPos(fvec3 pos);
-    ivec3 GetChunkPos(fvec3 pos);
+    virtual Block * GetBlock(fvec3 pos);
+    virtual ivec3 GetBlockPos(fvec3 pos);
 
-    void Update();
-    void UpdateChunks(fvec3 pos);
-    fvec3 UpdatePosition(fvec3 pos, fvec3 shift);
+    virtual uvec3 GetRelativeChunk(fvec3 pos);
+    virtual ivec3 GetAbsoluteChunk(fvec3 pos);
+
+    virtual void Update();
+    virtual void UpdateChunks(fvec3 & pos);
+    virtual fvec3 UpdatePosition(fvec3 pos, fvec3 shift);
 
     //GeometryBuffer * GenerateChunkGeometry(Vector3<size_t> position);
-    bool GetBlockNeighbors(uvec3 block, uint8 & faces, uint8 & texture);
+    virtual bool GetBlockNeighbors(uvec3 block, uint8 & faces, uint8 & texture);
 
 private:
-    void GenerateGeometry(uvec3 position);
-    void ProcessPoint(size_t lod, uvec3 position, uvec3 chunk);
+    World(RenderEngine * render);
+    ~World(void);
 
+    virtual void GenerateGeometry(uvec3 position);
+    virtual void ProcessPoint(uint8 lod, uvec3 position, uvec3 chunk);
+
+    virtual void LoadChunk(uvec3 chunk);
+    virtual void ClearChunk(uvec3 chunk);
+    virtual void MoveChunk(uvec3 chunk, uvec3 dest);
+
+#ifndef IMPORT_WORLDMANAGER
 private:
     Block * mBlocks[WORLD_BLOCKS][WORLD_BLOCKS][WORLD_BLOCKS];
     RenderObject * mObjects[WORLD_CHUNKS][WORLD_CHUNKS][WORLD_CHUNKS];
 
     BlockDictionary * mDictionary;
-    RenderEngine * mRenderer;
+    RenderEngine * mRenderEngine;
     vector<Vertex> mGeometryVector;
-    //WorldGenerator * mGen;
+    WorldLoader * mWorldLoader;
 
     ivec3 mOriginChunk;
+#endif
 };

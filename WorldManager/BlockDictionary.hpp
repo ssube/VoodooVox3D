@@ -1,28 +1,31 @@
 #pragma once
 
-#include "Includes.hpp"
-#include "BlockTemplate.hpp"
+#include "Interface_WorldManager.hpp"
+#include <vector>
+
+#define IMPORT_COMMON
+#include "CommonTypes.hpp"
+
+#ifndef IMPORT_WORLDMANAGER
+#   include <map>
+#endif
 
 using namespace std;
+using namespace Common;
 
-class __declspec(dllexport) BlockDictionary
+class WORLDMANAGER_API BlockDictionary
 {
 public:
-    // Serialization functions
-    static BlockDictionary * Deserialize(void * buffer);
-    void * Serialize(unsigned long * size);
-
-    static BlockDictionary * FromFile(string filename);
-    void ToFile(string filename);
-
     BlockDictionary(void);
     ~BlockDictionary(void);
 
-    void AddTemplate(BlockTemplate * temp);
+    virtual void AddTemplate(BlockTemplate * temp);
 
-    vector<int> GetTemplateList();
-    BlockTemplate * GetTemplate(int id);
+    virtual vector<uint8> GetTemplateList();
+    virtual BlockTemplate * GetTemplate(uint8 id);
 
+#ifndef IMPORT_WORLDMANAGER
 private:
-    map<int, BlockTemplate*> mTemplates;
+    map<uint8, BlockTemplate*> mTemplates;
+#endif
 };

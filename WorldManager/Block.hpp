@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Includes.hpp"
+#include "Interface_WorldManager.hpp"
 #include "BlockTemplate.hpp"
 
-class __declspec(dllexport) Block :
+class WORLDMANAGER_API Block :
     public BlockTemplate
 {
 public:

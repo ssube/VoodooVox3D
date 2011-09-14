@@ -1,10 +1,12 @@
 
-#include "Includes.hpp"
+#include "Interface_RenderEngine.hpp"
+
 #include "RenderObject.hpp"
 #include "RenderEngine.hpp"
 #include "Camera.hpp"
 #include "InputManager.hpp"
 
+#define IMPORT_WORLDMANAGER
 #include "BlockDictionary.hpp"
 #include "Block.hpp"
 #include "World.hpp"
@@ -35,39 +37,11 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
     AllocConsole();
 
     engine = new RenderEngine(hWnd);
-
-    // Block/chunk stuff
-    BlockTemplate * typeA = new BlockTemplate();
-    typeA->ID = 0;
-    typeA->Occludes = true;
-    typeA->Visible = true;
-    typeA->Texture = 0;
-    BlockTemplate * typeD = new BlockTemplate();
-    typeD->ID = 1;
-    typeD->Occludes = true;
-    typeD->Visible = true;
-    typeD->Texture = 1;
-    BlockTemplate * typeB = new BlockTemplate();
-    typeB->ID = 2;
-    typeB->Occludes = true;
-    typeB->Visible = true;
-    typeB->Texture = 2;
-    BlockTemplate * typeC = new BlockTemplate();
-    typeC->ID = 3;
-    typeC->Occludes = true;
-    typeC->Visible = true;
-    typeC->Texture = 3;
-    BlockDictionary * dict = new BlockDictionary(); //BlockDictionary::FromFile("blocks.dict");
-    dict->AddTemplate(typeA);
-    dict->AddTemplate(typeB);
-    dict->AddTemplate(typeC);
-    dict->AddTemplate(typeD);
-
-    world = new World(dict, engine);
-    //world->AddDictionary(dict);
+    
+    world = World::Create(engine);
 
     camera = engine->GetCamera();
-    camera->TranslateRaw(D3DXVECTOR3(WORLD_SIZE/2, WORLD_SIZE + 10.0f, WORLD_SIZE/2));
+    camera->TranslateRaw(fvec3(WORLD_SIZE / 2.0f, WORLD_SIZE + 10.0f, WORLD_SIZE / 2.0f));
 
     input = new InputManager(hWnd);
     input->Grab();
@@ -121,8 +95,6 @@ INT WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, 
 
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    STEP_IN;
-
     if ( render && 
         ( msg == WM_SIZE && wParam == SIZE_MINIMIZED ) ||
         ( msg == WM_ENTERSIZEMOVE ) || ( msg == WM_ENTERMENULOOP ) )
@@ -157,14 +129,10 @@ LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
 
     return DefWindowProc(hWnd, msg, wParam, lParam);
-
-    STEP_OUT;
 }
 
 void Input(float delta)
 {
-    STEP_IN;
-
     input->Poll();
 
     if ( input->KeyDown(DIK_ESCAPE) )
@@ -177,7 +145,7 @@ void Input(float delta)
     float defaultSpeed = 20.0f; // two meters
     float frameTime = delta; //engine->GetFrameDelta();
 
-    D3DXVECTOR3 translate(0, 0, 0);
+    fvec3 translate(0, 0, 0);
 
     if ( input->KeyDown(DIK_W) )
     {
@@ -198,10 +166,10 @@ void Input(float delta)
 
     if ( translate.x != 0 || translate.y != 0 || translate.z != 0 )
     {
-        //translate = camera->Transform(translate);
-        //translate = world->UpdatePosition(camera->GetPosition(), translate);
-        //camera->SetPosition(translate);
-        camera->Translate(translate);
+        translate = camera->Transform(translate);
+        translate = world->UpdatePosition(camera->GetPosition(), translate);
+        camera->SetPosition(translate);
+        //camera->Translate(translate);
     }
 
     LONG mX = input->MouseX();
@@ -211,19 +179,13 @@ void Input(float delta)
     {
         camera->Rotate(mX / 10.0f, mY / 10.0f);
     }
-
-    STEP_OUT;
 }
 
 VOID Cleanup()
 {
-    STEP_IN;
-
     engine->DestroyRenderObject(obj);
 
     delete engine;
 
     render = false;
-
-    STEP_OUT;
 }

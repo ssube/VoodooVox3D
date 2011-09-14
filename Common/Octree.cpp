@@ -125,6 +125,30 @@ namespace Common
             }
         }
 
+        void OctreeNode::RemoveItem(GenericObject * object)
+        {
+            fvec3 halfSize = mSize / 2;
+            fvec3 halfSpace = mOrigin + halfSize;
+            fvec3 nodePosition = object->GetPosition();
+
+            // Find out which section it should be in
+            uint8 section = 0;
+            if ( nodePosition.x > halfSpace.x ) section |= 0x01;
+            if ( nodePosition.y > halfSpace.y ) section |= 0x02;
+            if ( nodePosition.z > halfSpace.z ) section |= 0x04;
+
+            if ( mChildNodes[section] == object )
+            {
+                mChildNodes[section] = 0;
+            } else {
+                OctreeNode * node = (OctreeNode*)mChildNodes[section];
+                if ( node )
+                {
+                    node->RemoveItem(object);
+                }
+            }
+        }
+
         void OctreeNode::Cull(GenericCamera * camera, std::list<GenericObject*> * objectlist)
         {
             for ( uint32 child = 0; child < 8; ++child )
@@ -179,6 +203,16 @@ namespace Common
         void Octree::AddItem(GenericObject * object)
         {
             mRoot->AddItem(object);
+        }
+
+        void Octree::RemoveItem(GenericObject * object)
+        {
+            if ( mRoot == object )
+            {
+                mRoot = 0;
+            } else {
+                mRoot->RemoveItem(object);
+            }
         }
 
         void Octree::Cull(GenericCamera * camera, std::list<GenericObject*> * objectlist)

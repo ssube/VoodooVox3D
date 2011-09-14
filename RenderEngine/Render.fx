@@ -23,6 +23,7 @@ struct VertexOut
 	float4 Position : POSITION;
 	float2 TexCoord : TEXCOORD0;
 	float4 Color : COLOR0;
+	float4 Normal : TEXCOORD1;
 };
 
 void vstage(in VertexIn iv, out VertexOut ov)

@@ -1,5 +1,5 @@
 
-#include "Includes.hpp"
+#include "Interface_RenderEngine.hpp"
 #include "InputManager.hpp"
 
 InputManager::InputManager(HWND hWnd)
@@ -107,17 +107,17 @@ void InputManager::Poll()
     }
 }
 
-bool InputManager::KeyDown(DWORD key)
+bool InputManager::KeyDown(uint32 key)
 {
     return ( mKeyboardState[key] & 0x80 ) == 0x80;
 }
 
-bool InputManager::KeyPress(DWORD key)
+bool InputManager::KeyPress(uint32 key)
 {
     return ( mKeyboardState[key] & 0x80 ) && !( mLastKeyboardState[key] & 0x80 );
 }
 
-bool InputManager::MouseDown(DWORD button)
+bool InputManager::MouseDown(uint32 button)
 {
     return ( mMouseState.rgbButtons[button] > 0 );
 }

@@ -1,11 +1,15 @@
 #pragma once
 
-#include "Includes.hpp"
+#ifndef IMPORT_WORLDMANAGER
 
+#include <windows.h>
+
+#include "Interface_WorldManager.hpp"
+#include "WorldDefs.hpp"
 #include "World.hpp"
 
 // Render engine includes
-#define RENDERENGINE_INTERFACE
+#define IMPORT_RENDERENGINE
 #include "RenderEngine.hpp"
 #include "RenderObject.hpp"
 
@@ -19,3 +23,5 @@ struct GeometryBuilderDesc
 };
 
 DWORD WINAPI GeometryBuilder(LPVOID lpParameter);
+
+#endif

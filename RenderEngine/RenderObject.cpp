@@ -1,5 +1,8 @@
 #include "RenderObject.hpp"
 
+#include <stdexcept>
+
+#define IMPORT_WORLDMANAGER
 #include "World.hpp"
 
 RenderObject::RenderObject
@@ -15,7 +18,7 @@ RenderObject::RenderObject
     mDevice->AddRef();
     mVertDecl->AddRef();
 
-    D3DXMatrixIdentity(&mTransform);
+    D3DXMatrixIdentity((D3DXMATRIX*)&mTransform);
 
     HRESULT hrOQ = mDevice->CreateQuery(D3DQUERYTYPE_OCCLUSION, &mOcclQuery);
 }
@@ -93,7 +96,7 @@ void RenderObject::SetLOD(int32 lod)
 void RenderObject::SetPosition(fvec3 pos)
 {
     mPosition = pos;
-    D3DXMatrixTranslation(&mTransform, pos.x, pos.y, pos.z);
+    D3DXMatrixTranslation((D3DXMATRIX*)&mTransform, pos.x, pos.y, pos.z);
 }
 
 void RenderObject::SetTransform(fmat4x4 trans)
@@ -159,7 +162,7 @@ void RenderObject::Render(int32 lod)
 
     if ( this->mVertCount[0] == 0 ) return;
 
-    mDevice->SetTransform(D3DTS_WORLD, &mTransform);
+    mDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&mTransform);
 
     mDevice->SetStreamSource(0, mVertBuffer, mVertOffset[0] * sizeof(Vertex), sizeof(Vertex));
     mDevice->SetVertexDeclaration(mVertDecl);

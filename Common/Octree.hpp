@@ -26,6 +26,7 @@ namespace Common
             virtual void SetSize(fvec3 size);
 
             virtual void AddItem(GenericObject * object);
+            virtual void RemoveItem(GenericObject * object);
 
             virtual void Cull(GenericCamera * camera, std::list<GenericObject*> * objectlist);
 
@@ -51,6 +52,7 @@ namespace Common
             virtual fvec3 GetSize();
 
             virtual void AddItem(GenericObject * object);
+            virtual void RemoveItem(GenericObject * object);
 
             // Returns count and array in objectlist
             virtual void Cull(GenericCamera * camera, std::list<GenericObject*> * objectlist);

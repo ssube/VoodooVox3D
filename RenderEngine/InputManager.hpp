@@ -1,27 +1,38 @@
-
 #pragma once
 
-#include "Includes.hpp"
+#include "Interface_RenderEngine.hpp"
 
-class InputManager
+#define IMPORT_COMMON
+#include "CommonTypes.hpp"
+
+#ifndef IMPORT_RENDERENGINE
+#   include <dinput.h>
+#endif
+
+using namespace Common;
+
+class RENDERENGINE_API InputManager
 {
 public:
+#ifndef IMPORT_RENDERENGINE
     InputManager(HWND hWnd);
     ~InputManager(void);
+#endif
 
     void Grab();
     void Drop();
 
     void Poll();
 
-    bool KeyDown(DWORD key);
-    bool KeyPress(DWORD key);
+    bool KeyDown(uint32 key);
+    bool KeyPress(uint32 key);
 
-    bool MouseDown(DWORD button);
+    bool MouseDown(uint32 button);
 
-    LONG MouseX();
-    LONG MouseY();
+    long MouseX();
+    long MouseY();
 
+#ifndef IMPORT_RENDERENGINE
 private:
     HWND mHwnd;
     LPDIRECTINPUT mDInput;
@@ -29,4 +40,5 @@ private:
 
     DIMOUSESTATE mLastMouseState, mMouseState;
     char mLastKeyboardState[256], mKeyboardState[256];
+#endif
 };

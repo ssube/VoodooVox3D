@@ -1,76 +1,38 @@
 #include "World.hpp"
+#include "Block.hpp"
 
-#include "CoherentNoise.hpp"
+#include "VectorMath.hpp"
 
-World::World(BlockDictionary * dict, RenderEngine * render)
-    : mRenderer(render), mDictionary(dict)
+#include "RenderEngine.hpp"
+
+World * World::Create(RenderEngine * render)
 {
-    ZeroMemory(mBlocks, sizeof(Block*)*WORLD_BLOCKS*WORLD_BLOCKS*WORLD_BLOCKS);
+    return new World(render);
+}
 
-    vector<int> idList = dict->GetTemplateList();
-    //mGen = new WorldGenerator(idList);
-    //WorldSegment * segment = mGen->Generate(13, uvec3(), uvec3(WORLD_BLOCKS));
+void World::Destroy()
+{
+    delete this;
+}
 
-    srand(GetTickCount() * 13);
-    Noise::CoherentNoise * noiseBlock = new Noise::CoherentNoise(rand());
-    float masslimit = ( ( rand() / 32768.0f ) * 0.5f ) + 0.25f;
-    float waterlevel = ( ( rand() / 32768.0f ) * 0.2f ) + 0.4f;
-    
-    fprintf(stdout, "Generating world.\n");
-    const float wbfloat = WORLD_BLOCKS;
+World::World(RenderEngine * render)
+    : mRenderEngine(render)
+{
+    memset(mBlocks, 0, sizeof(Block*) * WORLD_BLOCKS_COUNT);
+    memset(mObjects, 0, sizeof(RenderObject*) * WORLD_CHUNKS_COUNT);
 
-    for ( size_t x = 0; x < WORLD_BLOCKS; ++x )
+    mDictionary = new BlockDictionary();
+    mWorldLoader = WorldLoader::Create("world.db3", mDictionary);
+
+    uvec3 relativeCoord;
+
+    for ( relativeCoord.x = 0; relativeCoord.x < WORLD_CHUNKS; ++relativeCoord.x )
     {
-        fprintf(stdout, "Generating x:%u\n", x);
-
-        for ( size_t z = 0; z < WORLD_BLOCKS; ++z )
+        for ( relativeCoord.y = 0; relativeCoord.y < WORLD_CHUNKS; ++relativeCoord.y )
         {
-           // fprintf(stdout, "Generating z:%u, height: %f\n", x, height);
-
-            for ( size_t y = 0; y < WORLD_BLOCKS; ++y )
+            for ( relativeCoord.z = 0; relativeCoord.z < WORLD_CHUNKS; ++relativeCoord.z )
             {
-                float mass = noiseBlock->GetOctavePoint(fvec3(x / wbfloat, y / wbfloat, z / wbfloat), 6);
-                float height = y / wbfloat;
-
-                mass = pow(mass, height * 3);
-
-                if ( mass < masslimit )
-                {
-                    int type = 1 + min(2, ((y / wbfloat)+0.15f) * 2);
-                    //int type = rand() % idList.size();
-                    BlockTemplate * temp = dict->GetTemplate(idList[type]);
-                    mBlocks[x][y][z] = new Block(temp);
-                } else if ( height < waterlevel ) {
-                    BlockTemplate * temp = dict->GetTemplate(idList[0]);
-                    mBlocks[x][y][z] = new Block(temp);
-                } else {
-                    mBlocks[x][y][z] = NULL;
-                }
-            }
-        }
-    }
-
-    delete noiseBlock;
-
-    fprintf(stdout, "Generating geometry.\n");
-
-    for ( size_t x = 0; x < WORLD_CHUNKS; ++x )
-    {
-        fprintf(stdout, "Generating x:%u\n", x);
-
-        for ( size_t y = 0; y < WORLD_CHUNKS; ++y )
-        {
-            for ( size_t z = 0; z < WORLD_CHUNKS; ++z )
-            {
-                RenderObject * ro = render->CreateRenderObject(); // Cross dependency
-
-                ro->SetPosition(fvec3(CHUNK_SIZE * x, CHUNK_SIZE * y, CHUNK_SIZE * z)); // Cross dependency
-
-                mObjects[x][y][z] = ro;
-
-                GenerateGeometry(uvec3(x, y, z));
-
-                render->AddRenderObject(ro);
+                this->LoadChunk(relativeCoord);
             }
         }
     }
@@ -95,9 +57,15 @@ ivec3 World::GetBlockPos(fvec3 pos)
     return Common::Math::Floor(pos / BLOCK_SIZE);
 }
 
-ivec3 World::GetChunkPos(fvec3 pos)
+uvec3 World::GetRelativeChunk(fvec3 pos)
 {
-    return ( Common::Math::Floor(pos / CHUNK_SIZE) + mOriginChunk );
+    return ( Common::Math::Floor(pos / CHUNK_SIZE) );
+}
+
+ivec3 World::GetAbsoluteChunk(fvec3 pos)
+{
+    uvec3 relativeComp = GetRelativeChunk(pos);
+    return mOriginChunk + relativeComp;
 }
 
 void World::Update()
@@ -105,29 +73,42 @@ void World::Update()
     // Handle block physics
 }
 
-void World::UpdateChunks(fvec3 pos)
+void World::UpdateChunks(fvec3 & pos)
 {
     using namespace Common::Math;
 
-    // Find if we've left the central chunk
-    //bool needUpdate = All(pos, CHUNK_SIZE) && !Any(pos, CHUNK_SIZE*2);
-
     // Find the new center chunk
-    ivec3 newOrigin = GetChunkPos(pos);
+    uvec3 newOrigin = GetAbsoluteChunk(pos);
+    //uvec3 center(1, 1, 1);
 
     if ( newOrigin == mOriginChunk )
     {
         return;
     } else {
         // We need to update, find out how much
-        ivec3 shift = newOrigin - mOriginChunk;
+        mOriginChunk = newOrigin;
 
-        if ( Any(shift, WORLD_CHUNKS) )
-        {
-            // Full reload
-        } else {
-            // Partial reload
-        }
+        //if ( Any(shift, WORLD_CHUNKS) )
+        //{
+        //     Full reload
+            uvec3 chunk;
+            for ( chunk.x = 0; chunk.x < WORLD_CHUNKS; ++chunk.x )
+            {
+                for ( chunk.y = 0; chunk.y < WORLD_CHUNKS; ++chunk.y )
+                {
+                    for ( chunk.z = 0; chunk.z < WORLD_CHUNKS; ++chunk.z )
+                    {
+                        ClearChunk(chunk);
+                        LoadChunk(chunk);
+                    }
+                }
+            }
+        //} else {
+        //     Partial reload; find affected chunks and reload
+        //}
+
+        //pos = pos - ( center * CHUNK_SIZE );
+        pos = WrapBoth<fvec3>(pos, newOrigin * CHUNK_SIZE, ( newOrigin + 1.0f ) * CHUNK_SIZE, 1.0f);
     }
 }
 
@@ -144,13 +125,109 @@ fvec3 World::UpdatePosition(fvec3 pos, fvec3 shift)
     {
         fvec3 realShift = shift * newBlock->Speed;
         final = pos + realShift;
-    
-        this->UpdateChunks(final);
     } else {
         final = pos + shift;
     }
 
+    this->UpdateChunks(final);
+
     return final;
+}
+
+void World::ClearChunk(uvec3 chunk)
+{
+    uvec3 relativeBlock;
+
+    for ( relativeBlock.x = 0; relativeBlock.x < CHUNK_BLOCKS; ++relativeBlock.x )
+    {
+        for ( relativeBlock.y = 0; relativeBlock.y < CHUNK_BLOCKS; ++relativeBlock.y )
+        {
+            for ( relativeBlock.z = 0; relativeBlock.z < CHUNK_BLOCKS; ++relativeBlock.z )
+            {
+                uvec3 absoluteBlock = relativeBlock + ( chunk * CHUNK_BLOCKS );
+
+                Block * block = INDEX3(mBlocks, absoluteBlock);
+
+                if ( block )
+                {
+                    delete block;
+                }
+
+                INDEX3(mBlocks, relativeBlock) = NULL;
+            }
+        }
+    }
+}
+
+void World::LoadChunk(uvec3 relcoord)
+{
+    RawChunk chunk;
+
+    ivec3 abschunk = relcoord + mOriginChunk;
+
+    if ( mWorldLoader->LoadChunk(abschunk, &chunk) )
+    {
+        uvec3 relativeBlock;
+
+        for ( relativeBlock.x = 0; relativeBlock.x < CHUNK_BLOCKS; ++relativeBlock.x )
+        {
+            for ( relativeBlock.y = 0; relativeBlock.y < CHUNK_BLOCKS; ++relativeBlock.y )
+            {
+                for ( relativeBlock.z = 0; relativeBlock.z < CHUNK_BLOCKS; ++relativeBlock.z )
+                {
+                    uvec3 absoluteBlock = relativeBlock + ( relcoord * CHUNK_BLOCKS );
+
+                    uint8 id = INDEX3(chunk.BlockData, relativeBlock)[0];
+
+                    if ( id > 0 )
+                    {
+                        INDEX3(mBlocks, absoluteBlock) = new Block(mDictionary->GetTemplate(id));
+                    } else {
+                        INDEX3(mBlocks, absoluteBlock) = NULL;
+                    }
+                }
+            }
+        }
+    }
+
+    RenderObject * ro = INDEX3(mObjects, relcoord);
+
+    if ( ro ) { mRenderEngine->RemoveRenderObject(ro); delete ro; }
+
+    ro = mRenderEngine->CreateRenderObject();
+
+    ro->SetPosition(relcoord * CHUNK_SIZE); // Cross dependency
+
+    INDEX3(mObjects, relcoord) = ro;
+
+    mRenderEngine->AddRenderObject(ro);
+
+    GenerateGeometry(relcoord);
+}
+
+void World::MoveChunk(uvec3 chunk, uvec3 dest)
+{
+    uvec3 relativeBlock;
+
+    for ( relativeBlock.x = 0; relativeBlock.x < CHUNK_BLOCKS; ++relativeBlock.x )
+    {
+        for ( relativeBlock.y = 0; relativeBlock.y < CHUNK_BLOCKS; ++relativeBlock.y )
+        {
+            for ( relativeBlock.z = 0; relativeBlock.z < CHUNK_BLOCKS; ++relativeBlock.z )
+            {
+                uvec3 absoluteBlock = relativeBlock + ( chunk * CHUNK_BLOCKS );
+                uvec3     destBlock = relativeBlock + (  dest * CHUNK_BLOCKS );
+
+                INDEX3(mBlocks, destBlock) = INDEX3(mBlocks, absoluteBlock);
+            }
+        }
+    }
+
+    RenderObject * ro = INDEX3(mObjects, chunk);
+
+    ro->SetPosition(chunk * CHUNK_SIZE); // Cross dependency
+
+    std::swap(INDEX3(mObjects, dest), INDEX3(mObjects, chunk));
 }
 
 Block * World::GetBlock(fvec3 pos)
@@ -174,7 +251,7 @@ bool World::GetBlockNeighbors(uvec3 block, uint8 & faces, uint8 & texture)
 {
     using namespace Common::Math;
 
-    if ( Any<uint32>(block, WORLD_BLOCKS-1 ) )
+    if ( Any<uint32>(block, WORLD_BLOCKS_COUNT-1 ) )
     {
         return false;
     }
@@ -200,7 +277,7 @@ bool World::GetBlockNeighbors(uvec3 block, uint8 & faces, uint8 & texture)
         }
     }
 
-    if ( block.x < (WORLD_BLOCKS-1) )
+    if ( block.x < (WORLD_BLOCKS_COUNT-1) )
     {
         cblock = mBlocks[block.x+1][block.y][block.z];
         if ( cblock && cblock->Occludes )
@@ -218,7 +295,7 @@ bool World::GetBlockNeighbors(uvec3 block, uint8 & faces, uint8 & texture)
         }
     }
 
-    if ( block.y < (WORLD_BLOCKS-1) )
+    if ( block.y < (WORLD_BLOCKS_COUNT-1) )
     {
         cblock = mBlocks[block.x][block.y+1][block.z];
         if ( cblock && cblock->Occludes )
@@ -236,7 +313,7 @@ bool World::GetBlockNeighbors(uvec3 block, uint8 & faces, uint8 & texture)
         }
     }
 
-    if ( block.z < (WORLD_BLOCKS-1) )
+    if ( block.z < (WORLD_BLOCKS_COUNT-1) )
     {
         cblock = mBlocks[block.x][block.y][block.z+1];
         if ( cblock && cblock->Occludes )
@@ -284,7 +361,7 @@ void World::GenerateGeometry(uvec3 position)
     INDEX3(mObjects, position)->SetGeometry(mGeometryVector.size(), lodOffset, lodVCount, mGeometryVector.begin()._Ptr); // Cross dependency
 }
 
-void World::ProcessPoint(uint32 lod, uvec3 position, uvec3 chunk)
+void World::ProcessPoint(uint8 lod, uvec3 position, uvec3 chunk)
 {
     // Flag names and chunk sizes
     int32 minSize = 0, maxSize = 3;

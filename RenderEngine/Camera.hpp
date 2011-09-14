@@ -1,9 +1,12 @@
 #pragma once
 
-#ifndef RENDERENGINE_INTERFACE
-#    include "Includes.hpp"
+#include "Interface_RenderEngine.hpp"
+
+#ifndef IMPORT_RENDERENGINE
+#   include <d3dx9.h>
 #endif
 
+#define IMPORT_COMMON
 #include "CommonTypes.hpp"
 using namespace Common;
 
@@ -40,7 +43,7 @@ protected:
     virtual void      UpdateViewMatrix();
     virtual void      UpdateFrustrumPlanes();
 
-#ifndef RENDERENGINE_INTERFACE
+#ifndef IMPORT_RENDERENGINE
 private:
     fvec3 mPos, mForward, mUp;
     float mYaw, mPitch;

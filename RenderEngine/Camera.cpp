@@ -1,5 +1,8 @@
 #include "Camera.hpp"
 
+#include "Math.hpp"
+#include "VectorMath.hpp"
+
 Camera::Camera(float nearlimit, float farlimit, float fov, float aspect)
     : mDirty(true), mYaw(0.0f), mPitch(0.0f), mPos(0.0f), mForward(UnitZ), mUp(UnitY)
 {

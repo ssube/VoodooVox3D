@@ -35,7 +35,7 @@ namespace Common
             : x(), y()
         { };
 
-        Vector2(const T & val)
+        Vector2(T val)
             : x(val), y(val)
         { };
 
@@ -77,6 +77,13 @@ namespace Common
             return ( tmag < omag );
         };
 
+        bool operator>(const Vector2<T> other)
+        {
+            T tmag = ( this->x * this->x ) + ( this->y * this->y );
+            T omag = ( other.x * other.x ) + ( other.y * other.y );
+            return ( tmag > omag );
+        };
+
         Vector2<T> operator+(const Vector2<T> other)
         {
             return Vector2<T>(this->x + other.x, this->y + other.y);
@@ -104,6 +111,17 @@ namespace Common
         }
 
 #ifdef D3DX_CONVERSION_FUNCS
+        Vector2(D3DXVECTOR2 v)
+        {
+            this->x = v.x;
+            this->y = v.y;
+        }
+
+        Vector2<T> & operator=(const D3DXVECTOR2 & other)
+        {
+            memcpy(this, other, sizeof(float)*2);
+        };
+
         operator D3DXVECTOR2()
         {
             return *(D3DXVECTOR2*)this;
@@ -117,12 +135,6 @@ namespace Common
         operator D3DXVECTOR4()
         {
             return D3DXVECTOR4((float)x, (float)y, 0.0f, 1.0f);
-        };
-
-        Vector2(D3DXVECTOR2 v)
-            : x(v.x), y(v.y)
-        {
-
         };
 #endif
     };
@@ -145,7 +157,7 @@ namespace Common
             : x(), y(), z()
         { };
 
-        Vector3(const T & val)
+        Vector3(T val)
             : x(val), y(val), z(val)
         { };
 
@@ -188,6 +200,13 @@ namespace Common
             return ( tmag < omag );
         };
 
+        bool operator>(const Vector3<T> other)
+        {
+            T tmag = ( this->x * this->x ) + ( this->y * this->y ) + ( this->z * this->z );
+            T omag = ( other.x * other.x ) + ( other.y * other.y ) + ( other.z * other.z );
+            return ( tmag > omag );
+        };
+
         Vector3<T> operator+(const Vector3<T> other)
         {
             return Vector3<T>(this->x + other.x, this->y + other.y, this->z + other.z);
@@ -215,21 +234,26 @@ namespace Common
         }
 
 #ifdef D3DX_CONVERSION_FUNCS
+        Vector3(D3DXVECTOR3 v)
+        {
+            this->x = v.x;
+            this->y = v.y;
+            this->z = v.z;
+        }
+
+        Vector3<T> & operator=(const D3DXVECTOR3 & other)
+        {
+            memcpy(this, other, sizeof(float)*3);
+        };
+
         operator D3DXVECTOR3()
         {
-            //return D3DXVECTOR3((float)x, (float)y, (float)z);
             return *(D3DXVECTOR3*)this;
         };
 
         operator D3DXVECTOR4()
         {
             return D3DXVECTOR4((float)x, (float)y, (float)z, 1.0f);
-        };
-
-        Vector3(D3DXVECTOR3 v)
-            : x(v.x), y(v.y), z(v.z)
-        {
-
         };
 #endif
     };
@@ -252,7 +276,7 @@ namespace Common
             : x(), y(), z(), w()
         { };
 
-        Vector4(const T & val)
+        Vector4(T val)
             : x(val), y(val), z(val), w(val)
         { };
 
@@ -296,6 +320,13 @@ namespace Common
             return ( tmag < omag );
         };
 
+        bool operator>(const Vector4<T> other)
+        {
+            T tmag = ( this->x * this->x ) + ( this->y * this->y ) + ( this->z * this->z ) + ( this->w * this->w );
+            T omag = ( other.x * other.x ) + ( other.y * other.y ) + ( other.z * other.z ) + ( other.w * other.w );
+            return ( tmag > omag );
+        };
+
         Vector4<T> operator+(Vector4<T> other)
         {
             return Vector4<T>(this->x + other.x, this->y + other.y, this->z + other.z, this->w + other.w);
@@ -320,22 +351,29 @@ namespace Common
         operator Vector4<S>()
         {
             return Vector4<S>((S)this->x, (S)this->y, (S)this->z, (S)this->w);
-        }
-
-#ifdef D3DX_CONVERSION_FUNCS
-        operator D3DXVECTOR4()
-        {
-            //return D3DXVECTOR4((float)x, (float)y, (float)z, (float)w);
-            return *(D3DXVECTOR3*)this;
         };
 
+#ifdef D3DX_CONVERSION_FUNCS
         Vector4(D3DXVECTOR4 v)
-            : x(v.x), y(v.y), z(v.z), w(v.w)
         {
+            this->x = v.x;
+            this->y = v.y;
+            this->z = v.z;
+            this->w = v.w;
+        }
 
+        Vector4<T> & operator=(const D3DXVECTOR4 & other)
+        {
+            memcpy(this, other, sizeof(float)*4);
+        };
+
+        operator D3DXVECTOR4()
+        {
+            return *(D3DXVECTOR3*)this;
         };
 #endif
     };
+
 
     typedef Vector2<float>    fvec2;
     typedef Vector3<float>    fvec3;
@@ -392,6 +430,13 @@ namespace Common
             return Data[row][col];
         }
 
+        Matrix4x4<T> operator=(const Matrix4x4<T> other)
+        {
+            memcpy(this->Data, other.Data, sizeof(T)*16);
+
+            return *this;
+        }
+
         Vector4<T> Row(uint32 row)
         {
             return Vector4<T>(Data[row][0], Data[row][1], Data[row][2], Data[row][3]);
@@ -403,17 +448,23 @@ namespace Common
         }
 
 #ifdef D3DX_CONVERSION_FUNCS
+        Matrix4x4(D3DXMATRIX v)
+        {
+            memcpy(Data, v, sizeof(float)*16);
+        };
+
         operator D3DXMATRIX()
         {
             return *(D3DXMATRIX*)this;
         };
 
-        Matrix4x4(D3DXMATRIX v)
+        Matrix4x4<T> & operator=(const D3DXMATRIX & other)
         {
-            memcpy(Data, v, sizeof(float)*16);
+            memcpy(this, &other, sizeof(float)*16);
         };
 #endif
     };
+
 
     typedef Matrix4x4<float>  fmat4x4;
     typedef Matrix4x4<uint32> umat4x4;

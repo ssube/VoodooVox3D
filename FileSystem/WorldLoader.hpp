@@ -1,8 +1,20 @@
 #pragma once
 
-#include "Includes.hpp"
-#include "CoherentNoise.hpp"
-#include "BlockDictionary.hpp"
+#include "Interface_WorldLoader.hpp"
+
+#define IMPORT_COMMON
+#include "CommonTypes.hpp"
+
+#include "WorldDefs.hpp"
+
+#ifndef IMPORT_WORLDLOADER
+#   include <sqlite3.h>
+#   include <zlib.h>
+#   include "CoherentNoise.hpp"
+#   define IMPORT_WORLDMANAGER
+#endif
+
+#include "Interface_WorldManager.hpp"
 
 using namespace std;
 using namespace Common;
@@ -10,6 +22,7 @@ using namespace Common;
 struct WorldMeta
 {
     uint64 WorldSeed;
+    float WaterLevel;
     fvec3  WorldSpawn;
 };
 
@@ -21,23 +34,27 @@ struct RawChunk
     uint8 BlockData[CHUNK_BLOCKS][CHUNK_BLOCKS][CHUNK_BLOCKS][2];
 };
 
-class FILEMANAGER_API WorldLoader
+class WORLDLOADER_API WorldLoader
 {
 public:
-    WorldLoader(const char * name);
-    ~WorldLoader();
+    static WorldLoader * Create(const char * name, BlockDictionary * dict);
+    void Destroy();
 
-    bool MakeChunk(ivec3 position, RawChunk ** data);
-    bool LoadChunk(ivec3 position, RawChunk ** data);
-    bool SaveChunk(ivec3 position, RawChunk * data);
+    virtual bool MakeChunk(ivec3 position, RawChunk * data);
+    virtual bool LoadChunk(ivec3 position, RawChunk * data);
+    virtual bool SaveChunk(ivec3 position, RawChunk * data);
 
-    void * Compress  (uint32 size, void * data, uint32 * finalsize);
-    void * Decompress(uint32 size, void * data, uint32 * finalsize);
+    virtual void * Compress  (uint32 size, void * data, uint32 * finalsize);
+    virtual void * Decompress(uint32 size, void * data, uint32 * finalsize);
 
 protected:
-    void BuildWorldMeta();
-    void BuildWorldDict();
+    WorldLoader(const char * name, BlockDictionary * dict);
+    ~WorldLoader();
 
+    virtual void BuildWorldMeta();
+    virtual void BuildWorldDict();
+
+#ifndef IMPORT_WORLDLOADER
 private:
     sqlite3 * mDatabase;
     sqlite3_stmt * mStmtLoad, * mStmtSave;
@@ -46,4 +63,5 @@ private:
     // World meta data
     WorldMeta * mMeta;
     BlockDictionary * mDict;
+#endif
 };

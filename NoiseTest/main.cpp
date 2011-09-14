@@ -171,9 +171,11 @@ int main(int argc, char * argv[])
         {
             NoiseDesc * desc = new NoiseDesc();
 
-            wsprintf(desc->name, L"slice_%d.png", ++fileslice);
-            desc->cnoise = new Common::Noise::CoherentNoise(rand());
-            desc->pnoise = new Common::Noise::CoherentNoise(rand());
+            int seed1 = rand(), seed2 = rand();
+            wsprintf(desc->name, L"seed_%d_%d.png", seed1, seed2);
+            ++fileslice;
+            desc->cnoise = new Common::Noise::CoherentNoise(seed1);
+            desc->pnoise = new Common::Noise::CoherentNoise(seed2);
             desc->sPower = (float)( rand() % 3 );
             desc->nOctaves = 4 + ( rand() % 5 );
             desc->sOctaves = 1 + ( rand() % 4 );

@@ -1,13 +1,28 @@
 #pragma once
 
 #define LOD_COUNT 3
-#define OCCL_THRESHOLD 8
 
-#ifndef RENDERENGINE_INTERFACE
-#    include "Includes.hpp"
-#endif
+#include "Interface_RenderEngine.hpp"
 
+#define IMPORT_COMMON
 #include "CommonTypes.hpp"
+
+#ifndef IMPORT_RENDERENGINE
+#   include <windows.h>
+
+#   ifdef _DEBUG
+#       define D3D_DEBUG_INFO
+#   endif
+#   include <d3d9.h>
+#   include <d3dx9.h>
+#   include <d3dx9effect.h>
+
+#   define IMPORT_COMMON
+#   define D3DX_CONVERSION_FUNCS
+#   include "CommonTypes.hpp"
+#   include "Math.hpp"
+#   include "VectorMath.hpp"
+#endif
 
 using namespace Common;
 
@@ -15,7 +30,7 @@ class RenderObject
     : GenericObject
 {
 public:
-#ifndef RENDERENGINE_INTERFACE
+#ifndef IMPORT_RENDERENGINE
     RenderObject(LPDIRECT3DDEVICE9 device, LPDIRECT3DVERTEXDECLARATION9 vertDecl);
     ~RenderObject(void);
 #endif
@@ -39,14 +54,14 @@ public:
     virtual void    Render(int32 lod = -1);
     virtual uint32  UpdateOcclusion();
 
-#ifndef RENDERENGINE_INTERFACE
+#ifndef IMPORT_RENDERENGINE
 private:
     int32 mLOD;
     uint32 mVertCount[LOD_COUNT];
     uint32 mVertOffset[LOD_COUNT];
 
     fvec3 mPosition;
-    D3DXMATRIX mTransform;
+    fmat4x4 mTransform;
 
     bool mHasGeometry, mOccluded, mVisible;
 

@@ -1,6 +1,23 @@
 #include "WorldLoader.hpp"
 
-WorldLoader::WorldLoader(const char * name)
+#define IMPORT_WORLDMANAGER
+#include "BlockTemplate.hpp"
+#include "BlockDictionary.hpp"
+
+static const uint32 chunkBlocks = CHUNK_BLOCKS * CHUNK_BLOCKS * CHUNK_BLOCKS;
+
+WorldLoader * WorldLoader::Create(const char * name, BlockDictionary * dict)
+{
+    return new WorldLoader(name, dict);
+}
+
+void WorldLoader::Destroy()
+{
+    delete this;
+}
+
+WorldLoader::WorldLoader(const char * name, BlockDictionary * dict)
+    : mDict(dict)
 {
     int rc = sqlite3_open(name, &mDatabase);
     if ( rc )
@@ -12,11 +29,15 @@ WorldLoader::WorldLoader(const char * name)
 
     sqlite3_exec(mDatabase, "CREATE TABLE IF NOT EXISTS 'chunks';", NULL, NULL, NULL);
 
-    rc = sqlite3_prepare_v2(mDatabase, "SELECT blocks FROM chunks WHERE ( x = ?1 AND y = ?2 AND z = ?3 );", -1, &mStmtLoad, NULL);
-    rc = sqlite3_prepare_v2(mDatabase, "INSERT OR REPLACE INTO chunks ( px, py, pz, blocks ) VALUES ( ?1, ?2, ?3, ?4 );", -1, &mStmtSave, NULL);
+    rc = sqlite3_prepare_v2(mDatabase, "SELECT blocks FROM chunks WHERE ( world = ?1 AND x = ?2 AND y = ?3 AND z = ?4 );", -1, &mStmtLoad, NULL);
+    rc = sqlite3_prepare_v2(mDatabase, "INSERT OR REPLACE INTO chunks ( world, x, y, z, blocks ) VALUES ( ?1, ?2, ?3, ?4, ?5 );", -1, &mStmtSave, NULL);
 
     mMeta = new WorldMeta();
-    mDict = new BlockDictionary();
+
+    this->BuildWorldMeta();
+    this->BuildWorldDict();
+
+    mNoise = new Noise::CoherentNoise(mMeta->WorldSeed);
 }
 
 WorldLoader::~WorldLoader()
@@ -30,26 +51,18 @@ WorldLoader::~WorldLoader()
     }
 
     delete mMeta;
-    delete mDict;
+    delete mNoise;
 }
 
 int BuildWorldMetaCallback(void * meta, int columns, char ** value, char ** colname)
 {
     WorldMeta * Meta = (WorldMeta*)meta;
 
-    if ( strcmp(colname[0], "seed") == 0 )
-    {
-        Meta->WorldSeed = atoi(value[0]);
-        return 0;
-    } else if ( strcmp(colname[0], "spawnx") == 0 ) {
-        Meta->WorldSpawn.x = atof(value[0]);
-        Meta->WorldSpawn.y = atof(value[1]);
-        Meta->WorldSpawn.z = atof(value[2]);
-        return 0;
-    } else {
-        fprintf(stderr, "SQLite Error: World loader called back with unknown stage.\n");
-        return 1;
-    }
+    Meta->WorldSeed    = atoi(value[0]);
+    Meta->WaterLevel   = atof(value[1]);
+    Meta->WorldSpawn.x = atof(value[2]);
+    Meta->WorldSpawn.y = atof(value[3]);
+    Meta->WorldSpawn.z = atof(value[4]);
 
     return 0;
 }
@@ -58,16 +71,7 @@ void WorldLoader::BuildWorldMeta()
 {
     char * error;
 
-    sqlite3_exec(mDatabase, "SELECT seed FROM world LIMIT 1;", &BuildWorldMetaCallback, this->mMeta, &error);
-
-    if ( error )
-    {
-        fprintf(stderr, "SQLite Error: %s\n", error);
-        sqlite3_free(error);
-        return;
-    }
-
-    sqlite3_exec(mDatabase, "SELECT spawnx, spawny, spawnz FROM world LIMIT 1;", &BuildWorldMetaCallback, this->mMeta, &error);
+    sqlite3_exec(mDatabase, "SELECT seed, waterlevel, spawnx, spawny, spawnz FROM worlds LIMIT 1;", &BuildWorldMetaCallback, this->mMeta, &error);
 
     if ( error )
     {
@@ -112,19 +116,58 @@ void WorldLoader::BuildWorldDict()
     }
 }
 
-bool WorldLoader::MakeChunk(ivec3 position, RawChunk ** data)
+bool WorldLoader::MakeChunk(ivec3 position, RawChunk * data)
 {
-    // Need to generate a chunk because it doesn't exist
-    *data = nullptr;
+    data->DataValid = false;
+    data->ChunkPosition = position;
+    data->BlockCount = chunkBlocks;
+
+    vector<uint8> idList = mDict->GetTemplateList();
+
+    float waterlevel = mMeta->WaterLevel;
+
+    fprintf(stdout, "Generating world.\n");
+    const float wbfloat = CHUNK_BLOCKS;
+    const float chunkheight = position.y * CHUNK_SIZE;
+
+    for ( size_t x = 0; x < CHUNK_BLOCKS; ++x )
+    {
+        for ( size_t z = 0; z < CHUNK_BLOCKS; ++z )
+        {
+            for ( size_t y = 0; y < CHUNK_BLOCKS; ++y )
+            {
+                fvec3 noisepoint(( x / wbfloat ) + position.x, 0, (z/wbfloat)+position.z);
+                float hlimit = mNoise->GetOctavePoint(noisepoint, 4);
+                float height = ( y / wbfloat ) + chunkheight;
+
+                if ( height < hlimit )
+                {
+                    uint8 type = 1 + min(2.0f, ((y / wbfloat)+0.15f) * 2.0f);
+                    data->BlockData[x][y][z][0] = idList[type];
+                } else if ( height < waterlevel ) {
+                    data->BlockData[x][y][z][0] = idList[3];
+                } else {
+                    data->BlockData[x][y][z][0] = 0;
+                }
+            }
+        }
+    }
+
+    data->DataValid = true;
+
+    this->SaveChunk(position, data);
 
     return true;
 }
 
-bool WorldLoader::LoadChunk(ivec3 position, RawChunk ** data)
+bool WorldLoader::LoadChunk(ivec3 position, RawChunk * data)
 {
-    int rc = sqlite3_bind_int(mStmtLoad, 1, position.x);
-    rc = sqlite3_bind_int(mStmtLoad, 1, position.y);
-    rc = sqlite3_bind_int(mStmtLoad, 1, position.z);
+    data->DataValid = false;
+
+    int rc = sqlite3_bind_int(mStmtLoad, 1, 1);
+    rc = sqlite3_bind_int(mStmtLoad, 2, position.x);
+    rc = sqlite3_bind_int(mStmtLoad, 3, position.y);
+    rc = sqlite3_bind_int(mStmtLoad, 4, position.z);
 
     rc = sqlite3_step(mStmtLoad);
 
@@ -134,33 +177,47 @@ bool WorldLoader::LoadChunk(ivec3 position, RawChunk ** data)
 
         if ( cdata )
         {
-            RawChunk * rawChunk = new RawChunk();
-
-            rawChunk->ChunkPosition = position;
+            data->ChunkPosition = position;
 
             int size = sqlite3_column_bytes(mStmtLoad, 0);
-            rawChunk->DataValid = true;
-            rawChunk->BlockCount = size / 2;
+            data->DataValid = true;
+            data->BlockCount = size / 2;
 
-            memset(rawChunk->BlockData, 0, sizeof(uint8) * CHUNK_BLOCKS * CHUNK_BLOCKS * CHUNK_BLOCKS * 2);
-            memcpy(rawChunk->BlockData, cdata, size);
+            data->BlockCount = chunkBlocks;
 
-            *data = rawChunk;
+            memset(data->BlockData, 0, chunkBlocks * 2);
+            memcpy(data->BlockData, cdata, chunkBlocks * 2);
 
             sqlite3_reset(mStmtLoad);
+
+            data->DataValid = true;
             return true;
         }
     }
 
-    *data = nullptr;
-
     sqlite3_reset(mStmtLoad);
-    return false;
+
+    return this->MakeChunk(position, data);
 }
 
 bool WorldLoader::SaveChunk(ivec3 position, RawChunk * data)
 {
-    return false;
+    int rc = sqlite3_bind_int(mStmtLoad, 1, 1);
+    rc = sqlite3_bind_int(mStmtSave, 2, position.x);
+    rc = sqlite3_bind_int(mStmtSave, 3, position.y);
+    rc = sqlite3_bind_int(mStmtSave, 4, position.z);
+    rc = sqlite3_bind_blob(mStmtSave, 5, data->BlockData, chunkBlocks * 2, NULL);
+
+    rc = sqlite3_step(mStmtSave);
+
+    if ( rc == SQLITE_DONE )
+    {
+        sqlite3_reset(mStmtSave);
+        return true;
+    } else {
+        sqlite3_reset(mStmtSave);
+        return false;
+    }
 }
 
 void * WorldLoader::Compress(size_t size, void * data, size_t * finalsize)

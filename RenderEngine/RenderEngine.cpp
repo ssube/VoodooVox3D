@@ -1,6 +1,9 @@
 #include "RenderEngine.hpp"
 
-#include "World.hpp"
+#include "Camera.hpp"
+#include "RenderObject.hpp"
+
+#include "WorldDefs.hpp"
 
 RenderEngine::RenderEngine(HWND hWnd)
     : mFrameTime(0.0f)
@@ -92,7 +95,6 @@ RenderEngine::~RenderEngine(void)
 
 void RenderEngine::CreateOcclusionData()
 {
-    STEP_IN;
 
     D3DXCreateTexture(mDevice, 256, 256, 1, D3DUSAGE_RENDERTARGET, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &mOcclusionTexture);
     
@@ -102,8 +104,7 @@ void RenderEngine::CreateOcclusionData()
 
     D3DXCreateRenderToSurface(mDevice, desc.Width, desc.Height, D3DFMT_X8R8G8B8, TRUE, D3DFMT_D24S8, &mOcclusionRTS);
 
-    STEP_OUT;
-}
+    }
 
 RenderObject * RenderEngine::CreateRenderObject()
 {
@@ -127,37 +128,29 @@ void RenderEngine::DestroyRenderObject(RenderObject * object)
 void RenderEngine::AddRenderObject(RenderObject * object)
 {
     mSceneTree->AddItem((GenericObject*)object);
+    //mRenderObjects.push_back(object);
 }
 
 void RenderEngine::RemoveRenderObject(RenderObject * object)
 {
-    //
+    //mRenderObjects.remove_if([&](RenderObject * obj){ return (obj == object); });
+    mSceneTree->RemoveItem((GenericObject*)object);
 }
 
 Camera * RenderEngine::GetCamera()
 {
-    STEP_IN;
-
     return mCamera;
-
-    STEP_OUT;
 }
 
 float RenderEngine::GetFrameDelta()
 {
-    STEP_IN;
-
     return mFrameTime;
-
-    STEP_OUT;
 }
 
 fvec3 camPos;
 DWORD sortOps;
 bool DistanceSort(RenderObject * a, RenderObject * b)
-{
-    STEP_IN;
-
+{ 
     using namespace Common::Math;
 
     ++sortOps;
@@ -165,8 +158,6 @@ bool DistanceSort(RenderObject * a, RenderObject * b)
     float adist = DistSq(a->GetPosition(), camPos);
     float bdist = DistSq(b->GetPosition(), camPos);
     return ( adist < bdist );
-
-    STEP_OUT;
 }
 
 char msg[256];
@@ -175,8 +166,6 @@ D3DXMATRIX lastPos;
 
 void RenderEngine::Render()
 {
-    STEP_IN;
-
     using namespace Common::Math;
 
     mDevice->SetRenderState(D3DRS_CLIPPING, TRUE);
@@ -201,9 +190,9 @@ void RenderEngine::Render()
         cullTime = GetTickCount() - cullTime;
 
         // Depth-sort objects
-        //sortTime = GetTickCount();
-        //mRenderObjects.sort(DistanceSort);
-        //sortTime = GetTickCount() - sortTime;
+        sortTime = GetTickCount();
+        mRenderObjects.sort(DistanceSort);
+        sortTime = GetTickCount() - sortTime;
 
         std::list<RenderObject*>::iterator lodIttr = mRenderObjects.begin();
         while ( lodIttr != mRenderObjects.end() )
@@ -300,6 +289,4 @@ void RenderEngine::Render()
         frames = 0;
         fpsTicks = mTicks + 1000;
     }
-
-    STEP_OUT;
 }

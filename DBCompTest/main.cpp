@@ -1,7 +1,7 @@
 
 #include <time.h>
 
-#define FILEMANAGER_API
+#define WORLDLOADER_API
 #include "WorldLoader.hpp"
 
 int main(int argc, char * argv[])
